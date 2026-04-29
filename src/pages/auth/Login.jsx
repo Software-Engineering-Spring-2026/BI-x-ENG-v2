@@ -22,13 +22,29 @@ function Login() {
     admin: '/admin',
   }
 
+  const ADMIN_EMAIL = 'admin@guc.edu.eg'
+  const ADMIN_PASSWORD = 'password123'
+
   const handleSubmit = (event) => {
     event.preventDefault()
     setError('')
     setSuccess('')
 
-    seedDemoUsers()
     const normalizedEmail = email.trim().toLowerCase()
+
+    
+    if (role === 'admin') {
+      if (normalizedEmail === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        setSuccess('Login successful. Redirecting to admin dashboard...')
+        navigate(roleRoutes.admin)
+      } else {
+        setError('Invalid administrator credentials. Please check your assigned GUC email and password.')
+      }
+      return 
+    }
+
+    
+    seedDemoUsers()
     const existingUser = findUserByEmail(normalizedEmail)
 
     if (!existingUser) {
@@ -101,10 +117,11 @@ function Login() {
       </form>
 
       <div className="mt-6 border-t border-slate-200 pt-4">
+        {/* MS2 Req 4.0: Update (change) my forgotten password using an OTP */}
         <Link to="/forgot-password" className="text-sm font-medium text-blue-700 hover:text-blue-900">
           Forgot password?
         </Link>
-        <p className="text-sm font-medium text-slate-700">New to BI X ENG V2 ProjectHub?</p>
+        <p className="mt-4 text-sm font-medium text-slate-700">New to BI X ENG V2 ProjectHub?</p>
         <div className="mt-2 flex flex-wrap gap-4 text-sm">
           <Link
             to="/register-student"
@@ -118,6 +135,7 @@ function Login() {
           >
             Register Company
           </Link>
+          {/* Note: No admin registration link provided as per MS2 Requirement 2 ("Admin will NOT REGISTER") */}
         </div>
       </div>
     </div>
