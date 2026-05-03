@@ -1,0 +1,64 @@
+import { useState, useEffect } from 'react'
+import { getCurrentUser, getEmployerProfile, saveEmployerProfile } from '../../data/authStorage'
+import Button from '../../components/Button'
+
+function CompanyProfile() {
+  const user = getCurrentUser()
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({ bio: '', address: '', phone: '', website: '' })
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    const profile = getEmployerProfile(user.email)
+    if (profile) setForm(profile)
+  }, [])
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+
+  const handleSave = (e) => {
+    e.preventDefault()
+    saveEmployerProfile(user.email, form)
+    setEditing(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  const handleClear = (field) => {
+    const updated = { ...form, [field]: '' }
+    setForm(updated)
+    saveEmployerProfile(user.email, updated)
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto mt-8 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-slate-900">Company Profile</h2>
+        {!editing && <Button onClick={()=> setEditing(true)}>Edit</Button>}
+      </div>
+
+      {saved && (
+        <p className="mb-4 text-sm text-emerald-600 font-medium">Profile saved successfully!</p>
+      )}
+
+      {!editing ? (
+        <div className="space-y-4 text-sm text-slate-700">
+          <div><span className="font-semibold">Company:</span> {user.companyName}</div>
+          <div><span className="font-semibold">Email:</span> {user.email}</div>
+          <div><span className="font-semibold">Bio:</span> {form.bio || <span className="text-slate-400">Not set</span>}</div>
+          <div><span className="font-semibold">Address:</span> {form.address || <span className="text-slate-400">Not set</span>}</div>
+          <div><span className="font-semibold">Phone:</span> {form.phone || <span className="text-slate-400">Not set</span>}</div>
+          <div><span className="font-semibold">Website:</span> {form.website || <span className="text-slate-400">Not set</span>}</div>
+        </div>
+      ) : (
+        <form onSubmit={handleSave} className="space-y-4">
+          {['bio', 'address', 'phone', 'website'].map((field) => (
+            <div key={field}>
+              <label className="block text-sm font-medium text-slate-700 capitalize mb-1">
+                {field}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  name={field}
+                  value={form[field]}
+                  onChange={handleChange}
+                  className="flex-1 rounded-md border border-sla

@@ -1,0 +1,79 @@
+import { useState, useEffect } from 'react'
+import { getCurrentUser } from '../../data/authStorage'
+import Button from '../../components/Button'
+
+function CompanyLocation() {
+  const user = getCurrentUser()
+  const storageKey = `employer_location_${user.email.toLowerCase()}`
+  const [address, setAddress] = useState('')
+  const [saved, setSaved] = useState('')
+  const [mapSrc, setMapSrc] = useState('')
+
+  useEffect(() => {
+    const stored = localStorage.getItem(storageKey)
+    if (stored) {
+      setSaved(stored)
+      setMapSrc(`https://maps.google.com/maps?q=${encodeURIComponent(stored)}&output=embed`)
+    }
+  }, [])
+
+  const handleSave = (e) => {
+    e.preventDefault()
+    if (!address.trim()) return
+    localStorage.setItem(storageKey, address.trim())
+    setSaved(address.trim())
+    setMapSrc(`https://maps.google.com/maps?q=${encodeURIComponent(address.trim())}&output=embed`)
+    setAddress('')
+  }
+
+  const handleRemove = () => {
+    localStorage.removeItem(storageKey)
+    setSaved('')
+    setMapSrc('')
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto mt-8 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <h2 className="text-2xl font-bold text-slate-900 mb-4">Company Location</h2>
+
+      <form onSubmit={handleSave} className="flex gap-2 mb-4">
+        <input
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder="Enter your company address"
+          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700 focus:outline-none"
+        />
+        <Button type="submit">Set Location</Button>
+      </form>
+
+      {saved && (
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm text-emerald-600">📍 {saved}</p>
+          <button
+            onClick={handleRemove}
+            className="text-xs text-red-500 hover:text-red-700"
+          >
+            Remove
+          </button>
+        </div>
+      )}
+
+      {mapSrc && (
+        <iframe
+          src={mapSrc}
+          width="100%"
+          height="350"
+          className="rounded-lg border border-slate-200"
+          allowFullScreen
+          loading="lazy"
+          title="Company Location"
+        />
+      )}
+
+      {!saved && (
+        <p className="text-sm text-slate-400 mt-4">No location set yet. Enter an address above.</p>
+      )}
+    </div>
+  )
+  export default CompanyLocation
+}
