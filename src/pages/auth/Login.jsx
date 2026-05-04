@@ -22,26 +22,12 @@ function Login() {
     admin: '/admin',
   }
 
-  const ADMIN_EMAIL = 'admin@guc.edu.eg'
-  const ADMIN_PASSWORD = 'password123'
-
   const handleSubmit = (event) => {
     event.preventDefault()
     setError('')
     setSuccess('')
 
     const normalizedEmail = email.trim().toLowerCase()
-
-    
-    if (role === 'admin') {
-      if (normalizedEmail === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        setSuccess('Login successful. Redirecting to admin dashboard...')
-        navigate(roleRoutes.admin)
-      } else {
-        setError('Invalid administrator credentials. Please check your assigned GUC email and password.')
-      }
-      return 
-    }
 
     
     seedDemoUsers()
