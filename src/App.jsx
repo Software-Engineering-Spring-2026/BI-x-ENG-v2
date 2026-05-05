@@ -7,6 +7,7 @@ import ProjectDetails from './pages/public/ProjectDetails'
 import PortfolioDetails from './pages/public/PortfolioDetails'
 import Login from './pages/auth/Login'
 import RegisterStudent from './pages/auth/RegisterStudent'
+import RegisterInstructor from './pages/auth/RegisterInstructor'
 import RegisterEmployer from './pages/auth/RegisterEmployer'
 import ForgotPassword from './pages/auth/ForgotPassword'
 import StudentDashboard from './pages/dashboards/StudentDashboard'
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
       { path: 'login', element: <Login /> },
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'register-student', element: <RegisterStudent /> },
+      { path: 'register-instructor', element: <RegisterInstructor /> },
       { path: 'register-employer', element: <RegisterEmployer /> },
     ],
   },

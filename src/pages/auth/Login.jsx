@@ -116,6 +116,12 @@ function Login() {
             Create Student Account
           </Link>
           <Link
+            to="/register-instructor"
+            className="font-semibold text-blue-700 hover:text-blue-900"
+          >
+            Create Instructor Account
+          </Link>
+          <Link
             to="/register-employer"
             className="font-semibold text-blue-700 hover:text-blue-900"
           >

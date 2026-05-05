@@ -26,6 +26,9 @@ function Landing() {
           <Link to="/register-student">
             <Button>Get Started as Student</Button>
           </Link>
+          <Link to="/register-instructor">
+            <Button variant="secondary">Register as Instructor</Button>
+          </Link>
           <Link to="/register-employer">
             <Button variant="secondary">Join as Employer</Button>
           </Link>

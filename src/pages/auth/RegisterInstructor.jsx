@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import { getUsers, loginUser, saveUser, seedDemoUsers } from '../../data/authStorage'
 
-function RegisterStudent() {
+function RegisterInstructor() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
     firstName: '',
@@ -28,8 +28,11 @@ function RegisterStudent() {
     seedDemoUsers()
 
     const email = form.email.trim().toLowerCase()
-    if (!email.endsWith('@student.guc.edu.eg')) {
-      setError('Please use a valid student GUC email ending with @student.guc.edu.eg.')
+    const isInstructorGucEmail =
+      email.endsWith('@guc.edu.eg') && !email.endsWith('@student.guc.edu.eg')
+
+    if (!isInstructorGucEmail) {
+      setError('Please use a valid instructor GUC email (e.g. name@guc.edu.eg).')
       return
     }
 
@@ -39,8 +42,8 @@ function RegisterStudent() {
     }
 
     const users = getUsers()
-    if (users.some((u) => u.email.toLowerCase() === email && u.role === 'student')) {
-      setError('A student account with this email already exists.')
+    if (users.some((u) => u.email.toLowerCase() === email && u.role === 'instructor')) {
+      setError('An instructor account with this email already exists.')
       return
     }
 
@@ -50,19 +53,19 @@ function RegisterStudent() {
       email,
       password: form.password,
       profilePicture: form.profilePicture,
-      role: 'student',
+      role: 'instructor',
     })
 
-    loginUser(email, form.password, 'student')
+    loginUser(email, form.password, 'instructor')
     setSuccess('Account created successfully. Redirecting to your dashboard...')
-    setTimeout(() => navigate('/student'), 900)
+    setTimeout(() => navigate('/instructor'), 900)
   }
 
   return (
     <div className="mx-auto w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h1 className="text-2xl font-bold text-slate-900">Register as Student</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Register as Instructor</h1>
       <p className="mt-1 text-sm text-slate-600">
-        Create your student account for BI X ENG V2 ProjectHub.
+        Create your course instructor account for BI X ENG V2 ProjectHub.
       </p>
 
       <form className="mt-5 grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
@@ -88,7 +91,7 @@ function RegisterStudent() {
           onChange={handleChange}
           type="email"
           required
-          placeholder="Student GUC Email"
+          placeholder="Instructor GUC Email"
           className="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
         />
         <input
@@ -131,11 +134,11 @@ function RegisterStudent() {
           <p className="text-sm font-medium text-emerald-700 sm:col-span-2">{success}</p>
         )}
         <Button type="submit" className="sm:col-span-2">
-          Create Student Account
+          Create Instructor Account
         </Button>
       </form>
     </div>
   )
 }
 
-export default RegisterStudent
+export default RegisterInstructor

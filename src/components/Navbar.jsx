@@ -78,6 +78,18 @@ function Navbar() {
                 Register Student
               </NavLink>
               <NavLink
+                to="/register-instructor"
+                className={({ isActive }) =>
+                  `rounded-md px-3 py-2 text-sm font-medium transition ${
+                    isActive
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-blue-700'
+                  }`
+                }
+              >
+                Register Instructor
+              </NavLink>
+              <NavLink
                 to="/register-employer"
                 className={({ isActive }) =>
                   `rounded-md px-3 py-2 text-sm font-medium transition ${
@@ -147,6 +159,13 @@ function Navbar() {
                   className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-blue-700"
                 >
                   Register Student
+                </NavLink>
+                <NavLink
+                  to="/register-instructor"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-blue-700"
+                >
+                  Register Instructor
                 </NavLink>
                 <NavLink
                   to="/register-employer"
