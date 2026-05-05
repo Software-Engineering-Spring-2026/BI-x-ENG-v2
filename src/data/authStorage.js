@@ -125,6 +125,28 @@ function getCurrentUser() {
   }
 }
 
+function getEmployerRecord(email) {
+  if (!email) return null
+  const normalized = email.trim().toLowerCase()
+  const users = getUsers()
+  return (
+    users.find(
+      (entry) =>
+        entry.email.toLowerCase() === normalized && entry.role === 'employer',
+    ) ?? null
+  )
+}
+
+function updateEmployerRecord(email, updates) {
+  const existing = getEmployerRecord(email)
+  if (!existing) {
+    return null
+  }
+  const merged = { ...existing, ...updates }
+  saveUser(merged)
+  return merged
+}
+
 export {
   seedDemoUsers,
   getUsers,
@@ -133,4 +155,6 @@ export {
   loginUser,
   logoutUser,
   getCurrentUser,
+  getEmployerRecord,
+  updateEmployerRecord,
 }
