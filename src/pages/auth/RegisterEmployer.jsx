@@ -41,6 +41,12 @@ function RegisterEmployer() {
     }
 
     const email = form.email.trim().toLowerCase()
+
+    if (email.endsWith('@guc.edu.eg') || email.endsWith('@student.guc.edu.eg')) {
+      setError('Employers must register using an external company email, not a GUC email address.')
+      return
+    }
+
     const existingUser = findUserByEmail(email)
     if (existingUser && existingUser.role === 'employer') {
       setError('An employer account with this email already exists.')
@@ -87,7 +93,7 @@ function RegisterEmployer() {
           onChange={handleChange}
           type="email"
           required
-          placeholder="Company Email"
+          placeholder="Company Email (External)"
           className="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
         />
         <input
