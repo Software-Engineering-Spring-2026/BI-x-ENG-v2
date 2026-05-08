@@ -12,7 +12,7 @@ function EmployerDashboard() {
 
   // --- REQ 91: GLOBAL NOTIFICATIONS STATE ---
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
-  const [showNotifPanel, setShowNotifPanel] = useState(false)
+  const [showNotifPanel, setShowNotifPanel] = useState(false) 
   const [userNotifications, setUserNotifications] = useState([
     { id: 1, text: "New application received for Business Analyst role", read: false, time: "2 mins ago" },
     { id: 2, text: "Profile verification is currently pending", read: true, time: "1 hour ago" },
@@ -143,22 +143,22 @@ function EmployerDashboard() {
   return (
     <div className="max-w-6xl mx-auto mt-8 mb-20 px-4 font-sans relative">
       
-      {/* HEADER WITH NOTIFICATION ICON */}
+      {/* HEADER WITH NOTIFICATION ICON REDIRECT AND DROPDOWN */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-black text-slate-800">Employer Hub</h1>
         <div className="flex items-center gap-4 relative">
-          {/* Notification Bell */}
+          {/* Notification Bell (Toggles Dropdown) */}
           <button 
             onClick={() => setShowNotifPanel(!showNotifPanel)}
             className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors relative"
           >
             <span className="text-lg">🔔</span>
-            {userNotifications.some(n => !n.read) && (
+            {userNotifications.some(n => !n.read) && notificationsEnabled && (
               <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 border-2 border-white rounded-full"></span>
             )}
           </button>
 
-          {/* Notification Panel Overlay */}
+          {/* Notification Dropdown Panel Overlay */}
           {showNotifPanel && (
             <div className="absolute right-0 top-12 w-80 bg-white border border-slate-200 shadow-2xl rounded-2xl z-[110] overflow-hidden">
               <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
@@ -179,13 +179,24 @@ function EmployerDashboard() {
                   <p className="p-8 text-center text-xs text-slate-400 italic">No notifications yet.</p>
                 )}
               </div>
-              <div className="p-3 bg-white border-t flex justify-between items-center">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Alerts {notificationsEnabled ? 'ON' : 'OFF'}</span>
+              <div className="p-3 bg-white border-t flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Alerts {notificationsEnabled ? 'ON' : 'OFF'}</span>
+                  <button 
+                    onClick={toggleAllNotifications}
+                    className={`text-[10px] font-black px-3 py-1 rounded-full ${notificationsEnabled ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}
+                  >
+                    {notificationsEnabled ? 'Turn Off All' : 'Turn On'}
+                  </button>
+                </div>
                 <button 
-                  onClick={toggleAllNotifications}
-                  className={`text-[10px] font-black px-3 py-1 rounded-full ${notificationsEnabled ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}
+                  onClick={() => {
+                    setActiveTab('notifications');
+                    setShowNotifPanel(false);
+                  }}
+                  className="w-full text-center text-[10px] font-bold text-blue-600 hover:text-blue-800 uppercase tracking-widest pt-2 border-t border-slate-100 mt-1"
                 >
-                  {notificationsEnabled ? 'Turn Off All' : 'Turn On'}
+                  View All in Notifications Tab
                 </button>
               </div>
             </div>
@@ -204,14 +215,19 @@ function EmployerDashboard() {
       )}
 
       {/* TABS */}
-      <div className="flex border-b border-slate-200 mb-8 gap-10">
-        {['profile', 'internships', 'instructors'].map(tab => (
+      <div className="flex border-b border-slate-200 mb-8 gap-10 overflow-x-auto">
+        {['profile', 'internships', 'instructors', 'notifications'].map(tab => (
           <button 
             key={tab} 
             onClick={() => setActiveTab(tab)}
-            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'border-b-4 border-blue-600 text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? 'border-b-4 border-blue-600 text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
           >
             {tab}
+            {tab === 'notifications' && userNotifications.some(n => !n.read) && notificationsEnabled && (
+              <span className="ml-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-[9px]">
+                {userNotifications.filter(n => !n.read).length}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -430,6 +446,64 @@ function EmployerDashboard() {
           )}
         </div>
       )}
+
+      {/* --- NOTIFICATIONS TAB --- */}
+      {activeTab === 'notifications' && (
+        <div className="space-y-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">Notifications</h2>
+            <div className="flex gap-4 items-center">
+              <button 
+                onClick={markAllRead} 
+                className="text-sm font-bold text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Mark All as Read
+              </button>
+              <button 
+                onClick={toggleAllNotifications}
+                className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${notificationsEnabled ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+              >
+                {notificationsEnabled ? 'Turn Off Alerts' : 'Turn On Alerts'}
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            {!notificationsEnabled && (
+              <div className="p-4 bg-slate-50 border-b border-slate-200 text-center">
+                <span className="text-sm font-bold text-slate-500">Alerts are currently paused. You won't receive new notifications.</span>
+              </div>
+            )}
+            
+            <div className="divide-y divide-slate-100">
+              {userNotifications.length > 0 ? userNotifications.map(n => (
+                <div 
+                  key={n.id} 
+                  className={`p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors ${!n.read ? 'bg-blue-50/50' : 'bg-white hover:bg-slate-50'}`}
+                >
+                  <div className="flex-1">
+                    <p className={`text-base ${!n.read ? 'font-black text-slate-900' : 'font-semibold text-slate-600'}`}>{n.text}</p>
+                    <p className="text-xs text-slate-400 mt-2 font-bold tracking-wide uppercase">{n.time} • {n.read ? 'Read' : 'Unread'}</p>
+                  </div>
+                  <button 
+                    onClick={() => markAsRead(n.id)}
+                    className={`text-xs font-bold px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${!n.read ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    Mark as {n.read ? 'Unread' : 'Read'}
+                  </button>
+                </div>
+              )) : (
+                <div className="p-16 text-center">
+                  <span className="text-4xl block mb-4">📭</span>
+                  <p className="text-slate-500 font-bold">You're all caught up!</p>
+                  <p className="text-sm text-slate-400 mt-1">No notifications to display.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
