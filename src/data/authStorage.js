@@ -145,6 +145,15 @@ function updateEmployerRecord(email, updates) {
   const merged = { ...existing, ...updates }
   saveUser(merged)
   return merged
+}function getEmployerProfile(email) {
+  const key = `employer_profile_${email.toLowerCase()}`
+  const raw = localStorage.getItem(key)
+  try { return raw ? JSON.parse(raw) : null } catch { return null }
+}
+
+function saveEmployerProfile(email, profile) {
+  const key = `employer_profile_${email.toLowerCase()}`
+  localStorage.setItem(key, JSON.stringify(profile))
 }
 
 export {
@@ -157,4 +166,6 @@ export {
   getCurrentUser,
   getEmployerRecord,
   updateEmployerRecord,
+  getEmployerProfile,
+  saveEmployerProfile,
 }

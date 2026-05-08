@@ -1,335 +1,437 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { getCurrentUser, getEmployerProfile, saveEmployerProfile } from '../../data/authStorage'
 import Button from '../../components/Button'
-import {
-  getCurrentUser,
-  getEmployerRecord,
-  logoutUser,
-  updateEmployerRecord,
-} from '../../data/authStorage'
-import EmployerProfile from './EmployerProfile'
-import EmployerLocation from './EmployerLocation'
 
-const TABS = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'profile', label: 'Company Profile' },
-  { id: 'location', label: 'Company Location' },
-]
+function EmployerDashboard() {
+  const user = getCurrentUser()
+  const storageKey = `employer_location_${user.email.toLowerCase()}`
 
-function formatStatus(status) {
-  if (!status || typeof status !== 'string') return 'Unknown'
-  return status
-    .split(/\s+/)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ')
-}
+  // --- TAB & NOTIFICATION STATE ---
+  const [activeTab, setActiveTab] = useState('profile')
+  const [notification, setNotification] = useState({ show: false, message: '' })
 
-function isFilled(value) {
-  if (value === undefined || value === null) return false
-  return String(value).trim().length > 0
-}
+  // --- REQ 91: GLOBAL NOTIFICATIONS STATE ---
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+  const [showNotifPanel, setShowNotifPanel] = useState(false)
+  const [userNotifications, setUserNotifications] = useState([
+    { id: 1, text: "New application received for Business Analyst role", read: false, time: "2 mins ago" },
+    { id: 2, text: "Profile verification is currently pending", read: true, time: "1 hour ago" },
+    { id: 3, text: "Reminder: Internship deadline tomorrow", read: false, time: "5 hours ago" }
+  ])
 
-function profileCompletionPercent(employer) {
-  const phone = employer.phone ?? employer.contactInfo
-  const fields = [employer.bio, employer.address, phone, employer.website]
-  const done = fields.filter((f) => isFilled(f)).length
-  return Math.round((done / fields.length) * 100)
-}
+  // --- PROFILE STATE (Req 10, 11, 12, 13) ---
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({ 
+    bio: '', address: '', phone: '', website: '', logo: '', taxCertificate: '', isVerified: false 
+  })
+  const [mapAddress, setMapAddress] = useState('')
+  const [savedLocation, setSavedLocation] = useState('')
+  const [mapSrc, setMapSrc] = useState('')
 
-function EmployerOverview({ employer, onNavigate }) {
-  const completion = profileCompletionPercent(employer)
-  const locationSet = isFilled(employer.mapLocationAddress)
-  const logoSet = isFilled(employer.companyLogo)
-  const taxSet = isFilled(employer.taxCertificate)
-
-  const cards = [
-    {
-      key: 'profile',
-      title: 'Profile completion',
-      value: `${completion}%`,
-      hint: completion >= 100 ? 'Profile looks complete.' : 'Finish your company profile.',
-      tab: 'profile',
-    },
-    {
-      key: 'location',
-      title: 'Location on map',
-      value: locationSet ? 'Set' : 'Not set',
-      hint: locationSet ? 'Visitors can see your map pin.' : 'Add an address under Company Location.',
-      tab: 'location',
-    },
-    {
-      key: 'logo',
-      title: 'Company logo',
-      value: logoSet ? 'Uploaded' : 'Not set',
-      hint: logoSet ? 'Logo on file from registration.' : 'Upload a logo when you edit registration data (mock).',
-      tab: 'profile',
-    },
-    {
-      key: 'tax',
-      title: 'Tax certificate',
-      value: taxSet ? 'On file' : 'Not set',
-      hint: taxSet ? 'Document attached at signup.' : 'Add certificate via registration flow.',
-      tab: 'profile',
-    },
-  ]
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900">Overview</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Account summary and quick links to complete your employer presence.
-        </p>
-      </div>
-
-      <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-900 to-blue-900 p-6 text-white shadow-md sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-blue-200">Company</p>
-        <h3 className="mt-2 text-2xl font-bold">{employer.companyName || 'Company'}</h3>
-        <div className="mt-4 flex flex-col gap-2 text-sm text-blue-100 sm:flex-row sm:flex-wrap sm:gap-6">
-          <div>
-            <span className="text-blue-200/90">Email</span>
-            <p className="font-medium text-white">{employer.email}</p>
-          </div>
-          <div>
-            <span className="text-blue-200/90">Status</span>
-            <p className="font-medium text-white">{formatStatus(employer.status)}</p>
-          </div>
-        </div>
-        {employer.status?.toLowerCase().includes('pending') && (
-          <p className="mt-4 rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-blue-50">
-            Your account is awaiting administrator verification. You can still update your profile and
-            location in the meantime.
-          </p>
-        )}
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => (
-          <button
-            key={card.key}
-            type="button"
-            onClick={() => onNavigate(card.tab)}
-            className="rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-blue-300 hover:shadow-md"
-          >
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{card.title}</p>
-            <p className="mt-2 text-2xl font-bold text-blue-800">{card.value}</p>
-            <p className="mt-2 text-sm text-slate-600">{card.hint}</p>
-            <span className="mt-3 inline-block text-xs font-semibold text-blue-700">Open section →</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function AccessDenied() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-16">
-      <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <h1 className="text-xl font-bold text-slate-900">Access denied</h1>
-        <p className="mt-3 text-sm text-slate-600">
-          This area is only available to signed-in employer accounts. Please log in with an employer
-          account or return to the home page.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/login">
-            <Button>Go to login</Button>
-          </Link>
-          <Link to="/">
-            <Button variant="secondary">Home</Button>
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default function EmployerDashboard() {
-  const navigate = useNavigate()
-  const currentUser = getCurrentUser()
-  const [tab, setTab] = useState('overview')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [employer, setEmployer] = useState(null)
-
-  const refreshEmployer = useCallback(() => {
-    if (!currentUser?.email) {
-      setEmployer(null)
-      return
+  // --- INTERNSHIP & APPLICANT STATE (Req 74, 77, 78, 85, 87, 88) ---
+  const [internships, setInternships] = useState([
+    { 
+      id: 1, 
+      title: 'Business Analyst Intern', 
+      status: 'Hiring', 
+      deadline: '2026-04-01',
+      isArchived: false,
+      applicants: [
+        { id: 101, name: 'Laila Hassan', email: 'laila@guc.edu.eg', status: 'Nominated' }
+      ]
     }
-    setEmployer(getEmployerRecord(currentUser.email))
-  }, [currentUser?.email])
+  ])
+  const [showInternForm, setShowInternForm] = useState(false)
+  const [newIntern, setNewIntern] = useState({ title: '', details: '', deadline: '', status: 'Hiring' })
+
+  // --- INSTRUCTOR STATE (Req 8, 9) ---
+  const [instructors] = useState([
+    { id: 1, name: "Dr. Slim Abdennadher", email: "slim.abdennadher@guc.edu.eg", bio: "Expert in Logic Programming.", researchInterests: "AI", education: "Ph.D. Munich", courses: ["Bachelor Project", "Theory of Computation"] },
+    { id: 2, name: "Dr. Milad Ghantous", email: "milad.ghantous@guc.edu.eg", bio: "Database expert.", researchInterests: "DBMS", education: "Ph.D.", courses: ["Bachelor Project", "Database Systems"] }
+  ])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedInstructor, setSelectedInstructor] = useState(null)
 
   useEffect(() => {
-    refreshEmployer()
-  }, [refreshEmployer])
-
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/login')
+    const profile = getEmployerProfile(user.email)
+    if (profile) setProfileForm(profile)
+    const stored = localStorage.getItem(storageKey)
+    if (stored) {
+      setSavedLocation(stored)
+      setMapSrc(`https://maps.google.com/maps?q=${encodeURIComponent(stored)}&output=embed`)
     }
-  }, [currentUser, navigate])
+  }, [user.email, storageKey])
 
-  const applyEmployerPatch = useCallback(
-    (patch) => {
-      if (!currentUser?.email) return
-      const updated = updateEmployerRecord(currentUser.email, patch)
-      if (updated) {
-        setEmployer(updated)
-      }
-    },
-    [currentUser?.email],
-  )
-
-  const handleLogout = () => {
-    logoutUser()
-    navigate('/login')
+  // --- FEEDBACK HELPER (7 seconds) ---
+  const showSuccess = (msg) => {
+    setNotification({ show: true, message: msg })
+    setTimeout(() => setNotification({ show: false, message: '' }), 7000)
   }
 
-  const companyInitial = useMemo(() => {
-    const name = employer?.companyName || 'C'
-    return name.charAt(0).toUpperCase()
-  }, [employer?.companyName])
-
-  if (!currentUser) {
-    return null
+  // --- NOTIFICATION HANDLERS ---
+  const toggleAllNotifications = () => {
+    setNotificationsEnabled(!notificationsEnabled)
+    showSuccess(notificationsEnabled ? "All notifications turned off." : "Notifications enabled.")
   }
 
-  if (currentUser.role !== 'employer') {
-    return <AccessDenied />
+  const markAsRead = (id) => {
+    setUserNotifications(userNotifications.map(n => n.id === id ? { ...n, read: !n.read } : n))
   }
 
-  if (!employer) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-md rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-lg font-semibold text-slate-900">Employer record not found</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            We could not load your company profile from storage. Try logging out and back in.
-          </p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Button type="button" onClick={() => navigate('/login')}>
-              Login
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
+  const markAllRead = () => {
+    setUserNotifications(userNotifications.map(n => ({ ...n, read: true })))
+    showSuccess("All notifications marked as read.")
   }
 
-  const NavInner = () => (
-    <>
-      <div className="mb-6 px-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Employer hub</p>
-        <div className="mt-3 flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-700 text-lg font-bold text-white">
-            {companyInitial}
-          </div>
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-slate-900">{employer.companyName}</p>
-            <p className="truncate text-xs text-slate-500">{employer.email}</p>
-          </div>
-        </div>
-      </div>
-      <nav className="flex-1 space-y-1">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => {
-              setTab(item.id)
-              setSidebarOpen(false)
-            }}
-            className={`flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${
-              tab === item.id
-                ? 'bg-blue-700 text-white shadow-sm'
-                : 'text-slate-700 hover:bg-slate-100 hover:text-blue-800'
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
-      <div className="mt-6 border-t border-slate-200 pt-4">
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-red-50 hover:text-red-700"
-        >
-          Logout
-        </button>
-      </div>
-    </>
-  )
+  // --- INTERNSHIP HANDLERS ---
+  const toggleHiringStatus = (id) => {
+    setInternships(internships.map(i => 
+      i.id === id ? { ...i, status: i.status === 'Hiring' ? 'Position Filled' : 'Hiring' } : i
+    ))
+    showSuccess("Internship status updated.")
+  }
+
+  const archiveInternship = (id, deadline) => {
+    const today = new Date();
+    const expiry = new Date(deadline);
+    if (today < expiry) {
+      alert("Cannot archive: The application deadline has not passed yet.");
+      return;
+    }
+    setInternships(internships.map(i => i.id === id ? { ...i, isArchived: !i.isArchived } : i))
+    showSuccess("Internship archive status updated.")
+  }
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault()
+    saveEmployerProfile(user.email, profileForm)
+    setEditingProfile(false)
+    showSuccess("Profile details updated successfully!")
+  }
+
+  const handleLocationSave = (e) => {
+    e.preventDefault()
+    if (!mapAddress.trim()) return
+    localStorage.setItem(storageKey, mapAddress.trim())
+    setSavedLocation(mapAddress.trim())
+    setMapSrc(`https://maps.google.com/maps?q=${encodeURIComponent(mapAddress.trim())}&output=embed`)
+    setMapAddress('')
+    showSuccess("Location has been added to your company profile!")
+  }
+
+  const handleRemoveLocation = () => {
+    localStorage.removeItem(storageKey)
+    setSavedLocation('')
+    setMapSrc('')
+    showSuccess("Location removed from profile.")
+  }
+
+  const addInternship = (e) => {
+    e.preventDefault()
+    setInternships([...internships, { ...newIntern, id: Date.now(), isArchived: false, applicants: [] }])
+    setShowInternForm(false)
+    showSuccess(`Internship for '${newIntern.title}' posted!`)
+  }
+
+  const updateAppStatus = (internId, appId, newStatus) => {
+    setInternships(internships.map(i => i.id === internId ? {
+      ...i, applicants: i.applicants.map(a => a.id === appId ? { ...a, status: newStatus } : a)
+    } : i))
+    showSuccess(`Applicant status changed to ${newStatus}.`)
+  }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-6 md:flex">
-        <NavInner />
-      </aside>
-
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 md:hidden"
-          role="presentation"
-          onClick={() => setSidebarOpen(false)}
-        >
-          <div className="absolute inset-0 bg-slate-900/50" />
-          <aside
-            className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-slate-200 bg-white px-4 py-6 shadow-xl"
-            role="dialog"
-            aria-label="Employer menu"
-            onClick={(e) => e.stopPropagation()}
+    <div className="max-w-6xl mx-auto mt-8 mb-20 px-4 font-sans relative">
+      
+      {/* HEADER WITH NOTIFICATION ICON */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-xl font-black text-slate-800">Employer Hub</h1>
+        <div className="flex items-center gap-4 relative">
+          {/* Notification Bell */}
+          <button 
+            onClick={() => setShowNotifPanel(!showNotifPanel)}
+            className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors relative"
           >
-            <NavInner />
-          </aside>
+            <span className="text-lg">🔔</span>
+            {userNotifications.some(n => !n.read) && (
+              <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 border-2 border-white rounded-full"></span>
+            )}
+          </button>
+
+          {/* Notification Panel Overlay */}
+          {showNotifPanel && (
+            <div className="absolute right-0 top-12 w-80 bg-white border border-slate-200 shadow-2xl rounded-2xl z-[110] overflow-hidden">
+              <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
+                <span className="font-black text-xs uppercase tracking-widest">Notifications</span>
+                <button onClick={markAllRead} className="text-[10px] font-bold text-blue-600 hover:underline">Mark all read</button>
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {userNotifications.length > 0 ? userNotifications.map(n => (
+                  <div 
+                    key={n.id} 
+                    onClick={() => markAsRead(n.id)}
+                    className={`p-4 border-b last:border-0 cursor-pointer hover:bg-slate-50 transition-colors ${!n.read ? 'bg-blue-50/50' : ''}`}
+                  >
+                    <p className={`text-xs ${!n.read ? 'font-bold text-slate-900' : 'text-slate-600'}`}>{n.text}</p>
+                    <p className="text-[9px] text-slate-400 mt-1 font-bold">{n.time} • {n.read ? 'Read' : 'Unread'}</p>
+                  </div>
+                )) : (
+                  <p className="p-8 text-center text-xs text-slate-400 italic">No notifications yet.</p>
+                )}
+              </div>
+              <div className="p-3 bg-white border-t flex justify-between items-center">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Alerts {notificationsEnabled ? 'ON' : 'OFF'}</span>
+                <button 
+                  onClick={toggleAllNotifications}
+                  className={`text-[10px] font-black px-3 py-1 rounded-full ${notificationsEnabled ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}
+                >
+                  {notificationsEnabled ? 'Turn Off All' : 'Turn On'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SUCCESS NOTIFICATION */}
+      {notification.show && (
+        <div className="fixed top-8 right-8 z-[120] animate-in slide-in-from-right-10 fade-in duration-300">
+          <div className="bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 border border-emerald-400">
+            <div className="bg-white/20 p-1 rounded-full text-lg">✓</div>
+            <p className="font-bold text-sm tracking-wide">{notification.message}</p>
+          </div>
         </div>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 md:hidden">
-          <button
-            type="button"
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
-            onClick={() => setSidebarOpen(true)}
+      {/* TABS */}
+      <div className="flex border-b border-slate-200 mb-8 gap-10">
+        {['profile', 'internships', 'instructors'].map(tab => (
+          <button 
+            key={tab} 
+            onClick={() => setActiveTab(tab)}
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'border-b-4 border-blue-600 text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
           >
-            Menu
+            {tab}
           </button>
-          <span className="font-semibold text-slate-900">Employer</span>
-        </header>
+        ))}
+      </div>
 
-        <div className="border-b border-slate-200 bg-white px-4 py-3 md:hidden">
-          <div className="flex gap-1 overflow-x-auto pb-1">
-            {TABS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTab(item.id)}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                  tab === item.id
-                    ? 'bg-blue-700 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                {item.label}
-              </button>
+      {/* --- PROFILE TAB --- */}
+      {activeTab === 'profile' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="flex justify-between items-start mb-8">
+                <div className="flex gap-6 items-center">
+                  <div className="h-24 w-24 bg-slate-50 rounded-2xl border-2 border-slate-100 overflow-hidden flex items-center justify-center">
+                    {profileForm.logo ? <img src={profileForm.logo} alt="Logo" className="object-contain p-2" /> : <span className="text-[10px] text-slate-300 font-bold">LOGO</span>}
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black text-slate-900">{user.companyName}</h2>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-sm text-slate-500">{user.email}</span>
+                      <span className={`text-[10px] px-2 py-1 rounded-md font-black tracking-tighter ${profileForm.isVerified ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                        {profileForm.isVerified ? 'VERIFIED PARTNER' : 'VERIFICATION PENDING'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <Button onClick={() => setEditingProfile(!editingProfile)}>{editingProfile ? "Cancel" : "Edit Profile"}</Button>
+              </div>
+
+              {editingProfile ? (
+                <form onSubmit={handleSaveProfile} className="space-y-6">
+                  <div>
+                    <label className="text-xs font-black text-slate-400 uppercase mb-2 block">Company Biography</label>
+                    <textarea className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none min-h-[120px]" value={profileForm.bio} onChange={e => setProfileForm({...profileForm, bio: e.target.value})} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input className="p-3 bg-slate-50 border rounded-xl" placeholder="Website" value={profileForm.website} onChange={e => setProfileForm({...profileForm, website: e.target.value})} />
+                    <input className="p-3 bg-slate-50 border rounded-xl" placeholder="Phone" value={profileForm.phone} onChange={e => setProfileForm({...profileForm, phone: e.target.value})} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Logo</label>
+                      <input type="file" accept="image/*" onChange={e => {
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onloadend = () => setProfileForm({...profileForm, logo: reader.result});
+                        reader.readAsDataURL(file);
+                      }} className="text-xs w-full" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Tax Cert (PDF)</label>
+                      <input type="file" accept=".pdf" className="text-xs w-full" />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full py-4 text-lg">Update Profile Information</Button>
+                </form>
+              ) : (
+                <div className="space-y-8">
+                  <p className="text-slate-700 leading-relaxed text-lg">{profileForm.bio || "Provide a biography."}</p>
+                  <div className="grid grid-cols-2 gap-6 pt-6 border-t border-slate-50">
+                    <div><span className="text-xs font-black text-slate-400 uppercase block mb-1">Website</span><a href={profileForm.website} className="text-blue-600 font-bold">{profileForm.website || "Not set"}</a></div>
+                    <div><span className="text-xs font-black text-slate-400 uppercase block mb-1">Contact</span><span className="text-slate-900 font-bold">{profileForm.phone || "Not set"}</span></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+              <h3 className="font-black text-slate-900 tracking-tight mb-4">OFFICE LOCATION</h3>
+              <form onSubmit={handleLocationSave} className="space-y-3 mb-6">
+                <input value={mapAddress} onChange={e => setMapAddress(e.target.value)} placeholder="Enter building/city" className="w-full p-3 border rounded-xl text-sm bg-slate-50 outline-none" />
+                <Button className="w-full py-3" type="submit">Update Map</Button>
+              </form>
+              {mapSrc ? (
+                <div className="space-y-3">
+                  <div className="rounded-xl overflow-hidden border">
+                    <iframe src={mapSrc} width="100%" height="200" title="Map" />
+                  </div>
+                  <button onClick={handleRemoveLocation} className="text-[10px] font-black text-red-400 uppercase w-full">Remove Map</button>
+                </div>
+              ) : (
+                <div className="h-[200px] bg-slate-50 rounded-xl border border-dashed border-slate-200 flex items-center justify-center text-xs text-slate-400 px-6 text-center">Add your location.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- INTERNSHIPS TAB --- */}
+      {activeTab === 'internships' && (
+        <div className="space-y-8">
+          <div className="flex justify-between items-end">
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">Internships</h2>
+            <Button onClick={() => setShowInternForm(true)} className="px-8">+ POST NEW ROLE</Button>
+          </div>
+
+          {showInternForm && (
+            <div className="bg-blue-600 p-8 rounded-3xl shadow-2xl text-white space-y-6">
+              <h3 className="text-xl font-black italic">Post a New Opportunity</h3>
+              <form onSubmit={addInternship} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input required placeholder="Position Title" className="p-4 bg-white/10 border border-white/20 rounded-xl outline-none placeholder:text-white/50 col-span-2 text-white" onChange={e => setNewIntern({...newIntern, title: e.target.value})} />
+                <textarea placeholder="Description" className="p-4 bg-white/10 border border-white/20 rounded-xl outline-none placeholder:text-white/50 col-span-2 min-h-[100px] text-white" onChange={e => setNewIntern({...newIntern, details: e.target.value})} />
+                <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/20">
+                  <span className="text-sm font-bold opacity-70">DEADLINE:</span>
+                  <input type="date" className="bg-transparent text-white outline-none w-full" onChange={e => setNewIntern({...newIntern, deadline: e.target.value})} />
+                </div>
+                <div className="flex gap-4 col-span-2 mt-4">
+                  <button type="submit" className="bg-white text-blue-600 font-black hover:bg-slate-100 flex-1 py-4 rounded-xl transition-colors">
+                    Publish Internship
+                  </button>
+                  <button type="button" onClick={() => setShowInternForm(false)} className="text-white/60 font-bold hover:text-white underline px-4">Dismiss</button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-6">
+            {internships.map(intern => (
+              <div key={intern.id} className={`bg-white border-2 border-slate-100 rounded-3xl p-8 shadow-sm ${intern.isArchived ? 'opacity-50 grayscale' : ''}`}>
+                <div className="flex justify-between items-start mb-8">
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{intern.title} {intern.isArchived && "(Archived)"}</h3>
+                    <div className="flex gap-4 mt-2">
+                      <span className="text-[10px] font-black text-blue-500 uppercase">Closes: {intern.deadline}</span>
+                      <button onClick={() => toggleHiringStatus(intern.id)} className="text-[10px] font-black text-slate-400 hover:text-blue-600 uppercase underline">
+                        Switch to {intern.status === 'Hiring' ? 'Filled' : 'Hiring'}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 items-end">
+                    <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase ${intern.status === 'Hiring' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                      {intern.status}
+                    </span>
+                    <button onClick={() => archiveInternship(intern.id, intern.deadline)} className="text-[10px] font-bold text-red-500 hover:underline">
+                      {intern.isArchived ? 'Unarchive' : 'Archive Position'}
+                    </button>
+                  </div>
+                </div>
+                {!intern.isArchived && (
+                  <div className="space-y-4">
+                    {intern.applicants.map(app => (
+                      <div key={app.id} className="flex justify-between items-center bg-slate-50 p-5 rounded-2xl border">
+                        <div>
+                          <p className="text-sm font-black text-slate-800">{app.name}</p>
+                          <p className="text-[11px] text-slate-400">{app.email}</p>
+                        </div>
+                        <div className="flex items-center gap-6">
+                          <span className="text-[10px] font-black uppercase text-blue-500">{app.status}</span>
+                          <select className="text-xs font-bold p-3 border rounded-xl bg-white shadow-sm" value={app.status} onChange={e => updateAppStatus(intern.id, app.id, e.target.value)}>
+                            <option value="Nominated">Nominate</option>
+                            <option value="Accepted">Accept</option>
+                            <option value="Rejected">Reject</option>
+                          </select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
+      )}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto w-full max-w-5xl">
-            {tab === 'overview' && (
-              <EmployerOverview employer={employer} onNavigate={setTab} />
-            )}
-            {tab === 'profile' && (
-              <EmployerProfile employer={employer} onSaved={applyEmployerPatch} />
-            )}
-            {tab === 'location' && (
-              <EmployerLocation employer={employer} onSaved={applyEmployerPatch} />
-            )}
-          </div>
-        </main>
-      </div>
+      {/* --- INSTRUCTORS TAB --- */}
+      {activeTab === 'instructors' && (
+        <div className="space-y-8">
+          {!selectedInstructor ? (
+            <div className="space-y-8">
+              <div className="bg-white p-10 rounded-3xl border border-slate-200">
+                <h2 className="text-3xl font-black mb-2 text-slate-900 tracking-tighter">Faculty Search</h2>
+                <div className="relative">
+                  <input 
+                    type="text" placeholder="Search by name or course..." 
+                    className="w-full p-5 pl-5 border-2 border-slate-100 rounded-2xl bg-slate-50 focus:bg-white outline-none"
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {instructors.filter(i => i.name.toLowerCase().includes(searchTerm.toLowerCase()) || i.courses.join().toLowerCase().includes(searchTerm.toLowerCase())).map(inst => (
+                  <div key={inst.id} onClick={() => setSelectedInstructor(inst)} className="bg-white border-2 border-slate-100 p-6 rounded-3xl cursor-pointer hover:border-blue-400 group">
+                    <h3 className="font-black text-slate-900 text-lg group-hover:text-blue-700">{inst.name}</h3>
+                    <p className="text-[11px] text-slate-400 font-bold uppercase mt-1">Courses: {inst.courses.length}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border-2 border-slate-100 rounded-[40px] shadow-2xl overflow-hidden">
+              <div className="bg-slate-950 text-white p-12">
+                <button onClick={() => setSelectedInstructor(null)} className="text-[10px] font-black mb-8 text-slate-500 hover:text-white tracking-widest">← RETURN</button>
+                <h2 className="text-5xl font-black tracking-tighter mb-2">{selectedInstructor.name}</h2>
+                <p className="text-blue-400 font-bold">{selectedInstructor.email}</p>
+              </div>
+              <div className="p-12 grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div className="space-y-10">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-300 block uppercase mb-4 tracking-widest">Biography</label>
+                    <p className="text-xl text-slate-800 font-medium italic border-l-4 border-blue-100 pl-6">"{selectedInstructor.bio}"</p>
+                  </div>
+                </div>
+                <div className="bg-slate-50 p-10 rounded-[30px] border">
+                  <label className="text-[10px] font-black text-slate-900 block uppercase mb-8 tracking-widest">Teaching</label>
+                  <ul className="space-y-4">
+                    {selectedInstructor.courses.map(c => (
+                      <li key={c} className="flex items-center gap-4 text-slate-700 font-black">
+                        <span className="h-2 w-2 bg-blue-600 rounded-full"></span> 
+                        <span className="text-lg">{c}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
+
+export default EmployerDashboard
