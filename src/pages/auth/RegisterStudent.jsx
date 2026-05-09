@@ -44,6 +44,7 @@ function RegisterStudent() {
       return
     }
 
+    // saveUser stores the Base64 image
     saveUser({
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
@@ -109,23 +110,29 @@ function RegisterStudent() {
           placeholder="Confirm Password"
           className="rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
-        <label className="sm:col-span-2">
-          <span className="mb-1 block text-sm font-medium text-slate-700">
-            Profile Picture (mock upload)
-          </span>
-          <input
-            name="profilePicture"
-            type="file"
-            accept="image/*"
-            onChange={(event) =>
-              setForm((prev) => ({
-                ...prev,
-                profilePicture: event.target.files?.[0]?.name ?? '',
-              }))
-            }
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-          />
-        </label>
+
+        {/* CLICKABLE PROFILE PICTURE BOX */}
+        <div className="sm:col-span-2 pt-2 border-t border-slate-100">
+          <label className={`cursor-pointer flex flex-col items-center justify-center border-2 rounded-xl p-6 transition-all shadow-sm ${form.profilePicture ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'}`}>
+            <span className="text-2xl mb-2">{form.profilePicture ? '✅' : '📸'}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-center">
+              {form.profilePicture ? 'Picture Saved' : 'Upload Profile Picture'}
+            </span>
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onloadend = () => setForm(prev => ({ ...prev, profilePicture: reader.result }));
+                reader.readAsDataURL(file);
+              }} 
+            />
+          </label>
+        </div>
+
         {error && <p className="text-sm font-medium text-red-600 sm:col-span-2">{error}</p>}
         {success && (
           <p className="text-sm font-medium text-emerald-700 sm:col-span-2">{success}</p>

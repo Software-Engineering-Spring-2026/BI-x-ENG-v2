@@ -1,24 +1,55 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import Card from '../../components/Card'
-import projects from '../../data/projects'
+import projectsData from '../../data/projects'
+import { getCurrentUser } from '../../data/authStorage'
 
 function ExploreProjects() {
+  const navigate = useNavigate()
+  const currentUser = getCurrentUser()
+
+  // 1. Security Check: Redirect to login if not authenticated
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login')
+    }
+  }, [currentUser, navigate])
+
+  // 2. Dynamic Projects State (Pulls from LocalStorage to see new projects)
+  const [allProjects, setAllProjects] = useState(() => {
+    const saved = localStorage.getItem('guc_projecthub_projects')
+    if (saved) return JSON.parse(saved)
+    
+    // Seed initial data if empty
+    localStorage.setItem('guc_projecthub_projects', JSON.stringify(projectsData))
+    return projectsData
+  })
+
+  // 3. Listen for changes across tabs (Instant sync when a student adds a project)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'guc_projecthub_projects' && e.newValue) {
+        setAllProjects(JSON.parse(e.newValue))
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
   const [searchTerm, setSearchTerm] = useState('')
   const [domainFilter, setDomainFilter] = useState('all')
   const [courseFilter, setCourseFilter] = useState('all')
   const [instructorFilter, setInstructorFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('')
-  const [sortBy, setSortBy] = useState('default') // Sort state added
+  const [sortBy, setSortBy] = useState('default') 
 
-  // Dynamically extract unique domains, courses, and instructors
-  const domains = ['all', ...new Set(projects.map((project) => project.domain).filter(Boolean))]
-  const courses = ['all', ...new Set(projects.map((project) => project.course).filter(Boolean))]
-  const instructors = ['all', ...new Set(projects.map((project) => project.instructor).filter(Boolean))]
+  // Dynamically extract unique domains, courses, and instructors from all dynamic projects
+  const domains = ['all', ...new Set(allProjects.map((project) => project.domain).filter(Boolean))]
+  const courses = ['all', ...new Set(allProjects.map((project) => project.course).filter(Boolean))]
+  const instructors = ['all', ...new Set(allProjects.map((project) => project.instructor).filter(Boolean))]
 
   const filteredProjects = useMemo(() => {
-    // 1. Filter Projects
-    let result = projects.filter((project) => {
+    let result = allProjects.filter((project) => {
       const matchesSearch =
         project.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.student?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -34,19 +65,21 @@ function ExploreProjects() {
       return matchesSearch && matchesDomain && matchesCourse && matchesInstructor && matchesDate
     })
 
-    // 2. Sort Projects by Creation Date or Rating
     if (sortBy === 'dateDesc') {
-      result.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)) // Newest first
+      result.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)) 
     } else if (sortBy === 'dateAsc') {
-      result.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0)) // Oldest first
+      result.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0)) 
     } else if (sortBy === 'ratingDesc') {
-      result.sort((a, b) => (b.rating || 0) - (a.rating || 0)) // Highest rated first
+      result.sort((a, b) => (b.rating || 0) - (a.rating || 0)) 
     } else if (sortBy === 'ratingAsc') {
-      result.sort((a, b) => (a.rating || 0) - (b.rating || 0)) // Lowest rated first
+      result.sort((a, b) => (a.rating || 0) - (b.rating || 0)) 
     }
 
     return result
-  }, [searchTerm, domainFilter, courseFilter, instructorFilter, dateFilter, sortBy])
+  }, [allProjects, searchTerm, domainFilter, courseFilter, instructorFilter, dateFilter, sortBy])
+
+  // Prevent rendering the page while redirecting
+  if (!currentUser) return null;
 
   return (
     <div>

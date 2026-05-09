@@ -1,9 +1,22 @@
-import { Link, useParams } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import students from '../../data/students'
+import { getCurrentUser } from '../../data/authStorage'
 
 function PortfolioDetails() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const currentUser = getCurrentUser()
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login')
+    }
+  }, [currentUser, navigate])
+
   const student = students.find((entry) => entry.id === id)
+
+  if (!currentUser) return null;
 
   if (!student) {
     return (
@@ -19,6 +32,8 @@ function PortfolioDetails() {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <h1 className="text-3xl font-bold text-slate-900">{student.name}</h1>
+      {student.email && <p className="text-blue-600 font-medium text-sm">{student.email}</p>}
+      
       <p className="mt-2 text-slate-600">
         {student.major} • Class of {student.graduationYear}
       </p>

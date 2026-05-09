@@ -1,11 +1,17 @@
-const USERS_KEY = 'guc_projecthub_users'
-const CURRENT_USER_KEY = 'guc_projecthub_current_user'
+const USERS_KEY = 'guc_projecthub_users';
+const CURRENT_USER_KEY = 'guc_projecthub_currentUser'; 
 
-const demoUsers = [
+
+
+// --- GLOBAL DATABASE (localStorage) ---
+
+export const seedDemoUsers = () => {
+  if (!localStorage.getItem(USERS_KEY)) {
+  const demoUsers = [
   {
-    firstName: 'Demo',
-    lastName: 'Student',
-    email: 'student@guc.edu.eg',
+    firstName: 'Ahmed',
+    lastName: 'Mohamed',
+    email: 'ahmed@student.guc.edu.eg',
     password: '123456',
     role: 'student',
     major: 'Computer Science',
@@ -32,140 +38,66 @@ const demoUsers = [
     role: 'employer',
     status: 'pending verification',
   },
-]
-
-function seedDemoUsers() {
-  const raw = localStorage.getItem(USERS_KEY)
-  if (!raw) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(demoUsers))
-    return demoUsers
+] ;
+    localStorage.setItem(USERS_KEY, JSON.stringify(demoUsers));
   }
+};
 
-  try {
-    const users = JSON.parse(raw)
-    if (!Array.isArray(users) || users.length === 0) {
-      localStorage.setItem(USERS_KEY, JSON.stringify(demoUsers))
-      return demoUsers
-    }
-    return users
-  } catch {
-    localStorage.setItem(USERS_KEY, JSON.stringify(demoUsers))
-    return demoUsers
+export const getUsers = () => {
+  seedDemoUsers();
+  const users = localStorage.getItem(USERS_KEY);
+  return users ? JSON.parse(users) : [];
+};
+
+export const saveUser = (userObj) => {
+  const users = getUsers();
+  users.push(userObj);
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+};
+
+export const findUserByEmail = (email) => {
+  const users = getUsers();
+  return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+};
+
+// --- EMPLOYER SPECIFIC PROFILES (localStorage) ---
+
+export const getEmployerProfile = (email) => {
+  const key = `employer_profile_${email.toLowerCase()}`;
+  const profile = localStorage.getItem(key);
+  return profile ? JSON.parse(profile) : null;
+};
+
+export const saveEmployerProfile = (email, profileData) => {
+  const key = `employer_profile_${email.toLowerCase()}`;
+  localStorage.setItem(key, JSON.stringify(profileData));
+};
+
+// --- ISOLATED TAB SESSIONS (sessionStorage) ---
+
+export const loginUser = (email, password, role) => {
+  const users = getUsers();
+  const user = users.find(u => 
+    u.email.toLowerCase() === email.toLowerCase() && 
+    u.password === password && 
+    u.role === role
+  );
+  
+  if (user) {
+    // Saves the session ONLY to the current tab
+    sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    return user;
   }
-}
+  return null;
+};
 
-function getUsers() {
-  return seedDemoUsers()
-}
+export const getCurrentUser = () => {
+  // Reads the session ONLY from the current tab
+  const user = sessionStorage.getItem(CURRENT_USER_KEY);
+  return user ? JSON.parse(user) : null;
+};
 
-function saveUser(user) {
-  const users = getUsers()
-  const existingIndex = users.findIndex(
-    (entry) =>
-      entry.email.toLowerCase() === user.email.toLowerCase() &&
-      entry.role === user.role,
-  )
-
-  if (existingIndex >= 0) {
-    users[existingIndex] = user
-  } else {
-    users.push(user)
-  }
-
-  localStorage.setItem(USERS_KEY, JSON.stringify(users))
-  return user
-}
-
-function findUserByEmail(email) {
-  const users = getUsers()
-  return users.find((entry) => entry.email.toLowerCase() === email.toLowerCase())
-}
-
-function loginUser(email, password, role) {
-  const users = getUsers()
-  const user = users.find(
-    (entry) =>
-      entry.email.toLowerCase() === email.toLowerCase() &&
-      entry.password === password &&
-      entry.role === role,
-  )
-
-  if (!user) {
-    return null
-  }
-
-  const currentUser = {
-    email: user.email,
-    role: user.role,
-    firstName: user.firstName ?? '',
-    lastName: user.lastName ?? '',
-    companyName: user.companyName ?? '',
-    status: user.status ?? '',
-  }
-
-  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser))
-  return currentUser
-}
-
-function logoutUser() {
-  localStorage.removeItem(CURRENT_USER_KEY)
-}
-
-function getCurrentUser() {
-  const raw = localStorage.getItem(CURRENT_USER_KEY)
-  if (!raw) {
-    return null
-  }
-
-  try {
-    return JSON.parse(raw)
-  } catch {
-    localStorage.removeItem(CURRENT_USER_KEY)
-    return null
-  }
-}
-
-function getEmployerRecord(email) {
-  if (!email) return null
-  const normalized = email.trim().toLowerCase()
-  const users = getUsers()
-  return (
-    users.find(
-      (entry) =>
-        entry.email.toLowerCase() === normalized && entry.role === 'employer',
-    ) ?? null
-  )
-}
-
-function updateEmployerRecord(email, updates) {
-  const existing = getEmployerRecord(email)
-  if (!existing) {
-    return null
-  }
-  const merged = { ...existing, ...updates }
-  saveUser(merged)
-  return merged
-}function getEmployerProfile(email) {
-  const key = `employer_profile_${email.toLowerCase()}`
-  const raw = localStorage.getItem(key)
-  try { return raw ? JSON.parse(raw) : null } catch { return null }
-}
-
-function saveEmployerProfile(email, profile) {
-  const key = `employer_profile_${email.toLowerCase()}`
-  localStorage.setItem(key, JSON.stringify(profile))
-}
-
-export {
-  seedDemoUsers,
-  getUsers,
-  saveUser,
-  findUserByEmail,
-  loginUser,
-  logoutUser,
-  getCurrentUser,
-  getEmployerRecord,
-  updateEmployerRecord,
-  getEmployerProfile,
-  saveEmployerProfile,
-}
+export const logoutUser = () => {
+  // Clears the session ONLY from the current tab
+  sessionStorage.removeItem(CURRENT_USER_KEY);
+};

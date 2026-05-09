@@ -52,9 +52,7 @@ function Login() {
   return (
     <div className="mx-auto w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <h1 className="text-2xl font-bold text-slate-900">Login</h1>
-      <p className="mt-1 text-sm text-slate-600">
-        Demo login for role-based dashboard navigation.
-      </p>
+      
 
       <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
         <label className="block">

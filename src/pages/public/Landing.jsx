@@ -1,10 +1,23 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../../components/Button'
 import Card from '../../components/Card'
 import projects from '../../data/projects'
 import students from '../../data/students'
+import { getCurrentUser } from '../../data/authStorage'
 
 function Landing() {
+  const [currentUser, setCurrentUser] = useState(getCurrentUser())
+
+  // Listen for login/logout changes across tabs to instantly update the UI
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setCurrentUser(getCurrentUser())
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
   return (
     <div className="space-y-10">
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-900 to-blue-800 p-8 text-white sm:p-10">
@@ -22,20 +35,40 @@ function Landing() {
             validate skills, and create meaningful academic-industry connections.
           </p>
         </div>
+        
+        {/* Conditional Action Buttons */}
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link to="/register-student">
-            <Button>Get Started as Student</Button>
-          </Link>
-          <Link to="/register-instructor">
-            <Button variant="secondary">Register as Instructor</Button>
-          </Link>
-          <Link to="/register-employer">
-            <Button variant="secondary">Join as Employer</Button>
-          </Link>
-          <Link to="/explore-projects">
-            <Button variant="muted">Explore Projects</Button>
-          </Link>
+          
+          {/* ONLY show Registration options if NOT logged in */}
+          {!currentUser ? (
+            <>
+              <Link to="/register-student">
+                <Button>Get Started as Student</Button>
+              </Link>
+              <Link to="/register-instructor">
+                <Button variant="secondary">Register as Instructor</Button>
+              </Link>
+              <Link to="/register-employer">
+                <Button variant="secondary">Join as Employer</Button>
+              </Link>
+            </>
+          ) : (
+            /* ONLY show Explore options and Dashboard link if LOGGED IN */
+            <>
+              <Link to="/explore-projects">
+                <Button variant="muted">Explore Projects</Button>
+              </Link>
+              <Link to="/explore-portfolios">
+                <Button variant="muted">Explore Portfolios</Button>
+              </Link>
+              <Link to={`/${currentUser.role}`}>
+                <Button variant="secondary">Go to My Dashboard</Button>
+              </Link>
+            </>
+          )}
+
         </div>
+
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-white/20 bg-white/10 p-4">
             <p className="text-sm font-semibold text-white">Portfolio Visibility</p>

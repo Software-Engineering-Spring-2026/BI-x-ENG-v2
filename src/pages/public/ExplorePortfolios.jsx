@@ -1,37 +1,97 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import Card from '../../components/Card'
-import students from '../../data/students'
+import studentsData from '../../data/students'
+import { getCurrentUser, getUsers } from '../../data/authStorage'
 
 function ExplorePortfolios() {
+  const navigate = useNavigate()
+  const currentUser = getCurrentUser()
+
+  // 1. Security Check: Redirect to login if not authenticated
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login')
+    }
+  }, [currentUser, navigate])
+
+  // 2. Dynamic Portfolios State
+  const [allStudents, setAllStudents] = useState(() => {
+    // A: Get saved extended profiles if available
+    const savedProfiles = localStorage.getItem('guc_projecthub_students')
+    const parsedProfiles = savedProfiles ? JSON.parse(savedProfiles) : studentsData
+
+    // B: Merge newly registered users from authStorage that might not have a full profile yet
+    const registeredStudents = getUsers().filter(u => u.role === 'student')
+    
+    const mergedStudents = [...parsedProfiles]
+    
+    registeredStudents.forEach(registeredUser => {
+      // If the registered user isn't in our portfolio display list yet, add them dynamically!
+      if (!mergedStudents.find(s => s.email?.toLowerCase() === registeredUser.email?.toLowerCase())) {
+        mergedStudents.push({
+          id: registeredUser.email, // Fallback ID
+          name: `${registeredUser.firstName || ''} ${registeredUser.lastName || ''}`.trim() || registeredUser.email,
+          email: registeredUser.email,
+          major: registeredUser.major || 'Major Not Specified',
+          graduationYear: registeredUser.graduationYear || 'N/A',
+          headline: registeredUser.headline || 'Newly Registered Student',
+          skills: registeredUser.skills || [],
+          projects: registeredUser.projects || [],
+          projectCount: registeredUser.projects?.length || 0
+        })
+      }
+    })
+
+    return mergedStudents
+  })
+
+  // 3. Listen for changes (Instant sync if a new user registers or updates their profile in another tab)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'guc_projecthub_students' || e.key === 'guc_projecthub_users') {
+        // Trigger a reload of the state by reloading the window, 
+        // or re-running the merge logic. For simplicity, force refresh the list:
+        const updatedUsers = getUsers().filter(u => u.role === 'student');
+        setAllStudents(prev => {
+          const merged = [...prev];
+          updatedUsers.forEach(u => {
+            if (!merged.find(s => s.email?.toLowerCase() === u.email?.toLowerCase())) {
+              merged.push({ id: u.email, name: `${u.firstName} ${u.lastName}`.trim(), email: u.email, major: 'Not Specified', skills: [], headline: 'New Student' });
+            }
+          })
+          return [...merged];
+        })
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
   const [searchTerm, setSearchTerm] = useState('')
   const [majorFilter, setMajorFilter] = useState('all')
-  const [skillFilter, setSkillFilter] = useState('all') // Added skill filtering
+  const [skillFilter, setSkillFilter] = useState('all')
   const [sortBy, setSortBy] = useState('default') 
 
   // Dynamically extract unique majors and skills
-  const majors = ['all', ...new Set(students.map((student) => student.major))]
+  const majors = ['all', ...new Set(allStudents.map((student) => student.major))]
   const allSkills = new Set()
-  students.forEach((student) => student.skills?.forEach((skill) => allSkills.add(skill)))
+  allStudents.forEach((student) => student.skills?.forEach((skill) => allSkills.add(skill)))
   const availableSkills = ['all', ...Array.from(allSkills)]
 
   const filteredStudents = useMemo(() => {
-    // 1. Filter the portfolios
-    let result = students.filter((student) => {
+    let result = allStudents.filter((student) => {
       const matchesSearch =
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email?.toLowerCase().includes(searchTerm.toLowerCase()) || // Search by email
+        student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         student.headline?.toLowerCase().includes(searchTerm.toLowerCase())
       
       const matchesMajor = majorFilter === 'all' || student.major === majorFilter
-      
-      // Filter by skill check
       const matchesSkill = skillFilter === 'all' || (student.skills && student.skills.includes(skillFilter))
 
       return matchesSearch && matchesMajor && matchesSkill
     })
 
-    // 2. Sort the portfolios based on number of projects
     if (sortBy === 'projectsDesc') {
       result.sort((a, b) => (b.projects?.length || b.projectCount || 0) - (a.projects?.length || a.projectCount || 0))
     } else if (sortBy === 'projectsAsc') {
@@ -39,7 +99,10 @@ function ExplorePortfolios() {
     }
 
     return result
-  }, [searchTerm, majorFilter, skillFilter, sortBy])
+  }, [allStudents, searchTerm, majorFilter, skillFilter, sortBy])
+
+  // Prevent rendering the page while redirecting
+  if (!currentUser) return null;
 
   return (
     <div>
@@ -76,20 +139,19 @@ function ExplorePortfolios() {
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredStudents.map((student) => (
           <Card
-            key={student.id}
+            key={student.id || student.email}
             title={student.name}
-            subtitle={`${student.major} • Class of ${student.graduationYear}`}
+            subtitle={`${student.major} • Class of ${student.graduationYear || 'N/A'}`}
           >
             <p className="text-sm text-slate-600 line-clamp-2">{student.headline}</p>
             
-            {/* Displaying Project Count so sorting visually makes sense */}
             <div className="mt-3 flex items-center gap-2">
                <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider">
                  {student.projects?.length || student.projectCount || 0} Projects
                </span>
             </div>
 
-            <Link to={`/portfolio/${student.id}`} className="mt-4 inline-block text-sm font-semibold text-blue-700 hover:text-blue-900">
+            <Link to={`/portfolio/${student.id || student.email}`} className="mt-4 inline-block text-sm font-semibold text-blue-700 hover:text-blue-900">
               View portfolio →
             </Link>
           </Card>

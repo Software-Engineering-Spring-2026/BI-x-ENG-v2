@@ -6,6 +6,7 @@ import {
   loginUser,
   saveUser,
   seedDemoUsers,
+  saveEmployerProfile // Added this to save profile details immediately
 } from '../../data/authStorage'
 
 function RegisterEmployer() {
@@ -17,9 +18,11 @@ function RegisterEmployer() {
     confirmPassword: '',
     bio: '',
     address: '',
-    contactInfo: '',
+    website: '',
+    phone: '',
     companyLogo: '',
     taxCertificate: '',
+    taxCertificateName: '',
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -40,6 +43,11 @@ function RegisterEmployer() {
       return
     }
 
+    if (form.phone && form.phone.length !== 11) {
+      setError('Phone number must be exactly 11 digits.')
+      return
+    }
+
     const email = form.email.trim().toLowerCase()
 
     if (email.endsWith('@guc.edu.eg') || email.endsWith('@student.guc.edu.eg')) {
@@ -53,26 +61,35 @@ function RegisterEmployer() {
       return
     }
 
+    // 1. Save the basic user credentials for Authentication
     saveUser({
       companyName: form.companyName.trim(),
       email,
       password: form.password,
-      bio: form.bio.trim(),
-      address: form.address.trim(),
-      contactInfo: form.contactInfo.trim(),
-      companyLogo: form.companyLogo,
-      taxCertificate: form.taxCertificate,
       role: 'employer',
       status: 'pending verification',
     })
 
+    // 2. Save the full profile data so it instantly appears on the Dashboard
+    saveEmployerProfile(email, {
+      bio: form.bio.trim(),
+      address: form.address.trim(),
+      website: form.website.trim(),
+      phone: form.phone,
+      logo: form.companyLogo, // Map registration 'companyLogo' to dashboard 'logo'
+      taxCertificate: form.taxCertificate,
+      taxCertificateName: form.taxCertificateName,
+      isVerified: false
+    })
+
+    // Log them in and redirect
     loginUser(email, form.password, 'employer')
-    setSuccess('Your company account is pending administrator verification.')
+    setSuccess('Your company account is created! Redirecting...')
     setTimeout(() => navigate('/employer'), 900)
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="mx-auto w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-20 mt-10">
       <h1 className="text-2xl font-bold text-slate-900">Register as Employer</h1>
       <p className="mt-1 text-sm text-slate-600">
         Join BI X ENG V2 ProjectHub to discover top GUC talent.
@@ -114,66 +131,94 @@ function RegisterEmployer() {
           placeholder="Confirm Password"
           className="rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
-        <input
+        <textarea
           name="bio"
           value={form.bio}
           onChange={handleChange}
+          required
           placeholder="Company Biography"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2 min-h-[80px]"
         />
         <input
           name="address"
           value={form.address}
           onChange={handleChange}
-          placeholder="Address"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+          required
+          placeholder="Company Address"
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
         />
         <input
-          name="contactInfo"
-          value={form.contactInfo}
+          name="website"
+          value={form.website}
           onChange={handleChange}
-          placeholder="Contact Info"
+          required
+          placeholder="Company Website (e.g. https://...)"
           className="rounded-md border border-slate-300 px-3 py-2 text-sm"
         />
-        <label className="sm:col-span-2">
-          <span className="mb-1 block text-sm font-medium text-slate-700">
-            Company Logo (mock upload)
-          </span>
-          <input
-            name="companyLogo"
-            type="file"
-            accept="image/*"
-            onChange={(event) =>
-              setForm((prev) => ({
-                ...prev,
-                companyLogo: event.target.files?.[0]?.name ?? '',
-              }))
-            }
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-          />
-        </label>
-        <label className="sm:col-span-2">
-          <span className="mb-1 block text-sm font-medium text-slate-700">
-            Tax Certificate (PDF)
-          </span>
-          <input
-            name="taxCertificate"
-            type="file"
-            accept=".pdf"
-            onChange={(event) =>
-              setForm((prev) => ({
-                ...prev,
-                taxCertificate: event.target.files?.[0]?.name ?? '',
-              }))
-            }
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-          />
-        </label>
+        
+        {/* Phone Input: Exactly 11 Digits restriction */}
+        <input 
+          type="tel"
+          required
+          pattern="\d{11}"
+          title="Phone number must be exactly 11 digits"
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm" 
+          placeholder="Phone (11 digits)" 
+          value={form.phone}
+          maxLength={11}
+          minLength={11}
+          onChange={e => {
+            const numericVal = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            setForm({...form, phone: numericVal});
+          }} 
+        />
+
+        {/* CLICKABLE FILE UPLOAD BOXES */}
+        <div className="grid grid-cols-2 gap-4 sm:col-span-2 pt-4 border-t border-slate-100 mt-2">
+          <label className={`cursor-pointer flex flex-col items-center justify-center border-2 rounded-xl p-6 transition-all shadow-sm ${form.companyLogo ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'}`}>
+            <span className="text-2xl mb-2">{form.companyLogo ? '✅' : '🖼️'}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-center">
+              {form.companyLogo ? 'Logo Saved' : 'Upload Logo'}
+            </span>
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onloadend = () => setForm(prev => ({ ...prev, companyLogo: reader.result }));
+                reader.readAsDataURL(file);
+              }} 
+            />
+          </label>
+          
+          <label className={`cursor-pointer flex flex-col items-center justify-center border-2 rounded-xl p-6 transition-all shadow-sm ${form.taxCertificate ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'}`}>
+            <span className="text-2xl mb-2">{form.taxCertificate ? '✅' : '📄'}</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-center">
+              {form.taxCertificate ? 'Tax Cert Saved' : 'Upload Tax Cert'}
+            </span>
+            <input 
+              type="file" 
+              accept=".pdf" 
+              className="hidden" 
+              onChange={e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onloadend = () => setForm(prev => ({ ...prev, taxCertificate: reader.result, taxCertificateName: file.name }));
+                reader.readAsDataURL(file);
+              }} 
+            />
+          </label>
+        </div>
+
         {error && <p className="text-sm font-medium text-red-600 sm:col-span-2">{error}</p>}
         {success && (
           <p className="text-sm font-medium text-emerald-700 sm:col-span-2">{success}</p>
         )}
-        <Button type="submit" className="sm:col-span-2">
+        <Button type="submit" className="sm:col-span-2 py-3 mt-2">
           Create Employer Account
         </Button>
       </form>
