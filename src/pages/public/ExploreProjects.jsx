@@ -8,24 +8,19 @@ function ExploreProjects() {
   const navigate = useNavigate()
   const currentUser = getCurrentUser()
 
-  // 1. Security Check: Redirect to login if not authenticated
   useEffect(() => {
     if (!currentUser) {
       navigate('/login')
     }
   }, [currentUser, navigate])
 
-  // 2. Dynamic Projects State (Pulls from LocalStorage to see new projects)
   const [allProjects, setAllProjects] = useState(() => {
     const saved = localStorage.getItem('guc_projecthub_projects')
     if (saved) return JSON.parse(saved)
-    
-    // Seed initial data if empty
     localStorage.setItem('guc_projecthub_projects', JSON.stringify(projectsData))
     return projectsData
   })
 
-  // 3. Listen for changes across tabs (Instant sync when a student adds a project)
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'guc_projecthub_projects' && e.newValue) {
@@ -43,7 +38,6 @@ function ExploreProjects() {
   const [dateFilter, setDateFilter] = useState('')
   const [sortBy, setSortBy] = useState('default') 
 
-  // Dynamically extract unique domains, courses, and instructors from all dynamic projects
   const domains = ['all', ...new Set(allProjects.map((project) => project.domain).filter(Boolean))]
   const courses = ['all', ...new Set(allProjects.map((project) => project.course).filter(Boolean))]
   const instructors = ['all', ...new Set(allProjects.map((project) => project.instructor).filter(Boolean))]
@@ -78,7 +72,6 @@ function ExploreProjects() {
     return result
   }, [allProjects, searchTerm, domainFilter, courseFilter, instructorFilter, dateFilter, sortBy])
 
-  // Prevent rendering the page while redirecting
   if (!currentUser) return null;
 
   return (
@@ -88,7 +81,6 @@ function ExploreProjects() {
         Browse graduation and course projects submitted by GUC students.
       </p>
 
-      {/* Filter & Sort Section */}
       <div className="mt-5 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-6">
         <input
           value={searchTerm}
@@ -120,14 +112,19 @@ function ExploreProjects() {
         </select>
       </div>
 
-      {/* Projects Grid */}
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredProjects.map((project) => (
           <Card key={project.id} title={project.title} subtitle={`${project.student} • ${project.domain}`}>
             <p className="text-sm text-slate-600 line-clamp-2">{project.summary}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              {project.date && <span className="bg-slate-100 px-2 py-1 rounded">📅 {project.date}</span>}
-              {project.rating && <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded">⭐ {project.rating}</span>}
+            
+            {/* Instructor Rating visible to all */}
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider">
+              {project.date && <span className="bg-slate-100 text-slate-500 px-2 py-1 rounded">📅 {project.date}</span>}
+              {project.rating && (
+                <span className="bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1 rounded shadow-sm">
+                  ⭐ Instructor Rating: {project.rating}/5
+                </span>
+              )}
             </div>
             
             <Link to={`/project/${project.id}`} className="mt-4 inline-block text-sm font-semibold text-blue-700 hover:text-blue-900">

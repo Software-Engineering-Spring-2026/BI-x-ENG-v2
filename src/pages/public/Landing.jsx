@@ -9,7 +9,6 @@ import { getCurrentUser } from '../../data/authStorage'
 function Landing() {
   const [currentUser, setCurrentUser] = useState(getCurrentUser())
 
-  // Listen for login/logout changes across tabs to instantly update the UI
   useEffect(() => {
     const handleStorageChange = () => {
       setCurrentUser(getCurrentUser())
@@ -36,10 +35,7 @@ function Landing() {
           </p>
         </div>
         
-        {/* Conditional Action Buttons */}
         <div className="mt-8 flex flex-wrap gap-3">
-          
-          {/* ONLY show Registration options if NOT logged in */}
           {!currentUser ? (
             <>
               <Link to="/register-student">
@@ -53,7 +49,6 @@ function Landing() {
               </Link>
             </>
           ) : (
-            /* ONLY show Explore options and Dashboard link if LOGGED IN */
             <>
               <Link to="/explore-projects">
                 <Button variant="muted">Explore Projects</Button>
@@ -66,7 +61,6 @@ function Landing() {
               </Link>
             </>
           )}
-
         </div>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
