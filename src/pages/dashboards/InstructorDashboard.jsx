@@ -269,16 +269,27 @@ function ProfileSection({ user, profile, setProfile }) {
       <Card>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
           {/* avatar */}
-          <div className="flex flex-col items-center gap-2 shrink-0">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-700">
-              {(profile.firstName?.[0] || user.firstName?.[0] || 'I').toUpperCase()}
-            </div>
-            {editing && (
-              <label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600">
-                <Icon d={IC.upload} size={12} /> Upload Photo
-                <input type="file" className="hidden" accept="image/*" />
-              </label>
-            )}
+<div className="flex flex-col items-center gap-2 shrink-0">
+            {profile.photo
+              ? <img src={profile.photo} alt="avatar" className="h-24 w-24 rounded-full object-cover border-2 border-blue-200"/>
+              : <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-700">
+                  {(profile.firstName?.[0] || user.firstName?.[0] || 'I').toUpperCase()}
+                </div>
+            }
+            <label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600">
+              <Icon d={IC.upload} size={12} /> {profile.photo ? 'Change Photo' : 'Upload Photo'}
+              <input type="file" className="hidden" accept="image/*" key={photoKey} onChange={e=>{
+                const file=e.target.files?.[0]
+                if(!file)return
+                const reader=new FileReader()
+                reader.onload=ev=>{
+                  setProfile(prev=>({...prev,photo:ev.target.result}))
+                  setForm(prev=>({...prev,photo:ev.target.result}))
+                  setPhotoKey(k=>k+1)
+                }
+                reader.readAsDataURL(file)
+              }}/>
+            </label>
           </div>
 
           {/* fields */}
@@ -823,8 +834,8 @@ function InvitationsSection({ user, projects, setProjects, pushNotif }) {
 }
 
 // ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
-function NotificationsSection({ notifications, setNotifications }) {
-  const [notifsOn, setNotifsOn] = useState(true)
+function NotificationsSection({ notifications, setNotifications, profileEmail }) {
+  const [notifsOn, setNotifsOn] = useLS('instructor_notifs_on_'+(profileEmail||'default'), true)
   const unread = notifications.filter(n => !n.read).length
   const markAll = read => setNotifications(p => p.map(n => ({ ...n, read })))
   const toggle  = id   => setNotifications(p => p.map(n => n.id === id ? { ...n, read: !n.read } : n))
@@ -889,10 +900,26 @@ function MessagesSection({ user, pushNotif }) {
     setActive(em); setNewEmail('')
   }
 
-  const send = () => {
+const send = () => {
     if (!text.trim() || !active) return
     const msg = { id: Date.now().toString(), from: user.email, text: text.trim(), at: new Date().toISOString() }
     setThreads(p => p.map(t => t.with === active ? { ...t, messages: [...t.messages, msg] } : t))
+    // write into recipient's thread
+    const recipientKey = 'student_messages_' + active
+    const recipientThreads = LS.get(recipientKey, [])
+    const existingThread = recipientThreads.find(t => t.with === user.email)
+    if (existingThread) {
+      LS.set(recipientKey, recipientThreads.map(t => t.with === user.email ? { ...t, messages: [...t.messages, msg] } : t))
+    } else {
+      LS.set(recipientKey, [...recipientThreads, { with: user.email, messages: [msg] }])
+    }
+    // notify recipient
+    const recipientNotifsKey = 'student_notifs_' + active
+    LS.set(recipientNotifsKey, [...LS.get(recipientNotifsKey, []), {
+      id: Date.now().toString(), read: false,
+      message: `New message from ${user.email}.`,
+      createdAt: new Date().toISOString(),
+    }])
     pushNotif(`Message sent to ${active}.`)
     setText('')
   }
@@ -1011,6 +1038,164 @@ function RecommendedSection({ user, projects, linkedCourses }) {
     </div>
   )
 }
+// ─── STUDENT PORTFOLIOS (Req 8, 9, 47–51) ────────────────────────────────────
+function StudentPortfoliosSection() {
+  const [search, setSearch]         = useState('')
+  const [filterMajor, setFilterMajor] = useState('')
+  const [filterSkill, setFilterSkill] = useState('')
+  const [selected, setSelected]     = useState(null)
+
+  const allUsers   = LS.get('guc_projecthub_users', []).filter(u => u.role === 'student')
+  const allProjects= LS.get('student_projects', [])
+  const profiles   = allUsers.map(u => ({ ...u, ...LS.get('student_profile_'+u.email, {}) }))
+
+  const withProjects = profiles.map(p => ({
+    ...p,
+    publicProjects: allProjects.filter(pr => pr.owner === p.email && pr.visibility === 'public'),
+    projectCount:   allProjects.filter(pr => pr.owner === p.email && pr.visibility === 'public').length,
+  }))
+
+  const majors    = [...new Set(profiles.map(p => p.major).filter(Boolean))]
+  const allSkills = [...new Set(profiles.flatMap(p => p.skills || []))]
+
+  // Req 47 — search by name or email
+  // Req 48 — filter by major or skills
+  // Req 50 — sort by project count
+  const displayed = withProjects
+    .filter(p => {
+      const name = `${p.firstName||''} ${p.lastName||''}`.toLowerCase()
+      return name.includes(search.toLowerCase()) || p.email.toLowerCase().includes(search.toLowerCase())
+    })
+    .filter(p => !filterMajor || p.major === filterMajor)
+    .filter(p => !filterSkill || (p.skills || []).includes(filterSkill))
+    .sort((a, b) => b.projectCount - a.projectCount)
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900">Student Portfolios</h2>
+        <p className="mt-1 text-sm text-slate-500">Search and browse student portfolios — Req 8, 9, 47–51.</p>
+      </div>
+
+      {/* Req 47, 48, 50 — search + filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative min-w-48 flex-1">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon d={IC.search} size={14}/></span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or email…"
+            className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"/>
+        </div>
+        <select value={filterMajor} onChange={e=>setFilterMajor(e.target.value)}
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="">All Majors</option>
+          {majors.map(m=><option key={m}>{m}</option>)}
+        </select>
+        <select value={filterSkill} onChange={e=>setFilterSkill(e.target.value)}
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="">All Skills</option>
+          {allSkills.map(s=><option key={s}>{s}</option>)}
+        </select>
+      </div>
+
+      {/* Req 49 — view list */}
+      {displayed.length === 0
+        ? <Card><EmptyState message="No student portfolios found."/></Card>
+        : <div className="space-y-3">
+            {displayed.map(p=>(
+              <Card key={p.email}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {p.photo
+                      ? <img src={p.photo} alt="avatar" className="h-12 w-12 shrink-0 rounded-full object-cover border-2 border-blue-200"/>
+                      : <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-700">
+                          {(p.firstName?.[0]||p.email[0]).toUpperCase()}
+                        </div>
+                    }
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900">{p.firstName} {p.lastName}</p>
+                      <p className="text-sm text-slate-500">{p.email}</p>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        {p.major && <Badge color="blue">{p.major}</Badge>}
+                        <span className="text-xs text-slate-400">{p.projectCount} public project{p.projectCount!==1?'s':''}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {(p.skills||[]).slice(0,4).map(s=><Badge key={s} color="slate">{s}</Badge>)}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Req 51 */}
+                  <Btn size="sm" variant="secondary" onClick={()=>setSelected(p)}>
+                    <Icon d={IC.eye} size={13}/>View Portfolio
+                  </Btn>
+                </div>
+              </Card>
+            ))}
+          </div>
+      }
+
+      {/* Req 51 — view portfolio detail (Req 9 — view student profile) */}
+      {selected && (
+        <Modal title={`${selected.firstName} ${selected.lastName}'s Portfolio`} onClose={()=>setSelected(null)} wide>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              {selected.photo
+                ? <img src={selected.photo} alt="avatar" className="h-14 w-14 rounded-full object-cover border-2 border-blue-200"/>
+                : <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-700">
+                    {(selected.firstName?.[0]||selected.email[0]).toUpperCase()}
+                  </div>
+              }
+              <div>
+                <p className="text-lg font-semibold text-slate-900">{selected.firstName} {selected.lastName}</p>
+                <p className="text-sm text-slate-500">{selected.email}</p>
+                {selected.major && <Badge color="blue">{selected.major}</Badge>}
+              </div>
+            </div>
+            {selected.linkedin && (
+              <a href={selected.linkedin} target="_blank" rel="noreferrer"
+                className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline">
+                <Icon d={IC.link} size={13}/>{selected.linkedin}
+              </a>
+            )}
+            {(selected.skills||[]).length > 0 && (
+              <div>
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">Skills</p>
+                <div className="flex flex-wrap gap-1.5">{selected.skills.map(s=><Badge key={s}>{s}</Badge>)}</div>
+              </div>
+            )}
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Public Projects ({selected.publicProjects.length})
+              </p>
+              {selected.publicProjects.length === 0
+                ? <p className="text-sm text-slate-400">No public projects.</p>
+                : <div className="space-y-2">
+                    {selected.publicProjects.map(proj=>(
+                      <div key={proj.id} className="rounded-lg border border-slate-200 px-3 py-2.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium text-slate-800">{proj.title}</p>
+                          <Badge color="blue">{proj.course}</Badge>
+                          {proj.rating>0 && <Badge color="yellow">★ {proj.rating}/5</Badge>}
+                        </div>
+                        {proj.description && <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{proj.description}</p>}
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {(proj.languages||[]).map(l=><Badge key={l} color="slate">{l}</Badge>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+              }
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  )
+}
+
+
+
+
+
+
 
 // ─── MAIN DASHBOARD ───────────────────────────────────────────────────────────
 export default function InstructorDashboard() {
@@ -1069,7 +1254,8 @@ export default function InstructorDashboard() {
     { id: 'invitations',   label: 'Invitations',   icon: IC.users,    badge: invites },
     { id: 'notifications', label: 'Notifications', icon: IC.bell,     badge: unread  },
     { id: 'messages',      label: 'Messages',      icon: IC.chat,     },
-    { id: 'recommended',   label: 'Recommended',   icon: IC.heart,    },
+   { id: 'recommended',   label: 'Recommended',   icon: IC.heart,    },
+    { id: 'portfolios',    label: 'Student Portfolios', icon: IC.users },
   ]
 
   const handleLogout = () => { logoutUser(); navigate('/login') }
@@ -1146,12 +1332,15 @@ export default function InstructorDashboard() {
             {tab === 'courses'       && <CoursesSection user={rawUser} linkedCourses={linkedCourses} setLinkedCourses={setLinkedCourses} pushNotif={pushNotif} />}
             {tab === 'projects'      && <ProjectsSection user={rawUser} projects={projects} setProjects={setProjects} pushNotif={pushNotif} />}
             {tab === 'invitations'   && <InvitationsSection user={rawUser} projects={projects} setProjects={setProjects} pushNotif={pushNotif} />}
-            {tab === 'notifications' && <NotificationsSection notifications={notifications} setNotifications={setNotifications} />}
+           {tab === 'notifications' && <NotificationsSection notifications={notifications} setNotifications={setNotifications} profileEmail={rawUser.email}/>}
             {tab === 'messages'      && <MessagesSection user={rawUser} pushNotif={pushNotif} />}
-            {tab === 'recommended'   && <RecommendedSection user={rawUser} projects={projects} linkedCourses={linkedCourses} />}
+           {tab === 'recommended'   && <RecommendedSection user={rawUser} projects={projects} linkedCourses={linkedCourses} />}
+            {tab === 'portfolios'    && <StudentPortfoliosSection />}
           </div>
         </main>
       </div>
     </div>
   )
-}
+}   
+
+
