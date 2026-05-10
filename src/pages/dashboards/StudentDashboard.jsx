@@ -252,7 +252,7 @@ function InstructorsSection() {
   })
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Find Instructors</h2><p className="mt-1 text-sm text-slate-500">Search by name or course — Req 8 & 9.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Find Instructors</h2><p className="mt-1 text-sm text-slate-500">Search by name or course.</p></div>
       <SearchBar value={search} onChange={setSearch} placeholder="Search by name or course…"/>
       {displayed.length===0?<Card><EmptyState message="No instructors found."/></Card>:
         <div className="space-y-3">
@@ -402,7 +402,7 @@ function CollabsModal({ project, setProjects, profile, pushNotif, onClose }) {
     <Modal title={`Collaborators — ${project.title}`} onClose={onClose} wide>
       <div className="space-y-4">
         <div>
-          <p className="mb-1.5 text-sm font-medium text-slate-700">Search & Invite (Req 25, 26)</p>
+          <p className="mb-1.5 text-sm font-medium text-slate-700">Search & Invite</p>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon d={IC.search} size={14}/></span>
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or email…"
@@ -423,7 +423,7 @@ function CollabsModal({ project, setProjects, profile, pushNotif, onClose }) {
           )}
         </div>
         <div>
-          <p className="mb-2 text-sm font-medium text-slate-700">Collaborators List — Req 27 ({collabs.length})</p>
+          <p className="mb-2 text-sm font-medium text-slate-700">Collaborators List({collabs.length})</p>
           {collabs.length===0?<EmptyState message="No collaborators yet."/>:
             <ul className="space-y-2">
               {collabs.map(c=>(
@@ -537,7 +537,7 @@ function ProjectsSection({ projects, setProjects, profile, pushNotif }) {
                 </div>
                 {(p.instructorComments||[]).length>0&&(
                   <div className="mt-3 rounded-lg bg-blue-50 p-3">
-                    <p className="mb-1 text-xs font-semibold text-blue-700">💬 Instructor Feedback (Req 40)</p>
+                    <p className="mb-1 text-xs font-semibold text-blue-700">💬 Instructor Feedback </p>
                     {p.instructorComments.map((c,i)=><p key={i} className="text-xs text-blue-800">"{c.text}" — <span className="text-blue-600">{c.author}</span></p>)}
                   </div>
                 )}
@@ -592,7 +592,7 @@ function InvitationsSection({ profile, projects, setProjects, pushNotif }) {
   }
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Project Invitations</h2><p className="mt-1 text-sm text-slate-500">Req 29 & 30 — Accept or reject project invitations.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Project Invitations</h2><p className="mt-1 text-sm text-slate-500">Accept or reject project invitations.</p></div>
       {myInvites.length===0?<Card><EmptyState message="No pending invitations."/></Card>:
         <div className="space-y-3">
           {myInvites.map(({project,collab})=>(
@@ -638,7 +638,7 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Explore Projects</h2><p className="mt-1 text-sm text-slate-500">Req 42–46 — Search, filter by course/instructor/date, sort, view details.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Explore Projects</h2><p className="mt-1 text-sm text-slate-500"> Search, filter by course/instructor/date, sort, view details.</p></div>
       <div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by project title…"/>
         <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
@@ -708,7 +708,7 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios })
   const toggleFav=email=>setFavPortfolios(p=>p.includes(email)?p.filter(x=>x!==email):[...p,email])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Explore Portfolios</h2><p className="mt-1 text-sm text-slate-500">Req 47–51 — Search by name/email, filter by major/skills, sort by project count.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Explore Portfolios</h2><p className="mt-1 text-sm text-slate-500">Search by name/email, filter by major/skills, sort by project count.</p></div>
       <div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name or email…"/>
         <select value={filterMajor} onChange={e=>setFilterMajor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
@@ -776,7 +776,7 @@ function FavoritesSection({ projects, favProjects, setFavProjects, favPortfolios
   const savedPortfolios=favPortfolios.map(email=>{const p=allProfiles.find(x=>x.email===email);return p?{...p,projectCount:projects.filter(pr=>pr.owner===email&&pr.visibility==='public').length}:null}).filter(Boolean)
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">My Favorites — Req 65 & 66</h2>
+      <h2 className="text-2xl font-bold text-slate-900">My Favorites</h2>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
           <h3 className="mb-3 font-semibold text-slate-800">Saved Projects ({savedProjects.length})</h3>
@@ -814,7 +814,7 @@ function RecommendedSection({ profile, projects, favProjects, setFavProjects }) 
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Recommended Projects — Req 67</h2><p className="mt-1 text-sm text-slate-500">Projects matching your programming languages.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Recommended Projects</h2><p className="mt-1 text-sm text-slate-500">Projects matching your programming languages.</p></div>
       {scored.length===0?<Card><EmptyState message="No recommendations yet. Add projects with languages to get personalized recommendations."/></Card>:
         <div className="space-y-3">{scored.slice(0,10).map(p=>(
           <Card key={p.id}>
@@ -844,7 +844,7 @@ function MessagesSection({ profile, pushNotif }) {
   const activeThread=threads.find(t=>t.with===active)
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Messages — Req 68, 69, 70</h2>
+      <h2 className="text-2xl font-bold text-slate-900">Messages </h2>
       <div className="flex gap-4" style={{minHeight:'420px'}}>
         <div className="w-56 shrink-0 space-y-2">
           <div className="flex gap-1.5">
@@ -926,10 +926,10 @@ function InternshipsSection({ profile, pushNotif }) {
   const stColor={pending:'yellow',nominated:'purple',accepted:'green',rejected:'red'}
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Internships — Req 79–84, 89, 90</h2>
+      <h2 className="text-2xl font-bold text-slate-900">Internships</h2>
       {completedInternships.length>0&&(
         <Card className="border-green-200 bg-green-50">
-          <p className="font-semibold text-green-800 mb-2">✓ Completed Internships on Portfolio (Req 90)</p>
+          <p className="font-semibold text-green-800 mb-2">✓ Completed Internships on Portfolio</p>
           <div className="flex flex-wrap gap-2">{completedInternships.map(a=><Badge key={a.id} color="green">{a.internship.title} @ {a.internship.companyName||a.internship.companyEmail}</Badge>)}</div>
         </Card>
       )}
@@ -983,7 +983,7 @@ function NotificationsSection({ notifications, setNotifications }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 className="text-2xl font-bold text-slate-900">Notifications — Req 35, 36, 91</h2>{unread>0&&<p className="mt-0.5 text-sm text-slate-500">{unread} unread</p>}</div>
+        <div><h2 className="text-2xl font-bold text-slate-900">Notifications </h2>{unread>0&&<p className="mt-0.5 text-sm text-slate-500">{unread} unread</p>}</div>
         <div className="flex flex-wrap gap-2">
           <Btn size="sm" variant="secondary" onClick={()=>markAll(true)}>Mark all read</Btn>
           <Btn size="sm" variant="secondary" onClick={()=>markAll(false)}>Mark all unread</Btn>
@@ -1014,7 +1014,7 @@ function StatsSection({ projects, profile }) {
   const topCollabs=Object.entries(colMap).sort((a,b)=>b[1]-a[1]).slice(0,5)
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">My Statistics — Req 72</h2>
+      <h2 className="text-2xl font-bold text-slate-900">My Statistics </h2>
       <div className="grid gap-4 sm:grid-cols-3">
         {[{label:'Total Projects',value:myProjects.length},{label:'Public Projects',value:myProjects.filter(p=>p.visibility==='public').length},{label:'Collaborators',value:Object.keys(colMap).length}].map(s=>(
           <Card key={s.label} className="text-center"><p className="text-4xl font-bold text-blue-700">{s.value}</p><p className="mt-1 text-sm text-slate-500">{s.label}</p></Card>
