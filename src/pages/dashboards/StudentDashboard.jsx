@@ -707,12 +707,13 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
   )
 }
 
-function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios }) {
+function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios, setTab }) {
   const [search, setSearch]=useState('')
   const [filterMajor, setFilterMajor]=useState('')
   const [filterSkill, setFilterSkill]=useState('')
   const [selected, setSelected]=useState(null)
-  const allUsers=LS.get('guc_projecthub_users',[]).filter(u=>u.role==='student')
+  const currentUser=getCurrentUser()
+  const allUsers=LS.get('guc_projecthub_users',[]).filter(u=>u.role==='student'&&u.email!==currentUser?.email)
   const profiles=allUsers.map(u=>({...u,...LS.get('student_profile_'+u.email,{})}))
   const withProjects=profiles.map(p=>({...p,publicProjects:projects.filter(pr=>pr.owner===p.email&&pr.visibility==='public'),projectCount:projects.filter(pr=>pr.owner===p.email&&pr.visibility==='public').length}))
   const majors=[...new Set(profiles.map(p=>p.major).filter(Boolean))]
@@ -752,8 +753,13 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios })
                     <div className="flex flex-wrap gap-1 mt-1">{(p.skills||[]).slice(0,4).map(s=><Badge key={s} color="slate">{s}</Badge>)}</div>
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+<div className="flex gap-2 shrink-0">
                   <Btn size="sm" variant="secondary" onClick={()=>setSelected(p)}><Icon d={IC.eye} size={13}/>View Portfolio</Btn>
+                  <Btn size="sm" variant="secondary" onClick={()=>{
+                    setTab('messages')
+                    // store target email so MessagesSection can auto-open it
+                    LS.set('student_pending_message_target', p.email)
+                  }}><Icon d={IC.chat} size={13}/>Message</Btn>
                   <button onClick={()=>toggleFav(p.email)} className={`rounded-lg p-1.5 transition ${favPortfolios.includes(p.email)?'text-red-500':'text-slate-300 hover:text-red-400'}`}><Icon d={IC.heart} size={16}/></button>
                 </div>
               </div>
@@ -793,9 +799,10 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios })
 }
 
 function FavoritesSection({ projects, favProjects, setFavProjects, favPortfolios, setFavPortfolios }) {
-  const allUsers=LS.get('guc_projecthub_users',[]).filter(u=>u.role==='student')
+ const currentUser=getCurrentUser()
+  const allUsers=LS.get('guc_projecthub_users',[]).filter(u=>u.role==='student'&&u.email!==currentUser?.email)
   const allProfiles=allUsers.map(u=>({...u,...LS.get('student_profile_'+u.email,{})}))
-  const savedProjects=favProjects.map(id=>projects.find(p=>p.id===id)).filter(Boolean)
+ const savedProjects=favProjects.map(id=>projects.find(p=>p.id===id)).filter(p=>p&&p.owner!==currentUser?.email)
   const savedPortfolios=favPortfolios.map(email=>{const p=allProfiles.find(x=>x.email===email);return p?{...p,projectCount:projects.filter(pr=>pr.owner===email&&pr.visibility==='public').length}:null}).filter(Boolean)
   return (
     <div className="space-y-6">
@@ -862,7 +869,18 @@ function MessagesSection({ profile, pushNotif }) {
   const [active, setActive]=useState(null)
   const [newEmail, setNewEmail]=useState('')
   const [text, setText]=useState('')
-  const startThread=()=>{const em=newEmail.trim().toLowerCase();if(!em)return;if(threads.some(t=>t.with===em)){setActive(em);setNewEmail('');return}setThreads(p=>[...p,{with:em,messages:[]}]);setActive(em);setNewEmail('')}
+ const startThread=()=>{const em=newEmail.trim().toLowerCase();if(!em)return;if(threads.some(t=>t.with===em)){setActive(em);setNewEmail('');return}setThreads(p=>[...p,{with:em,messages:[]}]);setActive(em);setNewEmail('')}
+  // auto-open pending message target from portfolio page
+  useState(()=>{
+    const target=LS.get('student_pending_message_target',null)
+    if(target){
+      LS.set('student_pending_message_target',null)
+      if(!threads.some(t=>t.with===target)){
+        setThreads(p=>[...p,{with:target,messages:[]}])
+      }
+      setActive(target)
+    }
+  })
   const send=()=>{
   if(!text.trim()||!active)return
   const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString()}
@@ -1133,7 +1151,7 @@ const pushNotif=msg=>{if(!notifsEnabled)return;setNotificationsLS(p=>[...p,{id:D
         {navItems.map(item=>(
           <button key={item.id} onClick={()=>{setTab(item.id);setSidebar(false)}} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${tab===item.id?'bg-blue-700 text-white':'text-slate-700 hover:bg-slate-100 hover:text-blue-700'}`}>
             <Icon d={item.icon} size={16}/><span>{item.label}</span>
-            {item.badge>0&&<span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tab===item.id?'bg-white text-blue-700':'bg-blue-100 text-blue-700'}`}>{item.badge}</span>}
+            {item.badge>0&&<span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tab===item.id?'bg-white text-blue-700':'bg-red-500 text-white'}`}>{item.badge}</span>}
           </button>
         ))}
       </nav>
@@ -1166,7 +1184,7 @@ const pushNotif=msg=>{if(!notifsEnabled)return;setNotificationsLS(p=>[...p,{id:D
             {tab==='invitations'&&<InvitationsSection profile={p} projects={projects} setProjects={setProjects} pushNotif={pushNotif}/>}
             {tab==='instructors'&&<InstructorsSection/>}
             {tab==='explore'&&<ExploreProjectsSection profile={p} projects={projects} favProjects={favProjects} setFavProjects={setFavProjects}/>}
-            {tab==='portfolios'&&<ExplorePortfoliosSection projects={projects} favPortfolios={favPortfolios} setFavPortfolios={setFavPortfolios}/>}
+          {tab==='portfolios'&&<ExplorePortfoliosSection projects={projects} favPortfolios={favPortfolios} setFavPortfolios={setFavPortfolios} setTab={setTab}/>}
             {tab==='favorites'&&<FavoritesSection projects={projects} favProjects={favProjects} setFavProjects={setFavProjects} favPortfolios={favPortfolios} setFavPortfolios={setFavPortfolios}/>}
             {tab==='recommended'&&<RecommendedSection profile={p} projects={projects} favProjects={favProjects} setFavProjects={setFavProjects}/>}
             {tab==='messages'&&<MessagesSection profile={p} pushNotif={pushNotif}/>}
