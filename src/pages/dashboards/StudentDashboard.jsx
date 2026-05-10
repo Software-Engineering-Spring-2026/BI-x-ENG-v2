@@ -638,7 +638,7 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Explore Projects</h2><p className="mt-1 text-sm text-slate-500"> Search, filter by course/instructor/date, sort, view details.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Explore All Projects</h2><p className="mt-1 text-sm text-slate-500"> Search, filter by course/instructor/date, sort, view details.</p></div>
       <div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by project title…"/>
         <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
@@ -708,7 +708,7 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios })
   const toggleFav=email=>setFavPortfolios(p=>p.includes(email)?p.filter(x=>x!==email):[...p,email])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Explore Portfolios</h2><p className="mt-1 text-sm text-slate-500">Search by name/email, filter by major/skills, sort by project count.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900">Explore All Portfolios</h2><p className="mt-1 text-sm text-slate-500">Search by name/email, filter by major/skills, sort by project count.</p></div>
       <div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name or email…"/>
         <select value={filterMajor} onChange={e=>setFilterMajor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
@@ -780,7 +780,7 @@ function FavoritesSection({ projects, favProjects, setFavProjects, favPortfolios
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
           <h3 className="mb-3 font-semibold text-slate-800">Saved Projects ({savedProjects.length})</h3>
-          {savedProjects.length===0?<Card><EmptyState message="No saved projects. Heart a project in Explore Projects."/></Card>:
+          {savedProjects.length===0?<Card><EmptyState message="No saved projects. Heart a project in Explore All Projects."/></Card>:
             <div className="space-y-2">{savedProjects.map(p=>(
               <Card key={p.id} className="flex items-center justify-between gap-3">
                 <div className="min-w-0"><p className="font-medium text-slate-800 truncate">{p.title}</p><div className="flex gap-1.5 mt-0.5"><Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div></div>
@@ -791,7 +791,7 @@ function FavoritesSection({ projects, favProjects, setFavProjects, favPortfolios
         </div>
         <div>
           <h3 className="mb-3 font-semibold text-slate-800">Saved Portfolios ({savedPortfolios.length})</h3>
-          {savedPortfolios.length===0?<Card><EmptyState message="No saved portfolios. Heart a portfolio in Explore Portfolios."/></Card>:
+          {savedPortfolios.length===0?<Card><EmptyState message="No saved portfolios. Heart a portfolio in Explore All Portfolios."/></Card>:
             <div className="space-y-2">{savedPortfolios.map(p=>(
               <Card key={p.email} className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
