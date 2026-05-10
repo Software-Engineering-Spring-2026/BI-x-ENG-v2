@@ -193,7 +193,10 @@ function Overview({ user, projects, notifications, setTab }) {
 
 function ProfileSection({ profile, setProfile }) {
   const [editing, setEditing]=useState(false)
+
+
   const [form, setForm]=useState(profile)
+  const [photoKey, setPhotoKey]=useState(0)
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}))
   const save=()=>{setProfile(form);setEditing(false)}
   return (
@@ -205,9 +208,23 @@ function ProfileSection({ profile, setProfile }) {
       <Card>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
           <div className="flex flex-col items-center gap-2 shrink-0">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-700">{(profile.firstName?.[0]||'S').toUpperCase()}</div>
-            <label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600">
-              <Icon d={IC.upload} size={12}/> Upload Photo<input type="file" className="hidden" accept="image/*"/>
+            {profile.photo
+  ? <img src={profile.photo} alt="avatar" className="h-24 w-24 rounded-full object-cover border-2 border-blue-200"/>
+  : <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-700">{(profile.firstName?.[0]||'S').toUpperCase()}</div>
+}
+<label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600">
+              <Icon d={IC.upload} size={12}/> {profile.photo ? 'Change Photo' : 'Upload Photo'}
+              <input type="file" className="hidden" accept="image/*" key={photoKey} onChange={e=>{
+                const file=e.target.files?.[0]
+                if(!file)return
+                const reader=new FileReader()
+                reader.onload=ev=>{
+                  setProfile(prev=>({...prev,photo:ev.target.result}))
+                  setForm(prev=>({...prev,photo:ev.target.result}))
+                  setPhotoKey(k=>k+1)
+                }
+                reader.readAsDataURL(file)
+              }}/>
             </label>
           </div>
           <div className="flex-1 space-y-4">
@@ -724,7 +741,10 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios })
             <Card key={p.email}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-700">{(p.firstName?.[0]||p.email[0]).toUpperCase()}</div>
+                  {p.photo
+  ? <img src={p.photo} alt="avatar" className="h-12 w-12 shrink-0 rounded-full object-cover border-2 border-blue-200"/>
+  : <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-700">{(p.firstName?.[0]||p.email[0]).toUpperCase()}</div>
+}
                   <div className="min-w-0">
                     <p className="font-semibold text-slate-900">{p.firstName} {p.lastName}</p>
                     <p className="text-sm text-slate-500">{p.email}</p>
@@ -745,7 +765,10 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios })
         <Modal title={`${selected.firstName} ${selected.lastName}'s Portfolio`} onClose={()=>setSelected(null)} wide>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-700">{(selected.firstName?.[0]||selected.email[0]).toUpperCase()}</div>
+              {selected.photo
+  ? <img src={selected.photo} alt="avatar" className="h-14 w-14 rounded-full object-cover border-2 border-blue-200"/>
+  : <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-700">{(selected.firstName?.[0]||selected.email[0]).toUpperCase()}</div>
+}
               <div><p className="font-semibold text-slate-900 text-lg">{selected.firstName} {selected.lastName}</p><p className="text-sm text-slate-500">{selected.email}</p>{selected.major&&<Badge color="blue">{selected.major}</Badge>}</div>
             </div>
             {selected.linkedin&&<a href={selected.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline"><Icon d={IC.link} size={13}/>{selected.linkedin}</a>}
@@ -840,7 +863,23 @@ function MessagesSection({ profile, pushNotif }) {
   const [newEmail, setNewEmail]=useState('')
   const [text, setText]=useState('')
   const startThread=()=>{const em=newEmail.trim().toLowerCase();if(!em)return;if(threads.some(t=>t.with===em)){setActive(em);setNewEmail('');return}setThreads(p=>[...p,{with:em,messages:[]}]);setActive(em);setNewEmail('')}
-  const send=()=>{if(!text.trim()||!active)return;const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString()};setThreads(p=>p.map(t=>t.with===active?{...t,messages:[...t.messages,msg]}:t));pushNotif(`Message sent to ${active}.`);setText('')}
+  const send=()=>{
+  if(!text.trim()||!active)return
+  const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString()}
+  setThreads(p=>p.map(t=>t.with===active?{...t,messages:[...t.messages,msg]}:t))
+  const recipientKey='student_messages_'+active
+  const recipientThreads=LS.get(recipientKey,[])
+  const existingThread=recipientThreads.find(t=>t.with===profile.email)
+  if(existingThread){
+    LS.set(recipientKey,recipientThreads.map(t=>t.with===profile.email?{...t,messages:[...t.messages,msg]}:t))
+  } else {
+    LS.set(recipientKey,[...recipientThreads,{with:profile.email,messages:[msg]}])
+  }
+  const recipientNotifsKey='student_notifs_'+active
+  LS.set(recipientNotifsKey,[...LS.get(recipientNotifsKey,[]),{id:Date.now().toString(),read:false,message:`New message from ${profile.email}.`,createdAt:new Date().toISOString()}])
+  pushNotif(`Message sent to ${active}.`)
+  setText('')
+}
   const activeThread=threads.find(t=>t.with===active)
   return (
     <div className="space-y-6">
@@ -975,8 +1014,8 @@ function InternshipsSection({ profile, pushNotif }) {
   )
 }
 
-function NotificationsSection({ notifications, setNotifications }) {
-  const [notifsOn, setNotifsOn]=useState(true)
+function NotificationsSection({ notifications, setNotifications, profileEmail }) {
+  const [notifsOn, setNotifsOn]=useLS('student_notifs_on_'+(profileEmail||'default'),true)
   const unread=notifications.filter(n=>!n.read).length
   const markAll=read=>setNotifications(p=>p.map(n=>({...n,read})))
   const toggle=id=>setNotifications(p=>p.map(n=>n.id===id?{...n,read:!n.read}:n))
@@ -1062,23 +1101,25 @@ export default function StudentDashboard() {
   const setNotifications=fn=>setNotificationsLS(typeof fn==='function'?fn(notifications):fn)
   const setFavProjects=fn=>setFavProjectsLS(typeof fn==='function'?fn(favProjects):fn)
   const setFavPortfolios=fn=>setFavPortfoliosLS(typeof fn==='function'?fn(favPortfolios):fn)
-  const pushNotif=msg=>setNotificationsLS(p=>[...p,{id:Date.now().toString(),message:msg,read:false,createdAt:new Date().toISOString()}])
+  const notifsEnabled=LS.get('student_notifs_on_'+rawUser.email,true)
+const pushNotif=msg=>{if(!notifsEnabled)return;setNotificationsLS(p=>[...p,{id:Date.now().toString(),message:msg,read:false,createdAt:new Date().toISOString()}])}
   const unread=notifications.filter(n=>!n.read).length
   const invites=projects.filter(p=>(p.collaborators||[]).some(c=>c.email===rawUser.email&&c.status==='pending')).length
   const navItems=[
     {id:'overview',label:'Overview',icon:IC.home},
     {id:'profile',label:'My Profile',icon:IC.user},
+    {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
     {id:'projects',label:'My Projects',icon:IC.folder},
+    {id:'explore',label:'Explore All Projects',icon:IC.eye},
     {id:'invitations',label:'Invitations',icon:IC.users,badge:invites},
     {id:'instructors',label:'Find Instructors',icon:IC.book},
-    {id:'explore',label:'Explore Projects',icon:IC.eye},
-    {id:'portfolios',label:'Explore Portfolios',icon:IC.users},
+    {id:'portfolios',label:'Explore All Portfolios',icon:IC.users},
     {id:'favorites',label:'Favorites',icon:IC.heart},
     {id:'recommended',label:'Recommended',icon:IC.star},
     {id:'messages',label:'Messages',icon:IC.chat},
     {id:'internships',label:'Internships',icon:IC.briefcase},
     {id:'stats',label:'Statistics',icon:IC.chart},
-    {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
+
   ]
   const handleLogout=()=>{logoutUser();navigate('/login')}
   const NavContent=()=>(
@@ -1131,7 +1172,7 @@ export default function StudentDashboard() {
             {tab==='messages'&&<MessagesSection profile={p} pushNotif={pushNotif}/>}
             {tab==='internships'&&<InternshipsSection profile={p} pushNotif={pushNotif}/>}
             {tab==='stats'&&<StatsSection projects={projects} profile={p}/>}
-            {tab==='notifications'&&<NotificationsSection notifications={notifications} setNotifications={setNotifications}/>}
+            {tab==='notifications'&&<NotificationsSection notifications={notifications} setNotifications={setNotifications} profileEmail={rawUser.email}/>}
           </div>
         </main>
       </div>
