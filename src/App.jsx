@@ -1,5 +1,5 @@
-import CompanyProfile from './pages/employer/CompanyProfile'
-import CompanyLocation from './pages/employer/CompanyLocation'
+import CompanyProfile from './pages/Employer/CompanyProfile.jsx/index.js'
+import CompanyLocation from './pages/Employer/CompanyLocation.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import PublicLayout from './layouts/PublicLayout'
 import Landing from './pages/public/Landing'
