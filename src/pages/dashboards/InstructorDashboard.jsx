@@ -13,6 +13,176 @@ function useLS(key, initial) {
   return [val, save]
 }
 
+/** Seeds instructor demo localStorage only when a key is missing or stores an empty value (never overwrites real data). */
+function seedInstructorDemoData(userEmail) {
+  if (!userEmail) return
+
+  const missingOrEmpty = (key, kind) => {
+    const raw = localStorage.getItem(key)
+    if (raw === null || raw === '') return true
+    try {
+      const v = JSON.parse(raw)
+      if (kind === 'array') return !Array.isArray(v) || v.length === 0
+      if (kind === 'object') return !v || typeof v !== 'object' || Array.isArray(v) || Object.keys(v).length === 0
+      return false
+    } catch {
+      return true
+    }
+  }
+
+  const profileKey = `instructor_profile_${userEmail}`
+  if (missingOrEmpty(profileKey, 'object')) {
+    LS.set(profileKey, {
+      firstName: '',
+      lastName: '',
+      bio: 'Associate professor focusing on software engineering education and applied machine learning. Advises undergraduate capstone teams and graduate seminars.',
+      research: 'Human–computer interaction for collaboration tools, educational data mining, and trustworthy ML in production systems.',
+      education: 'Ph.D. Computer Science — Technical University; M.Sc. Software Engineering — GUC.',
+    })
+  }
+
+  const coursesKey = `instructor_courses_${userEmail}`
+  if (missingOrEmpty(coursesKey, 'array')) {
+    LS.set(coursesKey, ['Bachelor Project', 'CSEN 603', 'CSEN 701'])
+  }
+
+  const notifsKey = `instructor_notifs_${userEmail}`
+  if (missingOrEmpty(notifsKey, 'array')) {
+    LS.set(notifsKey, [
+      { id: 'demo-n1', read: false, message: 'Reminder: Bachelor Project thesis drafts are due for review this week.', createdAt: '2026-05-08T09:00:00.000Z' },
+      { id: 'demo-n2', read: false, message: 'You have a new project invitation waiting in Invitations.', createdAt: '2026-05-09T11:15:00.000Z' },
+      { id: 'demo-n3', read: true, message: 'Course link request for CSEN 701 was approved.', createdAt: '2026-05-02T14:20:00.000Z' },
+      { id: 'demo-n4', read: true, message: 'Weekly digest: 2 assigned projects updated this month.', createdAt: '2026-04-28T08:45:00.000Z' },
+    ])
+  }
+
+  const messagesKey = `instructor_messages_${userEmail}`
+  if (missingOrEmpty(messagesKey, 'array')) {
+    LS.set(messagesKey, [
+      {
+        with: 'student.alaa@guc.edu.eg',
+        messages: [
+          { id: 'demo-m1', from: userEmail, text: 'Thanks for uploading the midterm progress deck — looks good.', at: '2026-05-06T10:30:00.000Z' },
+          { id: 'demo-m2', from: 'student.alaa@guc.edu.eg', text: 'Will push the revised milestones by Friday.', at: '2026-05-06T15:45:00.000Z' },
+        ],
+      },
+      {
+        with: 'student.basma@guc.edu.eg',
+        messages: [
+          { id: 'demo-m3', from: 'student.basma@guc.edu.eg', text: 'Could we schedule a quick sync on the VR prototype?', at: '2026-05-07T09:00:00.000Z' },
+          { id: 'demo-m4', from: userEmail, text: 'Thursday 3pm works — I will send a calendar invite.', at: '2026-05-07T09:12:00.000Z' },
+        ],
+      },
+    ])
+  }
+
+  if (missingOrEmpty('student_projects', 'array')) {
+    LS.set('student_projects', [
+      {
+        id: 'demo-ins-accepted-1',
+        title: 'Distributed ML Pipeline',
+        owner: 'student.alaa@guc.edu.eg',
+        course: 'CSEN 603',
+        description: 'End-to-end training and deployment pipeline with experiment tracking and reproducible builds.',
+        visibility: 'private',
+        createdAt: '2026-02-15T10:00:00.000Z',
+        rating: 4,
+        languages: ['Python', 'PyTorch', 'Docker'],
+        collaborators: [
+          { email: userEmail, status: 'accepted', invitedAt: '2026-02-16T12:00:00.000Z' },
+        ],
+        tasks: [
+          { id: 'demo-t-a1', title: 'Literature survey', description: 'Related work on distributed training.', status: 'completed', instructorComment: 'Good coverage of recent frameworks.' },
+          { id: 'demo-t-a2', title: 'Baseline benchmarks', description: 'Establish throughput metrics.', status: 'completed', instructorComment: '' },
+        ],
+        github: 'https://github.com/example/distributed-ml-pipeline',
+        demoVideo: 'https://example.com/demo/distributed-ml',
+        thesisDrafts: [],
+        instructorComments: [
+          { id: 'demo-ic-a1', text: 'Architecture diagram is clear; consider documenting failure modes.', author: userEmail, at: '2026-03-01T09:00:00.000Z' },
+        ],
+        flagged: false,
+        flagReason: '',
+      },
+      {
+        id: 'demo-ins-pending-1',
+        title: 'VR Campus Tour',
+        owner: 'student.basma@guc.edu.eg',
+        course: 'CSEN 701',
+        description: 'Interactive VR walkthrough of campus buildings with accessibility mode.',
+        visibility: 'private',
+        createdAt: '2026-04-22T11:20:00.000Z',
+        rating: 0,
+        languages: ['C#', 'Unity'],
+        collaborators: [
+          { email: userEmail, status: 'pending', invitedAt: '2026-05-01T14:30:00.000Z' },
+        ],
+        tasks: [
+          { id: 'demo-t-b1', title: 'Scene blocking', description: 'Greybox main quad.', status: 'completed', instructorComment: '' },
+          { id: 'demo-t-b2', title: 'Performance pass', description: 'Target 90 FPS on lab headsets.', status: 'completed', instructorComment: '' },
+        ],
+        github: 'https://github.com/example/vr-campus-tour',
+        demoVideo: '',
+        thesisDrafts: [],
+        instructorComments: [],
+        flagged: false,
+        flagReason: '',
+      },
+      {
+        id: 'demo-ins-bachelor-thesis-1',
+        title: 'Smart Campus Parking',
+        owner: 'student.carim@guc.edu.eg',
+        course: 'Bachelor Project',
+        description: 'Sensor fusion and mobile app for real-time parking availability across campus lots.',
+        visibility: 'private',
+        createdAt: '2025-09-10T08:00:00.000Z',
+        rating: 5,
+        languages: ['TypeScript', 'React Native', 'Node.js'],
+        collaborators: [
+          { email: userEmail, status: 'accepted', invitedAt: '2025-09-12T09:15:00.000Z' },
+        ],
+        tasks: [
+          { id: 'demo-t-c1', title: 'User study', description: 'Pilot with 20 participants.', status: 'completed', instructorComment: 'Ethics appendix approved.' },
+        ],
+        github: 'https://github.com/example/smart-campus-parking',
+        demoVideo: 'https://example.com/demo/smart-parking',
+        thesisDrafts: [
+          { id: 'demo-td-c1', name: 'Draft_v2.pdf', isFinal: false, uploadedAt: '2026-03-01T12:00:00.000Z' },
+          { id: 'demo-td-c2', name: 'Final_Thesis_SmartParking.pdf', isFinal: true, uploadedAt: '2026-04-20T16:00:00.000Z' },
+        ],
+        instructorComments: [
+          { id: 'demo-ic-c1', text: 'Final thesis PDF received — scheduling defense.', author: userEmail, at: '2026-04-21T10:00:00.000Z' },
+        ],
+        flagged: false,
+        flagReason: '',
+      },
+      {
+        id: 'demo-ins-public-rec-1',
+        title: 'Collaborative Notes Hub',
+        owner: 'student.dana@guc.edu.eg',
+        course: 'CSEN 603',
+        description: 'Real-time collaborative markdown notes with CRDT sync — shared publicly for the course community.',
+        visibility: 'public',
+        createdAt: '2026-03-05T13:40:00.000Z',
+        rating: 5,
+        languages: ['Rust', 'WebSockets', 'React'],
+        collaborators: [
+          { email: 'peer.reviewer@guc.edu.eg', status: 'accepted', invitedAt: '2026-03-06T10:00:00.000Z' },
+        ],
+        tasks: [
+          { id: 'demo-t-d1', title: 'CRDT integration', description: 'Merge semantics for concurrent edits.', status: 'completed', instructorComment: '' },
+        ],
+        github: 'https://github.com/example/notes-hub',
+        demoVideo: 'https://example.com/demo/notes-hub',
+        thesisDrafts: [],
+        instructorComments: [],
+        flagged: false,
+        flagReason: '',
+      },
+    ])
+  }
+}
+
 // ─── constants ────────────────────────────────────────────────────────────────
 const ALL_COURSES = [
   'CSEN 401', 'CSEN 402', 'CSEN 501', 'CSEN 502',
@@ -145,12 +315,15 @@ const StarRating = ({ value, onChange }) => (
 const getSharedProjects = () => LS.get('student_projects', [])
 const setSharedProjects = (v) => LS.set('student_projects', typeof v === 'function' ? v(getSharedProjects()) : v)
 
+const unreadNotificationCount = (notifications) =>
+  notifications.filter((n) => n.read === false).length
+
 // ─── OVERVIEW ─────────────────────────────────────────────────────────────────
 function Overview({ user, profile, linkedCourses, notifications, projects, setTab }) {
   const assignedProjects = projects.filter(p =>
     (p.collaborators || []).some(c => c.email === user.email && c.status === 'accepted')
   )
-  const unread   = notifications.filter(n => !n.read).length
+  const unread   = unreadNotificationCount(notifications)
   const invites  = projects.filter(p =>
     (p.collaborators || []).some(c => c.email === user.email && c.status === 'pending')
   ).length
@@ -278,14 +451,13 @@ function ProfileSection({ user, profile, setProfile }) {
             }
             <label className="cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600">
               <Icon d={IC.upload} size={12} /> {profile.photo ? 'Change Photo' : 'Upload Photo'}
-              <input type="file" className="hidden" accept="image/*" key={photoKey} onChange={e=>{
+              <input type="file" className="hidden" accept="image/*" onChange={e => {
                 const file=e.target.files?.[0]
                 if(!file)return
                 const reader=new FileReader()
                 reader.onload=ev=>{
                   setProfile(prev=>({...prev,photo:ev.target.result}))
                   setForm(prev=>({...prev,photo:ev.target.result}))
-                  setPhotoKey(k=>k+1)
                 }
                 reader.readAsDataURL(file)
               }}/>
@@ -836,7 +1008,7 @@ function InvitationsSection({ user, projects, setProjects, pushNotif }) {
 // ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
 function NotificationsSection({ notifications, setNotifications, profileEmail }) {
   const [notifsOn, setNotifsOn] = useLS('instructor_notifs_on_'+(profileEmail||'default'), true)
-  const unread = notifications.filter(n => !n.read).length
+  const unread = unreadNotificationCount(notifications)
   const markAll = read => setNotifications(p => p.map(n => ({ ...n, read })))
   const toggle  = id   => setNotifications(p => p.map(n => n.id === id ? { ...n, read: !n.read } : n))
 
@@ -1207,6 +1379,8 @@ export default function InstructorDashboard() {
     return null
   }
 
+  seedInstructorDemoData(rawUser.email)
+
   const [tab, setTab]         = useState('overview')
   const [sidebarOpen, setSidebar] = useState(false)
 
@@ -1241,7 +1415,7 @@ export default function InstructorDashboard() {
     id: Date.now().toString(), message: msg, read: false, createdAt: new Date().toISOString(),
   }])
 
-  const unread  = notifications.filter(n => !n.read).length
+  const unread  = unreadNotificationCount(notifications)
   const invites = projects.filter(p =>
     (p.collaborators || []).some(c => c.email === rawUser.email && c.status === 'pending')
   ).length
@@ -1252,7 +1426,7 @@ export default function InstructorDashboard() {
     { id: 'courses',       label: 'My Courses',    icon: IC.book,     },
     { id: 'projects',      label: 'Projects',      icon: IC.folder,   },
     { id: 'invitations',   label: 'Invitations',   icon: IC.users,    badge: invites },
-    { id: 'notifications', label: 'Notifications', icon: IC.bell,     badge: unread  },
+    { id: 'notifications', label: 'Notifications', icon: IC.bell,     badge: unread, badgeTone: 'red' },
     { id: 'messages',      label: 'Messages',      icon: IC.chat,     },
    { id: 'recommended',   label: 'Recommended',   icon: IC.heart,    },
     { id: 'portfolios',    label: 'Student Portfolios', icon: IC.users },
@@ -1277,8 +1451,16 @@ export default function InstructorDashboard() {
             <Icon d={item.icon} size={16} />
             <span>{item.label}</span>
             {item.badge > 0 && (
-              <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold
-                ${tab === item.id ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-700'}`}>
+              <span
+                className={
+                  item.badgeTone === 'red'
+                    ? `ml-auto flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold leading-none text-white shadow-sm ${
+                        tab === item.id ? 'bg-red-500 ring-2 ring-white/90' : 'bg-red-600'
+                      }`
+                    : `ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        tab === item.id ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-700'
+                      }`
+                }>
                 {item.badge}
               </span>
             )}
@@ -1321,7 +1503,11 @@ export default function InstructorDashboard() {
           </button>
           <span className="font-semibold text-slate-900">Instructor Portal</span>
           {unread > 0 && (
-            <span className="ml-auto rounded-full bg-blue-700 px-2 py-0.5 text-xs font-semibold text-white">{unread}</span>
+            <span
+              className="ml-auto flex h-6 min-w-[1.5rem] shrink-0 items-center justify-center rounded-full bg-red-600 px-2 text-xs font-semibold leading-none text-white shadow-sm"
+              aria-label={`${unread} unread notifications`}>
+              {unread}
+            </span>
           )}
         </header>
 

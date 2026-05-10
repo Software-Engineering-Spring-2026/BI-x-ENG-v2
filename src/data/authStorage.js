@@ -1,13 +1,28 @@
 const USERS_KEY = 'guc_projecthub_users';
-const CURRENT_USER_KEY = 'guc_projecthub_currentUser'; 
+const CURRENT_USER_KEY = 'guc_projecthub_current_user';
 
+function readUsersSafe() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    if (raw === null || raw === '') return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
-
-// --- GLOBAL DATABASE (localStorage) ---
-
-export const seedDemoUsers = () => {
-  if (!localStorage.getItem(USERS_KEY)) {
-  const demoUsers = [
+/** Canonical demo rows inserted only when that email is not already present (never overwrites). */
+const DEMO_ACCOUNTS = [
+  {
+    firstName: 'Demo',
+    lastName: 'Student',
+    email: 'student@student.guc.edu.eg',
+    password: '123456',
+    role: 'student',
+    major: 'Computer Science',
+    graduationYear: '2026',
+  },
   {
     firstName: 'Ahmed',
     lastName: 'Mohamed',
@@ -38,16 +53,38 @@ export const seedDemoUsers = () => {
     role: 'employer',
     status: 'pending verification',
   },
-] ;
-    localStorage.setItem(USERS_KEY, JSON.stringify(demoUsers));
+];
+
+// --- GLOBAL DATABASE (localStorage) ---
+
+/**
+ * Ensures required demo accounts exist. Missing/corrupt storage starts from [].
+ * Adds each demo account only if no user with that email exists (no overwrites).
+ * @returns {object[]} final merged users array
+ */
+export const seedDemoUsers = () => {
+  let users = readUsersSafe();
+  const emails = new Set(
+    users.map((u) => (u && u.email ? String(u.email).toLowerCase() : null)).filter(Boolean),
+  );
+
+  let changed = false;
+  for (const demo of DEMO_ACCOUNTS) {
+    const key = demo.email.toLowerCase();
+    if (!emails.has(key)) {
+      users.push({ ...demo });
+      emails.add(key);
+      changed = true;
+    }
   }
+
+  if (changed) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
+  return users;
 };
 
-export const getUsers = () => {
-  seedDemoUsers();
-  const users = localStorage.getItem(USERS_KEY);
-  return users ? JSON.parse(users) : [];
-};
+export const getUsers = () => seedDemoUsers();
 
 export const saveUser = (userObj) => {
   const users = getUsers();
@@ -57,7 +94,7 @@ export const saveUser = (userObj) => {
 
 export const findUserByEmail = (email) => {
   const users = getUsers();
-  return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  return users.find((u) => u.email.toLowerCase() === email.toLowerCase());
 };
 
 // --- EMPLOYER SPECIFIC PROFILES (localStorage) ---
@@ -75,29 +112,25 @@ export const saveEmployerProfile = (email, profileData) => {
 
 // --- ISOLATED TAB SESSIONS (sessionStorage) ---
 
-export const loginUser = (email, password, role) => {
+export const loginUser = (email, password) => {
   const users = getUsers();
-  const user = users.find(u => 
-    u.email.toLowerCase() === email.toLowerCase() && 
-    u.password === password && 
-    u.role === role
-  );
-  
-  if (user) {
-    // Saves the session ONLY to the current tab
-    sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-    return user;
+  const normalized = email.trim().toLowerCase();
+  const user = users.find((u) => u.email.toLowerCase() === normalized);
+
+  if (!user || user.password !== password) {
+    return null;
   }
-  return null;
+
+  const { password: _removed, ...sessionUser } = user;
+  sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(sessionUser));
+  return sessionUser;
 };
 
 export const getCurrentUser = () => {
-  // Reads the session ONLY from the current tab
   const user = sessionStorage.getItem(CURRENT_USER_KEY);
   return user ? JSON.parse(user) : null;
 };
 
 export const logoutUser = () => {
-  // Clears the session ONLY from the current tab
   sessionStorage.removeItem(CURRENT_USER_KEY);
 };

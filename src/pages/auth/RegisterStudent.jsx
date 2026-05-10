@@ -28,8 +28,12 @@ function RegisterStudent() {
     seedDemoUsers()
 
     const email = form.email.trim().toLowerCase()
-    if (!email.endsWith('@student.guc.edu.eg')) {
-      setError('Please use a valid student GUC email ending with @student.guc.edu.eg.')
+    const okStudentEmail =
+      email.endsWith('@student.guc.edu.eg') || email.endsWith('@guc.edu.eg')
+    if (!okStudentEmail) {
+      setError(
+        'Please use a valid GUC student email ending with @student.guc.edu.eg or @guc.edu.eg.',
+      )
       return
     }
 
@@ -39,8 +43,8 @@ function RegisterStudent() {
     }
 
     const users = getUsers()
-    if (users.some((u) => u.email.toLowerCase() === email && u.role === 'student')) {
-      setError('A student account with this email already exists.')
+    if (users.some((u) => u.email.toLowerCase() === email)) {
+      setError('An account with this email already exists.')
       return
     }
 
@@ -54,7 +58,7 @@ function RegisterStudent() {
       role: 'student',
     })
 
-    loginUser(email, form.password, 'student')
+    loginUser(email, form.password)
     setSuccess('Account created successfully. Redirecting to your dashboard...')
     setTimeout(() => navigate('/student'), 900)
   }

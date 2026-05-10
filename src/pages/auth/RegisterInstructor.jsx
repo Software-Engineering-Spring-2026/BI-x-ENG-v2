@@ -28,11 +28,8 @@ function RegisterInstructor() {
     seedDemoUsers()
 
     const email = form.email.trim().toLowerCase()
-    const isInstructorGucEmail =
-      email.endsWith('@guc.edu.eg') && !email.endsWith('@student.guc.edu.eg')
-
-    if (!isInstructorGucEmail) {
-      setError('Please use a valid instructor GUC email (e.g. name@guc.edu.eg).')
+    if (!email.endsWith('@guc.edu.eg')) {
+      setError('Please use a valid GUC instructor email ending with @guc.edu.eg.')
       return
     }
 
@@ -42,8 +39,8 @@ function RegisterInstructor() {
     }
 
     const users = getUsers()
-    if (users.some((u) => u.email.toLowerCase() === email && u.role === 'instructor')) {
-      setError('An instructor account with this email already exists.')
+    if (users.some((u) => u.email.toLowerCase() === email)) {
+      setError('An account with this email already exists.')
       return
     }
 
@@ -57,7 +54,7 @@ function RegisterInstructor() {
       role: 'instructor',
     })
 
-    loginUser(email, form.password, 'instructor')
+    loginUser(email, form.password)
     setSuccess('Account created successfully. Redirecting to your dashboard...')
     setTimeout(() => navigate('/instructor'), 900)
   }

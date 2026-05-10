@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import {
-  findUserByEmail,
+  getUsers,
   loginUser,
+  saveEmployerProfile,
   saveUser,
   seedDemoUsers,
-  saveEmployerProfile // Added this to save profile details immediately
 } from '../../data/authStorage'
 
 function RegisterEmployer() {
@@ -50,14 +50,14 @@ function RegisterEmployer() {
 
     const email = form.email.trim().toLowerCase()
 
-    if (email.endsWith('@guc.edu.eg') || email.endsWith('@student.guc.edu.eg')) {
-      setError('Employers must register using an external company email, not a GUC email address.')
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.')
       return
     }
 
-    const existingUser = findUserByEmail(email)
-    if (existingUser && existingUser.role === 'employer') {
-      setError('An employer account with this email already exists.')
+    const users = getUsers()
+    if (users.some((u) => u.email.toLowerCase() === email)) {
+      setError('An account with this email already exists.')
       return
     }
 
@@ -83,7 +83,7 @@ function RegisterEmployer() {
     })
 
     // Log them in and redirect
-    loginUser(email, form.password, 'employer')
+    loginUser(email, form.password)
     setSuccess('Your company account is created! Redirecting...')
     setTimeout(() => navigate('/employer'), 900)
   }
@@ -110,7 +110,7 @@ function RegisterEmployer() {
           onChange={handleChange}
           type="email"
           required
-          placeholder="Company Email (External)"
+          placeholder="Company email"
           className="rounded-md border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
         />
         <input
