@@ -33,6 +33,15 @@ const DEMO_ACCOUNTS = [
     graduationYear: '2026',
   },
   {
+    firstName: 'Sara',
+    lastName: 'El-Masry',
+    email: 'student2@guc.edu.eg',
+    password: '123456',
+    role: 'student',
+    major: 'Computer Science',
+    graduationYear: '2026',
+  },
+  {
     firstName: 'Demo',
     lastName: 'Instructor',
     email: 'instructor@guc.edu.eg',

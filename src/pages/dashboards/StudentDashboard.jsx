@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logoutUser } from '../../data/authStorage'
+import { seedAcademicPlatformDemoData } from '../../data/academicPlatformSeed'
 
 const LS = {
   get: (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb } catch { return fb } },
@@ -676,7 +677,7 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
             <Card key={p.id}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1.5 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900">{p.title}</h3><Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div>
+                  <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900">{p.title}</h3>{p.featured && <Badge color="purple">Featured</Badge>}<Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div>
                   {p.description&&<p className="text-sm text-slate-500 line-clamp-2">{p.description}</p>}
                   <div className="flex flex-wrap gap-1">{(p.languages||[]).map(l=><Badge key={l} color="slate">{l}</Badge>)}</div>
                   <p className="text-xs text-slate-400">By {p.owner} · {new Date(p.createdAt).toLocaleDateString()}</p>
@@ -954,15 +955,81 @@ function InternshipsSection({ profile, pushNotif }) {
   const [modal, setModal]=useState(null)
   const [selected, setSelected]=useState(null)
   const [coverLetter, setCoverLetter]=useState('')
-  const getInternships=()=>{
-    const all=[]
-    for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key?.startsWith('employer_internships_')){const list=LS.get(key,[]);list.forEach(item=>all.push({...item,companyEmail:key.replace('employer_internships_','')}))}}
-    if(all.length===0)return[
-      {id:'i1',title:'Frontend Developer Intern',companyName:'TechCorp',companyEmail:'company@example.com',duration:'3 months',deadline:'2026-08-01',skills:['React','JavaScript'],languages:['JavaScript'],details:'Work on our web apps.',postedAt:'2026-04-01',status:'hiring',archived:false},
-      {id:'i2',title:'Data Science Intern',companyName:'DataViz Co',companyEmail:'dataviz@example.com',duration:'6 months',deadline:'2026-07-15',skills:['Python','SQL'],languages:['Python'],details:'Build ML pipelines.',postedAt:'2026-03-20',status:'hiring',archived:false},
-      {id:'i3',title:'Mobile Developer Intern',companyName:'AppWorks',companyEmail:'appworks@example.com',duration:'4 months',deadline:'2026-06-30',skills:['Flutter'],languages:['Dart'],details:'Build mobile features.',postedAt:'2026-04-10',status:'hiring',archived:false},
-    ]
-    return all.filter(i=>!i.archived)
+  const getInternships = () => {
+    const all = []
+    const seen = new Set()
+    const push = (item) => {
+      if (!item || !item.id) return
+      if (seen.has(item.id)) return
+      seen.add(item.id)
+      all.push(item)
+    }
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key?.startsWith('employer_internships_')) {
+        const list = LS.get(key, [])
+        list.forEach((item) =>
+          push({ ...item, companyEmail: key.replace('employer_internships_', '') }),
+        )
+      }
+    }
+    const catalog = LS.get('student_internships', [])
+    if (Array.isArray(catalog)) {
+      catalog.forEach((item) =>
+        push({
+          ...item,
+          companyEmail: item.companyEmail || 'company@example.com',
+          companyName: item.companyName || item.company || 'Company',
+        }),
+      )
+    }
+    if (all.length === 0) {
+      return [
+        {
+          id: 'i1',
+          title: 'Frontend Developer Intern',
+          companyName: 'TechCorp',
+          companyEmail: 'company@example.com',
+          duration: '3 months',
+          deadline: '2026-08-01',
+          skills: ['React', 'JavaScript'],
+          languages: ['JavaScript'],
+          details: 'Work on our web apps.',
+          postedAt: '2026-04-01',
+          status: 'hiring',
+          archived: false,
+        },
+        {
+          id: 'i2',
+          title: 'Data Science Intern',
+          companyName: 'DataViz Co',
+          companyEmail: 'dataviz@example.com',
+          duration: '6 months',
+          deadline: '2026-07-15',
+          skills: ['Python', 'SQL'],
+          languages: ['Python'],
+          details: 'Build ML pipelines.',
+          postedAt: '2026-03-20',
+          status: 'hiring',
+          archived: false,
+        },
+        {
+          id: 'i3',
+          title: 'Mobile Developer Intern',
+          companyName: 'AppWorks',
+          companyEmail: 'appworks@example.com',
+          duration: '4 months',
+          deadline: '2026-06-30',
+          skills: ['Flutter'],
+          languages: ['Dart'],
+          details: 'Build mobile features.',
+          postedAt: '2026-04-10',
+          status: 'hiring',
+          archived: false,
+        },
+      ]
+    }
+    return all.filter((i) => !i.archived)
   }
   const internships=getInternships()
   const companies=[...new Set(internships.map(i=>i.companyName||i.companyEmail))]
@@ -1107,6 +1174,7 @@ export default function StudentDashboard() {
   const navigate=useNavigate()
   const rawUser=getCurrentUser()
   if(!rawUser||rawUser.role!=='student'){navigate('/login');return null}
+  seedAcademicPlatformDemoData()
   const [tab, setTab]=useState('overview')
   const [sidebarOpen, setSidebar]=useState(false)
   const [profile, setProfileLS]=useLS('student_profile_'+rawUser.email,{firstName:rawUser.firstName||'',lastName:rawUser.lastName||'',email:rawUser.email,major:rawUser.major||'',linkedin:'',skills:[]})
