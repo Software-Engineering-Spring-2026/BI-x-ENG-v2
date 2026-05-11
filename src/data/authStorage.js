@@ -35,7 +35,7 @@ const DEMO_ACCOUNTS = [
   {
     firstName: 'Sara',
     lastName: 'El-Masry',
-    email: 'student2@guc.edu.eg',
+    email: 'sara@guc.edu.eg',
     password: '123456',
     role: 'student',
     major: 'Computer Science',
