@@ -23,8 +23,16 @@ const getSeedInstructors = () => {
   const instructors = users.filter(u => u.role === 'instructor')
   if (instructors.length === 0) {
     return [{ firstName:'Demo', lastName:'Instructor', email:'instructor@guc.edu.eg', role:'instructor', linkedCourses:['CSEN 401','CSEN 402','Bachelor Project'], bio:'Expert in software engineering.', research:'Distributed systems, AI', education:'PhD Computer Science, GUC' }]
-  }
-  return instructors.map(u => ({ ...u, linkedCourses: LS.get('instructor_courses_'+u.email, ['Bachelor Project']), ...LS.get('instructor_profile_'+u.email, {}) }))
+  }return instructors.map(u => {
+    const prof = LS.get('instructor_profile_'+u.email, {})
+    return {
+      ...u,
+      linkedCourses: LS.get('instructor_courses_'+u.email, ['Bachelor Project']),
+      ...prof,
+      firstName: (prof.firstName && prof.firstName.trim()) ? prof.firstName : (u.firstName || ''),
+      lastName:  (prof.lastName  && prof.lastName.trim())  ? prof.lastName  : (u.lastName  || ''),
+    }
+  })
 }
 
 const Icon = ({ d, size = 16 }) => (
@@ -662,8 +670,8 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
         <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Courses</option>{courses.map(c=><option key={c}>{c}</option>)}
         </select>
-        <select value={filterInstructor} onChange={e=>setFilterInstructor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="">All Instructors</option>{instructors.map(i=><option key={i.email} value={i.email}>{i.firstName} {i.lastName}</option>)}
+<select value={filterInstructor} onChange={e=>setFilterInstructor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="">All Instructors</option>{instructors.map(i=>{const name=`${i.firstName||''} ${i.lastName||''}`.trim()||i.email;return <option key={i.email} value={i.email}>{name}</option>})}
         </select>
         <input type="date" value={filterDateFrom} onChange={e=>setFilterDateFrom(e.target.value)} title="From date" className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
         <input type="date" value={filterDateTo} onChange={e=>setFilterDateTo(e.target.value)} title="To date" className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
