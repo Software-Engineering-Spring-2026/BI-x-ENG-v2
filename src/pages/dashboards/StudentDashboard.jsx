@@ -538,9 +538,15 @@ function ProjectsSection({ projects, setProjects, profile, pushNotif }) {
   const [selected, setSelected]=useState(null)
   const [search, setSearch]=useState('')
   const [filterCourse, setFilterCourse]=useState('')
-  const [sortBy, setSort]=useState('date')
+  const [sortBy, setSort]=useState('newest')
   const myProjects=projects.filter(p=>p.owner===profile.email||(p.collaborators||[]).some(c=>c.email===profile.email&&c.status==='accepted'))
-  const displayed=myProjects.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())).filter(p=>!filterCourse||p.course===filterCourse).sort((a,b)=>sortBy==='date'?new Date(b.createdAt)-new Date(a.createdAt):(b.rating||0)-(a.rating||0))
+  const displayed=myProjects.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())).filter(p=>!filterCourse||p.course===filterCourse).sort((a,b)=>{
+    if(sortBy==='newest')return new Date(b.createdAt)-new Date(a.createdAt)
+    if(sortBy==='oldest')return new Date(a.createdAt)-new Date(b.createdAt)
+    if(sortBy==='rating')return (b.rating||0)-(a.rating||0)
+    if(sortBy==='ratingAsc')return (a.rating||0)-(b.rating||0)
+    return new Date(b.createdAt)-new Date(a.createdAt)
+  })
   const blank=()=>({id:Date.now().toString(),title:'',course:COURSES[0],github:'',demoVideo:'',description:'',languages:[],visibility:'public',owner:profile.email,collaborators:[],tasks:[],thesisDrafts:[],createdAt:new Date().toISOString(),rating:0})
   const [form, setForm]=useState(blank)
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}))
@@ -557,8 +563,11 @@ function ProjectsSection({ projects, setProjects, profile, pushNotif }) {
         <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Courses</option>{COURSES.map(c=><option key={c}>{c}</option>)}
         </select>
-        <select value={sortBy} onChange={e=>setSort(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="date">Sort by Date</option><option value="rating">Sort by Rating</option>
+<select value={sortBy} onChange={e=>setSort(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="rating">Highest Rating</option>
+          <option value="ratingAsc">Lowest Rating</option>
         </select>
       </div>
       {displayed.length===0?<Card><EmptyState message="No projects found. Create your first project!"/></Card>:
@@ -680,7 +689,7 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
   const [filterInstructor, setFilterInstructor]=useState('')
   const [filterDateFrom, setFilterDateFrom]=useState('')
   const [filterDateTo, setFilterDateTo]=useState('')
-  const [sortBy, setSort]=useState('date')
+  const [sortBy, setSort]=useState('newest')
   const [selected, setSelected]=useState(null)
   const publicProjects=projects.filter(p=>p.visibility==='public')
   const instructors=getSeedInstructors()
@@ -691,7 +700,13 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
     .filter(p=>!filterInstructor||(p.collaborators||[]).some(c=>c.email===filterInstructor&&c.status==='accepted'))
     .filter(p=>!filterDateFrom||new Date(p.createdAt)>=new Date(filterDateFrom))
     .filter(p=>!filterDateTo||new Date(p.createdAt)<=new Date(filterDateTo))
-    .sort((a,b)=>sortBy==='date'?new Date(b.createdAt)-new Date(a.createdAt):(b.rating||0)-(a.rating||0))
+   .sort((a,b)=>{
+      if(sortBy==='newest')return new Date(b.createdAt)-new Date(a.createdAt)
+      if(sortBy==='oldest')return new Date(a.createdAt)-new Date(b.createdAt)
+      if(sortBy==='rating')return (b.rating||0)-(a.rating||0)
+      if(sortBy==='ratingAsc')return (a.rating||0)-(b.rating||0)
+      return new Date(b.createdAt)-new Date(a.createdAt)
+    })
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
@@ -706,8 +721,11 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
         </select>
         <input type="date" value={filterDateFrom} onChange={e=>setFilterDateFrom(e.target.value)} title="From date" className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
         <input type="date" value={filterDateTo} onChange={e=>setFilterDateTo(e.target.value)} title="To date" className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
-        <select value={sortBy} onChange={e=>setSort(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="date">Sort by Date</option><option value="rating">Sort by Rating</option>
+<select value={sortBy} onChange={e=>setSort(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="rating">Highest Rating</option>
+          <option value="ratingAsc">Lowest Rating</option>
         </select>
       </div>
       {displayed.length===0?<Card><EmptyState message="No public projects match your search."/></Card>:
@@ -751,6 +769,7 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios, s
   const [search, setSearch]=useState('')
   const [filterMajor, setFilterMajor]=useState('')
   const [filterSkill, setFilterSkill]=useState('')
+  const [sortByPortfolio, setSortByPortfolio]=useState('most')
   const [selected, setSelected]=useState(null)
   const currentUser=getCurrentUser()
   const allUsers=LS.get('guc_projecthub_users',[]).filter(u=>u.role==='student'&&u.email!==currentUser?.email)
@@ -762,18 +781,22 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios, s
     .filter(p=>{const name=`${p.firstName||''} ${p.lastName||''}`.toLowerCase();return name.includes(search.toLowerCase())||p.email.toLowerCase().includes(search.toLowerCase())})
     .filter(p=>!filterMajor||p.major===filterMajor)
     .filter(p=>!filterSkill||(p.skills||[]).includes(filterSkill))
-    .sort((a,b)=>b.projectCount-a.projectCount)
+    .sort((a,b)=>sortByPortfolio==='most'?b.projectCount-a.projectCount:a.projectCount-b.projectCount)
   const toggleFav=email=>setFavPortfolios(p=>p.includes(email)?p.filter(x=>x!==email):[...p,email])
   return (
     <div className="space-y-6">
       <div><h2 className="text-2xl font-bold text-slate-900">Explore All Portfolios</h2><p className="mt-1 text-sm text-slate-500">Search by name/email, filter by major/skills, sort by project count.</p></div>
-      <div className="flex flex-wrap gap-3">
+<div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name or email…"/>
         <select value={filterMajor} onChange={e=>setFilterMajor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Majors</option>{majors.map(m=><option key={m}>{m}</option>)}
         </select>
         <select value={filterSkill} onChange={e=>setFilterSkill(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Skills</option>{allSkills.map(s=><option key={s}>{s}</option>)}
+        </select>
+        <select value={sortByPortfolio} onChange={e=>setSortByPortfolio(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="most">Most Projects</option>
+          <option value="least">Least Projects</option>
         </select>
       </div>
       {displayed.length===0?<Card><EmptyState message="No student portfolios found."/></Card>:
@@ -994,6 +1017,7 @@ function InternshipsSection({ profile, pushNotif }) {
   const [modal, setModal]=useState(null)
   const [selected, setSelected]=useState(null)
   const [coverLetter, setCoverLetter]=useState('')
+  const [sortIntern, setSortIntern]=useState('newest')
   const getInternships = () => {
     const all = []
     const seen = new Set()
@@ -1073,7 +1097,7 @@ function InternshipsSection({ profile, pushNotif }) {
   const internships=getInternships()
   const companies=[...new Set(internships.map(i=>i.companyName||i.companyEmail))]
   const durations=[...new Set(internships.map(i=>i.duration))]
-  const displayed=internships.filter(i=>{const comp=(i.companyName||i.companyEmail||'').toLowerCase();return i.title.toLowerCase().includes(search.toLowerCase())||comp.includes(search.toLowerCase())}).filter(i=>!filterComp||(i.companyName||i.companyEmail)===filterComp).filter(i=>!filterDur||i.duration===filterDur).sort((a,b)=>new Date(b.postedAt)-new Date(a.postedAt))
+  const displayed=internships.filter(i=>{const comp=(i.companyName||i.companyEmail||'').toLowerCase();return i.title.toLowerCase().includes(search.toLowerCase())||comp.includes(search.toLowerCase())}).filter(i=>!filterComp||(i.companyName||i.companyEmail)===filterComp).filter(i=>!filterDur||i.duration===filterDur).sort((a,b)=>sortIntern==='oldest'?new Date(a.postedAt)-new Date(b.postedAt):new Date(b.postedAt)-new Date(a.postedAt))
   const getApp=id=>applications.find(a=>a.internshipId===id)
   const apply=()=>{
     if(!coverLetter.trim())return alert('Please write a cover letter.')
@@ -1096,13 +1120,17 @@ function InternshipsSection({ profile, pushNotif }) {
           <div className="flex flex-wrap gap-2">{completedInternships.map(a=><Badge key={a.id} color="green">{a.internship.title} @ {a.internship.companyName||a.internship.companyEmail}</Badge>)}</div>
         </Card>
       )}
-      <div className="flex flex-wrap gap-3">
+<div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by title or company…"/>
         <select value={filterComp} onChange={e=>setFilterComp(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Companies</option>{companies.map(c=><option key={c}>{c}</option>)}
         </select>
         <select value={filterDur} onChange={e=>setFilterDur(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Durations</option>{durations.map(d=><option key={d}>{d}</option>)}
+        </select>
+        <select value={sortIntern} onChange={e=>setSortIntern(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
         </select>
       </div>
       {displayed.length===0?<Card><EmptyState message="No internships found."/></Card>:
