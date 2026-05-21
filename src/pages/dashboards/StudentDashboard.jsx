@@ -58,7 +58,8 @@ const IC = {
   fileText:'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8',
   flag:'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7',
   book:'M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z',
-  star:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+ star:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+  download:'M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3',
 }
 
 const Badge = ({ children, color = 'blue' }) => {
@@ -472,14 +473,38 @@ function CollabsModal({ project, setProjects, profile, pushNotif, onClose }) {
 
 function ThesisModal({ project, setProjects, onClose }) {
   const drafts=project.thesisDrafts||[]
-  const addDraft=()=>{const name=prompt('Enter draft name (e.g. "Draft v1"):');if(!name?.trim())return;const updated=[...drafts,{id:Date.now().toString(),name:name.trim(),isFinal:false,uploadedAt:new Date().toISOString()}];setProjects(p=>p.map(x=>x.id===project.id?{...x,thesisDrafts:updated}:x))}
+const [draftName, setDraftName]=useState('')
+  const [draftFile, setDraftFile]=useState(null)
+  const [draftFileKey, setDraftFileKey]=useState(0)
+  const addDraft=()=>{
+    if(!draftName.trim())return alert('Please enter a draft name.')
+    if(!draftFile)return alert('Please select a file to upload.')
+    const reader=new FileReader()
+    reader.onload=ev=>{
+      const updated=[...drafts,{id:Date.now().toString(),name:draftName.trim(),isFinal:false,uploadedAt:new Date().toISOString(),fileData:ev.target.result,fileName:draftFile.name}]
+      setProjects(p=>p.map(x=>x.id===project.id?{...x,thesisDrafts:updated}:x))
+      setDraftName('')
+      setDraftFile(null)
+      setDraftFileKey(k=>k+1)
+    }
+    reader.readAsDataURL(draftFile)
+  }
   const setFinal=id=>{const updated=drafts.map(d=>({...d,isFinal:d.id===id}));setProjects(p=>p.map(x=>x.id===project.id?{...x,thesisDrafts:updated}:x))}
   const del=id=>setProjects(p=>p.map(x=>x.id===project.id?{...x,thesisDrafts:(x.thesisDrafts||[]).filter(d=>d.id!==id)}:x))
   const hasFinal=drafts.some(d=>d.isFinal)
   return (
     <Modal title={`Thesis Drafts — ${project.title}`} onClose={onClose}>
       <div className="space-y-3">
-        <Btn size="sm" onClick={addDraft}><Icon d={IC.upload} size={13}/>Upload Draft</Btn>
+       <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Add New Draft</p>
+       <Input placeholder="Draft name (e.g. Draft v1) *" value={draftName} onChange={e=>setDraftName(e.target.value)}/>
+          <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600">
+            <Icon d={IC.upload} size={12}/>
+            {draftFile?draftFile.name:'Choose file (PDF, DOCX, etc.)'}
+            <input type="file" className="hidden" key={draftFileKey} accept=".pdf,.doc,.docx,.txt" onChange={e=>setDraftFile(e.target.files?.[0]||null)}/>
+          </label>
+          <Btn size="sm" onClick={addDraft} disabled={!draftName.trim()||!draftFile}><Icon d={IC.upload} size={13}/>Upload Draft</Btn>
+        </div>
         {drafts.length===0?<EmptyState message="No thesis drafts uploaded yet."/>:
           <ul className="space-y-2">
             {drafts.map(d=>(
@@ -488,7 +513,13 @@ function ThesisModal({ project, setProjects, onClose }) {
                   <div className="flex items-center gap-2"><Icon d={IC.fileText} size={14}/><span className="text-sm font-medium text-slate-800">{d.name}</span>{d.isFinal&&<Badge color="blue">Final Draft</Badge>}{hasFinal&&!d.isFinal&&<Badge color="slate">Private</Badge>}</div>
                   <p className="text-xs text-slate-400 mt-0.5">{new Date(d.uploadedAt).toLocaleDateString()}</p>
                 </div>
-                <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
+                  {d.fileData&&(
+                    <a href={d.fileData} download={d.fileName||d.name}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition">
+                      <Icon d={IC.download} size={12}/>Download
+                    </a>
+                  )}
                   {!d.isFinal&&<Btn size="sm" variant="secondary" onClick={()=>setFinal(d.id)}>Set as Final</Btn>}
                   {!d.isFinal&&<button onClick={()=>del(d.id)} className="text-slate-300 hover:text-red-500"><Icon d={IC.trash} size={13}/></button>}
                 </div>
