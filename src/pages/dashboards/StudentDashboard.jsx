@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logoutUser } from '../../data/authStorage'
 import { seedAcademicPlatformDemoData } from '../../data/academicPlatformSeed'
@@ -1258,9 +1258,8 @@ export default function StudentDashboard() {
 const pushNotif=msg=>{if(!notifsEnabled)return;setNotificationsLS(p=>[...p,{id:Date.now().toString(),message:msg,read:false,createdAt:new Date().toISOString()}])}
   const unread=notifications.filter(n=>!n.read).length
   const invites=projects.filter(p=>(p.collaborators||[]).some(c=>c.email===rawUser.email&&c.status==='pending')).length
-  const navItems=[
+const navItems=[
     {id:'overview',label:'Overview',icon:IC.home},
-    {id:'profile',label:'My Profile',icon:IC.user},
     {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
     {id:'projects',label:'My Projects',icon:IC.folder},
     {id:'explore',label:'Explore All Projects',icon:IC.eye},
@@ -1269,48 +1268,270 @@ const pushNotif=msg=>{if(!notifsEnabled)return;setNotificationsLS(p=>[...p,{id:D
     {id:'portfolios',label:'Explore All Portfolios',icon:IC.users},
     {id:'favorites',label:'Favorites',icon:IC.heart},
     {id:'recommended',label:'Recommended',icon:IC.star},
-    {id:'messages',label:'Messages',icon:IC.chat},
     {id:'internships',label:'Internships',icon:IC.briefcase},
     {id:'stats',label:'Statistics',icon:IC.chart},
-
   ]
   const handleLogout=()=>{logoutUser();navigate('/login')}
+ const [profileDropdown, setProfileDropdown]=useState(false)
+  const [msgDropdown, setMsgDropdown]=useState(false)
+  const [notifDropdown, setNotifDropdown]=useState(false)
+  const profileRef=useRef(null)
+  const msgRef=useRef(null)
+  const notifRef=useRef(null)
+
+  useEffect(()=>{
+    const handler=(e)=>{
+      if(profileRef.current&&!profileRef.current.contains(e.target))setProfileDropdown(false)
+      if(msgRef.current&&!msgRef.current.contains(e.target))setMsgDropdown(false)
+      if(notifRef.current&&!notifRef.current.contains(e.target))setNotifDropdown(false)
+    }
+    document.addEventListener('mousedown',handler)
+    return()=>document.removeEventListener('mousedown',handler)
+  },[])
+
+  const recentThreads=(()=>{
+    const threads=LS.get('student_messages_'+rawUser.email,[])
+    return threads.filter(t=>t.messages.length>0).slice(0,4)
+  })()
+
   const NavContent=()=>(
     <>
-      <div className="mb-6 px-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Student Portal</p>
-        <p className="mt-1 font-semibold text-slate-900 truncate">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
-        <p className="text-xs text-slate-500 truncate">{rawUser.email}</p>
+      <div className="mb-6 px-2">
+        <div className="flex items-center gap-2.5 rounded-xl bg-blue-50 px-3 py-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
+            {(profile.firstName||rawUser.firstName||'S')[0].toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-slate-900">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
+            <p className="truncate text-xs text-slate-500">Student</p>
+          </div>
+        </div>
       </div>
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-0.5">
         {navItems.map(item=>(
-          <button key={item.id} onClick={()=>{setTab(item.id);setSidebar(false)}} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${tab===item.id?'bg-blue-700 text-white':'text-slate-700 hover:bg-slate-100 hover:text-blue-700'}`}>
-            <Icon d={item.icon} size={16}/><span>{item.label}</span>
-            {item.badge>0&&<span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tab===item.id?'bg-white text-blue-700':'bg-red-500 text-white'}`}>{item.badge}</span>}
+          <button key={item.id} onClick={()=>{setTab(item.id);setSidebar(false)}}
+            className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150
+              ${tab===item.id
+                ?'bg-blue-700 text-white shadow-sm'
+                :'text-slate-600 hover:bg-slate-100 hover:text-blue-700 hover:translate-x-0.5'}`}>
+            <Icon d={item.icon} size={16}/>
+            <span>{item.label}</span>
+            {item.badge>0&&(
+              <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold
+                ${tab===item.id?'bg-white text-blue-700':'bg-red-500 text-white'}`}>
+                {item.badge}
+              </span>
+            )}
           </button>
         ))}
       </nav>
-      <div className="mt-6 border-t border-slate-200 pt-4">
-        <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-red-50 hover:text-red-600"><Icon d={IC.logout} size={16}/>Logout</button>
+      <div className="mt-4 border-t border-slate-100 pt-4 space-y-0.5">
+        <button onClick={()=>{setTab('profile');setSidebar(false)}}
+          className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150
+            ${tab==='profile'?'bg-blue-700 text-white':'text-slate-600 hover:bg-slate-100 hover:text-blue-700 hover:translate-x-0.5'}`}>
+          <Icon d={IC.user} size={16}/><span>My Profile</span>
+        </button>
+        <button onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-all duration-150 hover:bg-red-50 hover:text-red-600">
+          <Icon d={IC.logout} size={16}/><span>Logout</span>
+        </button>
       </div>
     </>
   )
+
   const p={...profile,email:rawUser.email}
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-6 md:flex"><NavContent/></aside>
+      {/* Desktop Sidebar */}
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-5 md:flex">
+        {/* Logo / Brand */}
+        <div className="mb-5 flex items-center gap-2.5 px-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
+            <Icon d={IC.folder} size={16} />
+          </div>
+          <span className="text-base font-bold text-slate-900">ProjectHub</span>
+        </div>
+        <NavContent/>
+      </aside>
+
+      {/* Mobile Sidebar Overlay */}
       {sidebarOpen&&(
         <div className="fixed inset-0 z-40 md:hidden" onClick={()=>setSidebar(false)}>
-          <div className="absolute inset-0 bg-black/40"/>
-          <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 bg-white px-4 py-6" onClick={e=>e.stopPropagation()}><NavContent/></aside>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"/>
+          <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 bg-white px-3 py-5"
+            onClick={e=>e.stopPropagation()}>
+            <div className="mb-5 flex items-center gap-2.5 px-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
+                <Icon d={IC.folder} size={16}/>
+              </div>
+              <span className="text-base font-bold text-slate-900">ProjectHub</span>
+            </div>
+            <NavContent/>
+          </aside>
         </div>
       )}
+
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 md:hidden">
-          <button onClick={()=>setSidebar(true)} className="rounded-lg border border-slate-300 p-2 text-slate-600"><Icon d={IC.menu}/></button>
-          <span className="font-semibold text-slate-900">Student Portal</span>
-          {unread>0&&<span className="ml-auto rounded-full bg-blue-700 px-2 py-0.5 text-xs font-semibold text-white">{unread}</span>}
+
+        {/* Top Header */}
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3">
+          {/* Left: Hamburger (mobile) + Page title */}
+          <div className="flex items-center gap-3">
+            <button onClick={()=>setSidebar(true)}
+              className="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 md:hidden">
+              <Icon d={IC.menu} size={18}/>
+            </button>
+            <div className="hidden md:block">
+              <h1 className="text-sm font-semibold text-slate-900 capitalize">
+                {navItems.find(n=>n.id===tab)?.label || (tab==='profile'?'My Profile':tab)}
+              </h1>
+            </div>
+            <div className="md:hidden">
+              <span className="text-sm font-bold text-slate-900">ProjectHub</span>
+            </div>
+          </div>
+
+          {/* Right: Messages, Notifications, Avatar */}
+          <div className="flex items-center gap-1">
+
+            {/* Messages */}
+            <div className="relative" ref={msgRef}>
+              <button onClick={()=>{setMsgDropdown(p=>!p);setNotifDropdown(false);setProfileDropdown(false)}}
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+                <Icon d={IC.chat} size={18}/>
+                {recentThreads.length>0&&(
+                  <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-600"/>
+                )}
+              </button>
+              {msgDropdown&&(
+                <div className="absolute right-0 top-11 w-72 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
+                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900">Messages</p>
+                    <button onClick={()=>{setTab('messages');setMsgDropdown(false)}}
+                      className="text-xs text-blue-600 hover:underline">Open</button>
+                  </div>
+                  {recentThreads.length===0
+                    ?<p className="px-4 py-6 text-center text-xs text-slate-400">No messages yet.</p>
+                    :<ul className="divide-y divide-slate-100">
+                      {recentThreads.map(t=>(
+                        <li key={t.with}>
+                          <button onClick={()=>{
+                            LS.set('student_pending_message_target',t.with)
+                            setTab('messages')
+                            setMsgDropdown(false)
+                          }} className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 text-left">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                              {t.with[0].toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-medium text-slate-800">{t.with}</p>
+                              <p className="truncate text-xs text-slate-400">{t.messages.at(-1)?.text||'No messages'}</p>
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                  <div className="border-t border-slate-100 p-2">
+                    <button onClick={()=>{setTab('messages');setMsgDropdown(false)}}
+                      className="w-full rounded-lg py-2 text-center text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors">
+                      View all messages
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Notifications */}
+            <div className="relative" ref={notifRef}>
+              <button onClick={()=>{setNotifDropdown(p=>!p);setMsgDropdown(false);setProfileDropdown(false)}}
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+                <Icon d={IC.bell} size={18}/>
+                {unread>0&&(
+                  <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                    {unread>9?'9+':unread}
+                  </span>
+                )}
+              </button>
+              {notifDropdown&&(
+                <div className="absolute right-0 top-11 w-80 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
+                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                    {unread>0&&<span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">{unread} new</span>}
+                  </div>
+                  {notifications.length===0
+                    ?<p className="px-4 py-6 text-center text-xs text-slate-400">No notifications yet.</p>
+                    :<ul className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                      {notifications.slice().reverse().slice(0,6).map(n=>(
+                        <li key={n.id} className={`flex items-start gap-3 px-4 py-3 ${n.read?'':'bg-blue-50/50'}`}>
+                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read?'bg-slate-300':'bg-blue-600'}`}/>
+                          <div className="min-w-0">
+                            <p className={`text-xs ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>{n.message}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{new Date(n.createdAt).toLocaleDateString()}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                  <div className="border-t border-slate-100 p-2">
+                    <button onClick={()=>{setTab('notifications');setNotifDropdown(false)}}
+                      className="w-full rounded-lg py-2 text-center text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors">
+                      View all notifications
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="mx-1 h-6 w-px bg-slate-200"/>
+
+            {/* Avatar / Profile Dropdown */}
+            <div className="relative" ref={profileRef}>
+              <button onClick={()=>{setProfileDropdown(p=>!p);setMsgDropdown(false);setNotifDropdown(false)}}
+                className="flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-slate-100 transition-colors">
+                {profile.photo
+                  ?<img src={profile.photo} alt="avatar" className="h-8 w-8 rounded-full object-cover border-2 border-blue-200"/>
+                  :<div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
+                    {(profile.firstName||rawUser.firstName||'S')[0].toUpperCase()}
+                  </div>
+                }
+                <div className="hidden sm:block text-left">
+                  <p className="text-xs font-semibold text-slate-900 leading-tight">{profile.firstName||rawUser.firstName}</p>
+                  <p className="text-xs text-slate-400 leading-tight">Student</p>
+                </div>
+                <svg className="hidden sm:block h-3 w-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              {profileDropdown&&(
+                <div className="absolute right-0 top-11 w-56 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
+                  <div className="border-b border-slate-100 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
+                    <p className="text-xs text-slate-400 truncate">{rawUser.email}</p>
+                  </div>
+                  <div className="p-1.5 space-y-0.5">
+                    <button onClick={()=>{setTab('profile');setProfileDropdown(false)}}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      <Icon d={IC.user} size={14}/>My Profile
+                    </button>
+                    <button onClick={()=>{setTab('stats');setProfileDropdown(false)}}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      <Icon d={IC.chart} size={14}/>Statistics
+                    </button>
+                  </div>
+                  <div className="border-t border-slate-100 p-1.5">
+                    <button onClick={handleLogout}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                      <Icon d={IC.logout} size={14}/>Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </header>
+
+        {/* Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <div className="mx-auto w-full max-w-5xl">
             {tab==='overview'&&<Overview user={{...rawUser,...profile}} projects={projects} notifications={notifications} setTab={setTab}/>}
@@ -1319,7 +1540,7 @@ const pushNotif=msg=>{if(!notifsEnabled)return;setNotificationsLS(p=>[...p,{id:D
             {tab==='invitations'&&<InvitationsSection profile={p} projects={projects} setProjects={setProjects} pushNotif={pushNotif}/>}
             {tab==='instructors'&&<InstructorsSection/>}
             {tab==='explore'&&<ExploreProjectsSection profile={p} projects={projects} favProjects={favProjects} setFavProjects={setFavProjects}/>}
-          {tab==='portfolios'&&<ExplorePortfoliosSection projects={projects} favPortfolios={favPortfolios} setFavPortfolios={setFavPortfolios} setTab={setTab}/>}
+            {tab==='portfolios'&&<ExplorePortfoliosSection projects={projects} favPortfolios={favPortfolios} setFavPortfolios={setFavPortfolios} setTab={setTab}/>}
             {tab==='favorites'&&<FavoritesSection projects={projects} favProjects={favProjects} setFavProjects={setFavProjects} favPortfolios={favPortfolios} setFavPortfolios={setFavPortfolios}/>}
             {tab==='recommended'&&<RecommendedSection profile={p} projects={projects} favProjects={favProjects} setFavProjects={setFavProjects}/>}
             {tab==='messages'&&<MessagesSection profile={p} pushNotif={pushNotif}/>}
