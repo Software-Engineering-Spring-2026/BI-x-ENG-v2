@@ -571,15 +571,22 @@ function ProjectsSection({ projects, setProjects, profile, pushNotif, openCreate
   const [selected, setSelected]=useState(null)
   const [search, setSearch]=useState('')
   const [filterCourse, setFilterCourse]=useState('')
-  const [sortBy, setSort]=useState('newest')
+const [sortDate, setSortDate]=useState('newest')
+  const [sortRating, setSortRating]=useState('none')
   const myProjects=projects.filter(p=>p.owner===profile.email||(p.collaborators||[]).some(c=>c.email===profile.email&&c.status==='accepted'))
-  const displayed=myProjects.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())).filter(p=>!filterCourse||p.course===filterCourse).sort((a,b)=>{
-    if(sortBy==='newest')return new Date(b.createdAt)-new Date(a.createdAt)
-    if(sortBy==='oldest')return new Date(a.createdAt)-new Date(b.createdAt)
-    if(sortBy==='rating')return (b.rating||0)-(a.rating||0)
-    if(sortBy==='ratingAsc')return (a.rating||0)-(b.rating||0)
-    return new Date(b.createdAt)-new Date(a.createdAt)
-  })
+  const hasRatings=myProjects.some(p=>(p.rating||0)>0)
+  const displayed=myProjects
+    .filter(p=>p.title.toLowerCase().includes(search.toLowerCase()))
+    .filter(p=>!filterCourse||p.course===filterCourse)
+    .sort((a,b)=>{
+      // rating sort takes priority if selected
+      if(sortRating==='highest')return (b.rating||0)-(a.rating||0)
+      if(sortRating==='lowest')return (a.rating||0)-(b.rating||0)
+      // fallback to date sort
+      if(sortDate==='newest')return new Date(b.createdAt)-new Date(a.createdAt)
+      if(sortDate==='oldest')return new Date(a.createdAt)-new Date(b.createdAt)
+      return new Date(b.createdAt)-new Date(a.createdAt)
+    })
 
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}))
   const openCreate=()=>{setForm(blank());setModal('create')}
@@ -590,17 +597,51 @@ function ProjectsSection({ projects, setProjects, profile, pushNotif, openCreate
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between"><h2 className="text-2xl font-bold text-slate-900">My Projects</h2><Btn onClick={openCreate}><Icon d={IC.plus}/>New Project</Btn></div>
-      <div className="flex flex-wrap gap-3">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search by title…"/>
-        <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="">All Courses</option>{COURSES.map(c=><option key={c}>{c}</option>)}
-        </select>
-<select value={sortBy} onChange={e=>setSort(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="rating">Highest Rating</option>
-          <option value="ratingAsc">Lowest Rating</option>
-        </select>
+<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        {/* Search */}
+        <div className="flex-1 min-w-48">
+          <SearchBar value={search} onChange={setSearch} placeholder="Search by title…"/>
+        </div>
+
+        {/* Course filter */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Course</label>
+          <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors">
+            <option value="">All Courses</option>
+            {COURSES.map(c=><option key={c}>{c}</option>)}
+          </select>
+        </div>
+
+        {/* Sort by Date */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Sort by Date</label>
+          <select value={sortDate} onChange={e=>{setSortDate(e.target.value);setSortRating('none')}}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
+        {/* Sort by Rating */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Sort by Rating</label>
+          <select
+            value={sortRating}
+            disabled={!hasRatings}
+            onChange={e=>setSortRating(e.target.value)}
+            title={!hasRatings?'No ratings yet — rate a project to enable this filter':''}
+            className={`rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors
+              ${hasRatings
+                ?'border-slate-200 bg-white text-slate-700 hover:border-slate-300 focus:border-blue-500 cursor-pointer'
+                :'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'}`}>
+            <option value="none">{hasRatings?'No Rating Sort':'No ratings yet'}</option>
+            {hasRatings&&<>
+              <option value="highest">Highest Rating</option>
+              <option value="lowest">Lowest Rating</option>
+            </>}
+          </select>
+        </div>
       </div>
       {displayed.length===0?<Card><EmptyState message="No projects found. Create your first project!"/></Card>:
         <div className="space-y-3">
