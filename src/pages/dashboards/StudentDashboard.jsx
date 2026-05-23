@@ -140,14 +140,45 @@ function Overview({ user, projects, notifications, setTab }) {
     {label:'Public Projects',value:myProjects.filter(p=>p.visibility==='public').length,color:'text-purple-700',bg:'bg-purple-50',tab:'projects'},
   ]
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900">Welcome back, {user.firstName||'Student'} 👋</h2>
-        <p className="mt-1 text-slate-500">Here's a summary of your ProjectHub activity.</p>
+    <div className="space-y-8">
+
+      {/* ── Hero Section ── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-8 py-10 sm:px-12 sm:py-14 shadow-lg shadow-blue-200">
+        {/* decorative blobs */}
+        <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-white/10 blur-3xl"/>
+        <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl"/>
+        <div className="pointer-events-none absolute right-32 top-6 h-20 w-20 rounded-full bg-blue-400/20 blur-2xl"/>
+
+        <div className="relative flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+          {/* Text block */}
+          <div className="space-y-3 max-w-lg">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight">
+              Welcome back,<br className="hidden sm:block"/> {user.firstName||'Student'} 👋
+            </h2>
+            <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
+              Track your projects, collaborate with peers, and discover internship opportunities — all in one place.
+            </p>
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+            <button onClick={()=>setTab('create-project')}
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-md hover:bg-blue-50 hover:shadow-lg active:scale-95 transition-all duration-150 w-full sm:w-auto justify-center">
+              <Icon d={IC.plus} size={15}/>New Project
+            </button>
+            <button onClick={()=>setTab('explore')}
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/50 active:scale-95 transition-all duration-150 w-full sm:w-auto justify-center">
+              <Icon d={IC.eye} size={15}/>Explore Projects
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* ── Analytics Cards ── */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map(s=>(
-          <button key={s.label} onClick={()=>setTab(s.tab)} className={`rounded-xl border-0 p-5 text-left shadow-sm transition hover:opacity-80 ${s.bg}`}>
+          <button key={s.label} onClick={()=>setTab(s.tab)}
+            className={`group rounded-xl border-0 p-5 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${s.bg}`}>
             <p className="text-sm text-slate-500">{s.label}</p>
             <p className={`mt-1 text-3xl font-bold ${s.color}`}>{s.value}</p>
           </button>
@@ -533,8 +564,10 @@ const [draftName, setDraftName]=useState('')
   )
 }
 
-function ProjectsSection({ projects, setProjects, profile, pushNotif }) {
-  const [modal, setModal]=useState(null)
+function ProjectsSection({ projects, setProjects, profile, pushNotif, openCreateOnMount, setTab }) {
+  const blank=()=>({id:Date.now().toString(),title:'',course:COURSES[0],github:'',demoVideo:'',description:'',languages:[],visibility:'public',owner:profile.email,collaborators:[],tasks:[],thesisDrafts:[],createdAt:new Date().toISOString(),rating:0})
+  const [modal, setModal]=useState(openCreateOnMount?'create':null)
+  const [form, setForm]=useState(blank)
   const [selected, setSelected]=useState(null)
   const [search, setSearch]=useState('')
   const [filterCourse, setFilterCourse]=useState('')
@@ -547,8 +580,7 @@ function ProjectsSection({ projects, setProjects, profile, pushNotif }) {
     if(sortBy==='ratingAsc')return (a.rating||0)-(b.rating||0)
     return new Date(b.createdAt)-new Date(a.createdAt)
   })
-  const blank=()=>({id:Date.now().toString(),title:'',course:COURSES[0],github:'',demoVideo:'',description:'',languages:[],visibility:'public',owner:profile.email,collaborators:[],tasks:[],thesisDrafts:[],createdAt:new Date().toISOString(),rating:0})
-  const [form, setForm]=useState(blank)
+
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}))
   const openCreate=()=>{setForm(blank());setModal('create')}
   const openEdit=p=>{setSelected(p);setForm({...p});setModal('edit')}
@@ -1262,7 +1294,6 @@ const navItems=[
     {id:'overview',label:'Overview',icon:IC.home},
     {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
     {id:'projects',label:'My Projects',icon:IC.folder},
-    {id:'explore',label:'Explore All Projects',icon:IC.eye},
     {id:'invitations',label:'Invitations',icon:IC.users,badge:invites},
     {id:'instructors',label:'Find Instructors',icon:IC.book},
     {id:'portfolios',label:'Explore All Portfolios',icon:IC.users},
@@ -1270,6 +1301,7 @@ const navItems=[
     {id:'recommended',label:'Recommended',icon:IC.star},
     {id:'internships',label:'Internships',icon:IC.briefcase},
     {id:'stats',label:'Statistics',icon:IC.chart},
+    // explore is intentionally not in sidebar — accessible via hero CTA
   ]
   const handleLogout=()=>{logoutUser();navigate('/login')}
  const [profileDropdown, setProfileDropdown]=useState(false)
@@ -1536,7 +1568,7 @@ const navItems=[
           <div className="mx-auto w-full max-w-5xl">
             {tab==='overview'&&<Overview user={{...rawUser,...profile}} projects={projects} notifications={notifications} setTab={setTab}/>}
             {tab==='profile'&&<ProfileSection profile={p} setProfile={setProfile}/>}
-            {tab==='projects'&&<ProjectsSection projects={projects} setProjects={setProjects} profile={p} pushNotif={pushNotif}/>}
+           {(tab==='projects'||tab==='create-project')&&<ProjectsSection projects={projects} setProjects={setProjects} profile={p} pushNotif={pushNotif} openCreateOnMount={tab==='create-project'} setTab={setTab}/>}
             {tab==='invitations'&&<InvitationsSection profile={p} projects={projects} setProjects={setProjects} pushNotif={pushNotif}/>}
             {tab==='instructors'&&<InstructorsSection/>}
             {tab==='explore'&&<ExploreProjectsSection profile={p} projects={projects} favProjects={favProjects} setFavProjects={setFavProjects}/>}
