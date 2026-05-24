@@ -762,44 +762,103 @@ function ExploreProjectsSection({ profile, projects, favProjects, setFavProjects
   const [filterInstructor, setFilterInstructor]=useState('')
   const [filterDateFrom, setFilterDateFrom]=useState('')
   const [filterDateTo, setFilterDateTo]=useState('')
-  const [sortBy, setSort]=useState('newest')
+const [sortDate, setSortDate]=useState('newest')
+  const [sortRating, setSortRating]=useState('none')
   const [selected, setSelected]=useState(null)
   const publicProjects=projects.filter(p=>p.visibility==='public')
   const instructors=getSeedInstructors()
   const courses=[...new Set(publicProjects.map(p=>p.course))]
+  const hasRatings=publicProjects.some(p=>(p.rating||0)>0)
   const displayed=publicProjects
     .filter(p=>p.title.toLowerCase().includes(search.toLowerCase()))
     .filter(p=>!filterCourse||p.course===filterCourse)
     .filter(p=>!filterInstructor||(p.collaborators||[]).some(c=>c.email===filterInstructor&&c.status==='accepted'))
     .filter(p=>!filterDateFrom||new Date(p.createdAt)>=new Date(filterDateFrom))
     .filter(p=>!filterDateTo||new Date(p.createdAt)<=new Date(filterDateTo))
-   .sort((a,b)=>{
-      if(sortBy==='newest')return new Date(b.createdAt)-new Date(a.createdAt)
-      if(sortBy==='oldest')return new Date(a.createdAt)-new Date(b.createdAt)
-      if(sortBy==='rating')return (b.rating||0)-(a.rating||0)
-      if(sortBy==='ratingAsc')return (a.rating||0)-(b.rating||0)
+    .sort((a,b)=>{
+      if(sortRating==='highest')return (b.rating||0)-(a.rating||0)
+      if(sortRating==='lowest')return (a.rating||0)-(b.rating||0)
+      if(sortDate==='newest')return new Date(b.createdAt)-new Date(a.createdAt)
+      if(sortDate==='oldest')return new Date(a.createdAt)-new Date(b.createdAt)
       return new Date(b.createdAt)-new Date(a.createdAt)
     })
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
       <div><h2 className="text-2xl font-bold text-slate-900">Explore All Projects</h2><p className="mt-1 text-sm text-slate-500"> Search, filter by course/instructor/date, sort, view details.</p></div>
-      <div className="flex flex-wrap gap-3">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search by project title…"/>
-        <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="">All Courses</option>{courses.map(c=><option key={c}>{c}</option>)}
-        </select>
-<select value={filterInstructor} onChange={e=>setFilterInstructor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="">All Instructors</option>{instructors.map(i=>{const name=`${i.firstName||''} ${i.lastName||''}`.trim()||i.email;return <option key={i.email} value={i.email}>{name}</option>})}
-        </select>
-        <input type="date" value={filterDateFrom} onChange={e=>setFilterDateFrom(e.target.value)} title="From date" className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
-        <input type="date" value={filterDateTo} onChange={e=>setFilterDateTo(e.target.value)} title="To date" className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
-<select value={sortBy} onChange={e=>setSort(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="rating">Highest Rating</option>
-          <option value="ratingAsc">Lowest Rating</option>
-        </select>
+<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+
+        {/* Search */}
+        <div className="flex-1 min-w-48">
+          <SearchBar value={search} onChange={setSearch} placeholder="Search by project title…"/>
+        </div>
+
+        {/* Course */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Course</label>
+          <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors">
+            <option value="">All Courses</option>
+            {courses.map(c=><option key={c}>{c}</option>)}
+          </select>
+        </div>
+
+        {/* Instructor */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Instructor</label>
+          <select value={filterInstructor} onChange={e=>setFilterInstructor(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors">
+            <option value="">All Instructors</option>
+            {instructors.map(i=>{
+              const name=`${i.firstName||''} ${i.lastName||''}`.trim()||i.email
+              return <option key={i.email} value={i.email}>{name}</option>
+            })}
+          </select>
+        </div>
+
+        {/* Date range */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">From Date</label>
+          <input type="date" value={filterDateFrom} onChange={e=>setFilterDateFrom(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors"/>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">To Date</label>
+          <input type="date" value={filterDateTo} onChange={e=>setFilterDateTo(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors"/>
+        </div>
+
+        {/* Sort by Date */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Sort by Date</label>
+          <select value={sortDate} onChange={e=>{setSortDate(e.target.value);setSortRating('none')}}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
+        {/* Sort by Rating */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500 px-0.5">Sort by Rating</label>
+          <select
+            value={sortRating}
+            disabled={!hasRatings}
+            onChange={e=>setSortRating(e.target.value)}
+            title={!hasRatings?'No ratings yet':''}
+            className={`rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors
+              ${hasRatings
+                ?'border-slate-200 bg-white text-slate-700 hover:border-slate-300 focus:border-blue-500 cursor-pointer'
+                :'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'}`}>
+            <option value="none">{hasRatings?'No Rating Sort':'No ratings yet'}</option>
+            {hasRatings&&<>
+              <option value="highest">Highest Rating</option>
+              <option value="lowest">Lowest Rating</option>
+            </>}
+          </select>
+        </div>
+
       </div>
       {displayed.length===0?<Card><EmptyState message="No public projects match your search."/></Card>:
         <div className="space-y-3">
@@ -1003,6 +1062,12 @@ function RecommendedSection({ profile, projects, favProjects, setFavProjects }) 
 function MessagesSection({ profile, pushNotif }) {
   const [threads, setThreads]=useLS('student_messages_'+profile.email,[])
   const [active, setActive]=useState(null)
+  const markThreadRead=(email)=>{
+    setThreads(p=>p.map(t=>t.with===email?{...t,messages:t.messages.map(m=>m.from!==profile.email?{...m,read:true}:m)}:t))
+    const key='student_messages_'+profile.email
+    const stored=LS.get(key,[])
+    LS.set(key,stored.map(t=>t.with===email?{...t,messages:t.messages.map(m=>m.from!==profile.email?{...m,read:true}:m)}:t))
+  }
   const [newEmail, setNewEmail]=useState('')
   const [text, setText]=useState('')
  const startThread=()=>{const em=newEmail.trim().toLowerCase();if(!em)return;if(threads.some(t=>t.with===em)){setActive(em);setNewEmail('');return}setThreads(p=>[...p,{with:em,messages:[]}]);setActive(em);setNewEmail('')}
@@ -1046,7 +1111,7 @@ function MessagesSection({ profile, pushNotif }) {
           </div>
           {threads.length===0?<p className="text-center text-xs text-slate-400 py-4">No conversations.</p>:
             threads.map(t=>(
-              <button key={t.with} onClick={()=>setActive(t.with)} className={`w-full rounded-lg px-3 py-2.5 text-left text-sm transition ${active===t.with?'bg-blue-700 text-white':'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
+              <button key={t.with} onClick={()=>{setActive(t.with);markThreadRead(t.with)}} className={`w-full rounded-lg px-3 py-2.5 text-left text-sm transition ${active===t.with?'bg-blue-700 text-white':'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 mb-1">{t.with[0].toUpperCase()}</div>
                 <p className="font-medium truncate text-xs">{t.with}</p>
                 <p className={`text-xs truncate ${active===t.with?'text-blue-200':'text-slate-400'}`}>{t.messages.at(-1)?.text||'No messages yet'}</p>
@@ -1369,14 +1434,23 @@ const navItems=[
 
   const NavContent=()=>(
     <>
-      <div className="mb-6 px-2">
-        <div className="flex items-center gap-2.5 rounded-xl bg-blue-50 px-3 py-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
-            {(profile.firstName||rawUser.firstName||'S')[0].toUpperCase()}
-          </div>
+{/* Sidebar top spacer to align with header height */}
+      <div className="mb-4 mt-1 px-2">
+        <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+          Workspace
+        </p>
+        <div className="flex items-center gap-2.5 rounded-xl bg-blue-50 px-3 py-2.5 border border-blue-100">
+          {profile.photo
+            ?<img src={profile.photo} alt="avatar" className="h-8 w-8 shrink-0 rounded-full object-cover border-2 border-blue-200"/>
+            :<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
+              {(profile.firstName||rawUser.firstName||'S')[0].toUpperCase()}
+            </div>
+          }
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-slate-900">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
-            <p className="truncate text-xs text-slate-500">Student</p>
+            <p className="truncate text-sm font-semibold text-slate-900 leading-tight">
+              {profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}
+            </p>
+            <p className="truncate text-xs text-slate-400 leading-tight">Student · GUC</p>
           </div>
         </div>
       </div>
@@ -1416,14 +1490,7 @@ const navItems=[
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-5 md:flex">
-        {/* Logo / Brand */}
-        <div className="mb-5 flex items-center gap-2.5 px-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
-            <Icon d={IC.folder} size={16} />
-          </div>
-          <span className="text-base font-bold text-slate-900">ProjectHub</span>
-        </div>
+<aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-5 md:flex">
         <NavContent/>
       </aside>
 
@@ -1431,14 +1498,8 @@ const navItems=[
       {sidebarOpen&&(
         <div className="fixed inset-0 z-40 md:hidden" onClick={()=>setSidebar(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"/>
-          <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 bg-white px-3 py-5"
+<aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 bg-white px-3 py-5"
             onClick={e=>e.stopPropagation()}>
-            <div className="mb-5 flex items-center gap-2.5 px-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
-                <Icon d={IC.folder} size={16}/>
-              </div>
-              <span className="text-base font-bold text-slate-900">ProjectHub</span>
-            </div>
             <NavContent/>
           </aside>
         </div>
@@ -1449,33 +1510,65 @@ const navItems=[
 
         {/* Top Header */}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3">
-          {/* Left: Hamburger (mobile) + Page title */}
+{/* Left: Logo + Hamburger (mobile) + Page title */}
           <div className="flex items-center gap-3">
+
+            {/* Hamburger — mobile only */}
             <button onClick={()=>setSidebar(true)}
               className="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 md:hidden">
               <Icon d={IC.menu} size={18}/>
             </button>
-            <div className="hidden md:block">
-              <h1 className="text-sm font-semibold text-slate-900 capitalize">
-                {navItems.find(n=>n.id===tab)?.label || (tab==='profile'?'My Profile':tab)}
-              </h1>
+
+            {/* Brand logo — always visible, navigates to home */}
+            <button
+              onClick={()=>navigate('/')}
+              className="flex items-center gap-2 rounded-lg px-2 py-1 transition-all duration-150 hover:opacity-80 hover:bg-slate-50 group">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-700 shadow-sm group-hover:shadow-md transition-shadow duration-150">
+                <Icon d={IC.folder} size={14}/>
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-blue-600 hidden sm:block">
+                  BI × ENG V2
+                </span>
+                <span className="text-sm font-bold text-slate-900 leading-tight">
+                  ProjectHub
+                </span>
+              </div>
+            </button>
+
+{/* Breadcrumb — desktop only */}
+            <div className="hidden md:flex items-center gap-1.5">
+              <span className="text-slate-300 text-sm select-none">/</span>
+              <span className="text-xs font-medium text-slate-400 select-none">Dashboard</span>
+              <span className="text-slate-300 text-sm select-none">/</span>
+              <span className="text-xs font-semibold text-slate-600 capitalize">
+                {navItems.find(n=>n.id===tab)?.label
+                  || (tab==='profile'?'My Profile'
+                  : tab==='explore'?'Explore Projects'
+                  : tab==='create-project'?'New Project'
+                  : tab)}
+              </span>
             </div>
-            <div className="md:hidden">
-              <span className="text-sm font-bold text-slate-900">ProjectHub</span>
-            </div>
+
           </div>
 
           {/* Right: Messages, Notifications, Avatar */}
           <div className="flex items-center gap-1">
 
-            {/* Messages */}
+{/* Messages */}
             <div className="relative" ref={msgRef}>
               <button onClick={()=>{setMsgDropdown(p=>!p);setNotifDropdown(false);setProfileDropdown(false)}}
                 className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
                 <Icon d={IC.chat} size={18}/>
-                {recentThreads.length>0&&(
-                  <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-600"/>
-                )}
+{(()=>{
+                  const allThreads=LS.get('student_messages_'+rawUser.email,[])
+                  const unreadMsgs=allThreads.reduce((acc,t)=>acc+t.messages.filter(m=>m.from!==rawUser.email&&!m.read).length,0)
+                  return unreadMsgs>0?(
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm transition-all duration-200">
+                      {unreadMsgs>9?'9+':unreadMsgs}
+                    </span>
+                  ):null
+                })()}
               </button>
               {msgDropdown&&(
                 <div className="absolute right-0 top-11 w-72 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
@@ -1491,6 +1584,8 @@ const navItems=[
                         <li key={t.with}>
                           <button onClick={()=>{
                             LS.set('student_pending_message_target',t.with)
+                            const key='student_messages_'+rawUser.email
+                            LS.set(key,LS.get(key,[]).map(th=>th.with===t.with?{...th,messages:th.messages.map(m=>m.from!==rawUser.email?{...m,read:true}:m)}:th))
                             setTab('messages')
                             setMsgDropdown(false)
                           }} className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 text-left">
@@ -1531,25 +1626,102 @@ const navItems=[
                 <div className="absolute right-0 top-11 w-80 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
                   <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
                     <p className="text-sm font-semibold text-slate-900">Notifications</p>
-                    {unread>0&&<span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">{unread} new</span>}
+                    <div className="flex items-center gap-2">
+                      {unread>0&&(
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">
+                          {unread} new
+                        </span>
+                      )}
+                      {unread>0&&(
+                        <button
+                          onClick={()=>setNotifications(p=>p.map(n=>({...n,read:true})))}
+                          className="text-xs text-slate-400 hover:text-blue-600 transition-colors">
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
                   </div>
+
                   {notifications.length===0
                     ?<p className="px-4 py-6 text-center text-xs text-slate-400">No notifications yet.</p>
                     :<ul className="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                      {notifications.slice().reverse().slice(0,6).map(n=>(
-                        <li key={n.id} className={`flex items-start gap-3 px-4 py-3 ${n.read?'':'bg-blue-50/50'}`}>
-                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read?'bg-slate-300':'bg-blue-600'}`}/>
-                          <div className="min-w-0">
-                            <p className={`text-xs ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>{n.message}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">{new Date(n.createdAt).toLocaleDateString()}</p>
-                          </div>
-                        </li>
-                      ))}
+                      {notifications.slice().reverse().slice(0,6).map(n=>{
+                        // ── route resolver ──────────────────────────────
+                        const msg=n.message?.toLowerCase()||''
+                        const goTo=()=>{
+                          // mark as read
+                          setNotifications(p=>p.map(x=>x.id===n.id?{...x,read:true}:x))
+                          setNotifDropdown(false)
+                          // route by keyword
+                          if(msg.includes('message')||msg.includes('chat')){
+                            // try to extract sender email from message text
+                            const match=n.message?.match(/from\s+([\w.@+-]+)/i)
+                            if(match?.[1]){
+                              LS.set('student_pending_message_target',match[1])
+                            }
+                            setTab('messages')
+                          } else if(msg.includes('invitation')||msg.includes('invited')||msg.includes('collab')){
+                            setTab('invitations')
+                          } else if(msg.includes('internship')||msg.includes('application')||msg.includes('job')||msg.includes('hiring')){
+                            setTab('internships')
+                          } else if(msg.includes('appeal')){
+                            setTab('projects')
+                          } else if(msg.includes('project')){
+                            setTab('projects')
+                          } else if(msg.includes('notification')){
+                            setTab('notifications')
+                          } else {
+                            setTab('notifications')
+                          }
+                        }
+                        // ── icon resolver ────────────────────────────────
+                        const iconD=
+                          msg.includes('message')||msg.includes('chat')?IC.chat:
+                          msg.includes('invitation')||msg.includes('invited')?IC.users:
+                          msg.includes('internship')||msg.includes('application')||msg.includes('job')?IC.briefcase:
+                          msg.includes('project')||msg.includes('appeal')?IC.folder:
+                          IC.bell
+                        const iconBg=
+                          msg.includes('message')||msg.includes('chat')?'bg-blue-100 text-blue-600':
+                          msg.includes('invitation')||msg.includes('invited')?'bg-purple-100 text-purple-600':
+                          msg.includes('internship')||msg.includes('application')||msg.includes('job')?'bg-green-100 text-green-600':
+                          msg.includes('project')||msg.includes('appeal')?'bg-amber-100 text-amber-600':
+                          'bg-slate-100 text-slate-500'
+                        return (
+                          <li key={n.id}>
+                            <button
+                              onClick={goTo}
+                              className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-all duration-150
+                                ${n.read
+                                  ?'bg-white hover:bg-slate-50'
+                                  :'bg-blue-50/60 hover:bg-blue-50'}`}>
+                              {/* category icon */}
+                              <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
+                                <Icon d={iconD} size={12}/>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className={`text-xs leading-snug ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>
+                                  {n.message}
+                                </p>
+                                <p className="text-[10px] text-slate-400 mt-1">
+                                  {new Date(n.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+                                </p>
+                              </div>
+                              {/* unread dot */}
+                              {!n.read&&(
+                                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-600 transition-all duration-200"/>
+                              )}
+                            </button>
+                          </li>
+                        )
+                      })}
                     </ul>
                   }
-                  <div className="border-t border-slate-100 p-2">
-                    <button onClick={()=>{setTab('notifications');setNotifDropdown(false)}}
-                      className="w-full rounded-lg py-2 text-center text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors">
+
+                  <div className="border-t border-slate-100 p-2 flex gap-1">
+                    <button
+                      onClick={()=>{setTab('notifications');setNotifDropdown(false)}}
+                      className="flex-1 rounded-lg py-2 text-center text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors">
                       View all notifications
                     </button>
                   </div>
