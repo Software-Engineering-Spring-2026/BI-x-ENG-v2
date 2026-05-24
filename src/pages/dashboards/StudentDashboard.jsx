@@ -1062,86 +1062,296 @@ function RecommendedSection({ profile, projects, favProjects, setFavProjects }) 
 function MessagesSection({ profile, pushNotif }) {
   const [threads, setThreads]=useLS('student_messages_'+profile.email,[])
   const [active, setActive]=useState(null)
-  const markThreadRead=(email)=>{
-    setThreads(p=>p.map(t=>t.with===email?{...t,messages:t.messages.map(m=>m.from!==profile.email?{...m,read:true}:m)}:t))
-    const key='student_messages_'+profile.email
-    const stored=LS.get(key,[])
-    LS.set(key,stored.map(t=>t.with===email?{...t,messages:t.messages.map(m=>m.from!==profile.email?{...m,read:true}:m)}:t))
-  }
   const [newEmail, setNewEmail]=useState('')
   const [text, setText]=useState('')
- const startThread=()=>{const em=newEmail.trim().toLowerCase();if(!em)return;if(threads.some(t=>t.with===em)){setActive(em);setNewEmail('');return}setThreads(p=>[...p,{with:em,messages:[]}]);setActive(em);setNewEmail('')}
-  // auto-open pending message target from portfolio page
-  useState(()=>{
+  const [showNewThread, setShowNewThread]=useState(false)
+  const bottomRef=useRef(null)
+  const inputRef=useRef(null)
+
+  const markThreadRead=(email)=>{
+    // mark messages as read in state
+    setThreads(p=>p.map(t=>t.with===email
+      ?{...t,messages:t.messages.map(m=>m.from!==profile.email?{...m,read:true}:m)}
+      :t
+    ))
+    // persist to localStorage
+    const msgKey='student_messages_'+profile.email
+    LS.set(msgKey,LS.get(msgKey,[]).map(t=>t.with===email
+      ?{...t,messages:t.messages.map(m=>m.from!==profile.email?{...m,read:true}:m)}
+      :t
+    ))
+    // mark related message notifications as read
+    const notifKey='student_notifs_'+profile.email
+    const notifs=LS.get(notifKey,[])
+    const updated=notifs.map(n=>{
+      const txt=(n.message||'').toLowerCase()
+      const isMsg=txt.includes('message')||txt.includes('chat')
+      const fromMatch=n.message?.includes(email)
+      return (isMsg&&fromMatch)?{...n,read:true}:n
+    })
+    LS.set(notifKey,updated)
+    // also update sender's outgoing messages to mark as read (receipt)
+    const senderKey='student_messages_'+email
+    const senderThreads=LS.get(senderKey,[])
+    const senderUpdated=senderThreads.map(t=>
+      t.with===profile.email
+        ?{...t,messages:t.messages.map(m=>m.from===email?{...m,read:true}:m)}
+        :t
+    )
+    LS.set(senderKey,senderUpdated)
+  }
+
+  useEffect(()=>{
     const target=LS.get('student_pending_message_target',null)
     if(target){
       LS.set('student_pending_message_target',null)
-      if(!threads.some(t=>t.with===target)){
-        setThreads(p=>[...p,{with:target,messages:[]}])
-      }
+      setThreads(p=>{
+        if(!p.some(t=>t.with===target)) return[...p,{with:target,messages:[]}]
+        return p
+      })
       setActive(target)
+      markThreadRead(target)
     }
-  })
-  const send=()=>{
-  if(!text.trim()||!active)return
-  const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString()}
-  setThreads(p=>p.map(t=>t.with===active?{...t,messages:[...t.messages,msg]}:t))
-  const recipientKey='student_messages_'+active
-  const recipientThreads=LS.get(recipientKey,[])
-  const existingThread=recipientThreads.find(t=>t.with===profile.email)
-  if(existingThread){
-    LS.set(recipientKey,recipientThreads.map(t=>t.with===profile.email?{...t,messages:[...t.messages,msg]}:t))
-  } else {
-    LS.set(recipientKey,[...recipientThreads,{with:profile.email,messages:[msg]}])
+  },[])
+
+  useEffect(()=>{
+    bottomRef.current?.scrollIntoView({behavior:'smooth'})
+  },[active,threads])
+
+  useEffect(()=>{
+    if(active) inputRef.current?.focus()
+  },[active])
+
+  const startThread=()=>{
+    const em=newEmail.trim().toLowerCase()
+    if(!em)return
+    if(threads.some(t=>t.with===em)){
+      setActive(em);markThreadRead(em)
+    } else {
+      setThreads(p=>[...p,{with:em,messages:[]}])
+      setActive(em)
+    }
+    setNewEmail('');setShowNewThread(false)
   }
-  const recipientNotifsKey='student_notifs_'+active
-  LS.set(recipientNotifsKey,[...LS.get(recipientNotifsKey,[]),{id:Date.now().toString(),read:false,message:`New message from ${profile.email}.`,createdAt:new Date().toISOString()}])
-  pushNotif(`Message sent to ${active}.`)
-  setText('')
-}
+
+  const send=()=>{
+    if(!text.trim()||!active)return
+    const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString(),read:true}
+    setThreads(p=>p.map(t=>t.with===active?{...t,messages:[...t.messages,msg]}:t))
+    const recipientKey='student_messages_'+active
+    const recipientThreads=LS.get(recipientKey,[])
+    const existingThread=recipientThreads.find(t=>t.with===profile.email)
+    if(existingThread){
+      LS.set(recipientKey,recipientThreads.map(t=>t.with===profile.email?{...t,messages:[...t.messages,msg]}:t))
+    } else {
+      LS.set(recipientKey,[...recipientThreads,{with:profile.email,messages:[msg]}])
+    }
+    LS.set('student_notifs_'+active,[...LS.get('student_notifs_'+active,[]),
+      {id:Date.now().toString(),read:false,message:`New message from ${profile.email}.`,createdAt:new Date().toISOString()}
+    ])
+    pushNotif(`Message sent to ${active}.`)
+    setText('')
+  }
+
   const activeThread=threads.find(t=>t.with===active)
+  const unreadCount=(email)=>threads.find(t=>t.with===email)?.messages.filter(m=>m.from!==profile.email&&!m.read).length||0
+  const formatTime=(iso)=>new Date(iso).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+  const formatDate=(iso)=>{
+    const d=new Date(iso),today=new Date()
+    if(d.toDateString()===today.toDateString())return 'Today'
+    const y=new Date(today);y.setDate(today.getDate()-1)
+    if(d.toDateString()===y.toDateString())return 'Yesterday'
+    return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})
+  }
+  const grouped=(msgs=[])=>{
+    const groups=[];let lastDate=''
+    msgs.forEach(m=>{
+      const label=formatDate(m.at)
+      if(label!==lastDate){groups.push({type:'date',label});lastDate=label}
+      groups.push({type:'msg',...m})
+    })
+    return groups
+  }
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Messages </h2>
-      <div className="flex gap-4" style={{minHeight:'420px'}}>
-        <div className="w-56 shrink-0 space-y-2">
-          <div className="flex gap-1.5">
-            <input value={newEmail} onChange={e=>setNewEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&startThread()} placeholder="Email…" className="flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-xs focus:border-blue-500 focus:outline-none"/>
-            <Btn size="sm" onClick={startThread}><Icon d={IC.plus} size={12}/></Btn>
-          </div>
-          {threads.length===0?<p className="text-center text-xs text-slate-400 py-4">No conversations.</p>:
-            threads.map(t=>(
-              <button key={t.with} onClick={()=>{setActive(t.with);markThreadRead(t.with)}} className={`w-full rounded-lg px-3 py-2.5 text-left text-sm transition ${active===t.with?'bg-blue-700 text-white':'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 mb-1">{t.with[0].toUpperCase()}</div>
-                <p className="font-medium truncate text-xs">{t.with}</p>
-                <p className={`text-xs truncate ${active===t.with?'text-blue-200':'text-slate-400'}`}>{t.messages.at(-1)?.text||'No messages yet'}</p>
-              </button>
-            ))
-          }
+    <div className="flex h-[calc(100vh-8rem)] rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+
+      {/* LEFT: Thread list */}
+      <div className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-slate-50">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3.5">
+          <p className="text-sm font-bold text-slate-900">Messages</p>
+          <button onClick={()=>setShowNewThread(p=>!p)} title="New conversation"
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-700 text-white hover:bg-blue-800 transition-colors">
+            <Icon d={IC.plus} size={13}/>
+          </button>
         </div>
-        <div className="flex-1 flex flex-col rounded-xl border border-slate-200 bg-white overflow-hidden">
-          {!activeThread?<div className="flex flex-1 items-center justify-center text-sm text-slate-400">Select a conversation or start a new one.</div>:
-            <>
-              <div className="border-b border-slate-200 px-4 py-3"><p className="font-semibold text-slate-800">{activeThread.with}</p></div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {activeThread.messages.length===0?<p className="text-center text-sm text-slate-400">Say hello 👋</p>:
-                  activeThread.messages.map(m=>(
-                    <div key={m.id} className={`flex ${m.from===profile.email?'justify-end':'justify-start'}`}>
-                      <div className={`max-w-xs rounded-2xl px-4 py-2 text-sm ${m.from===profile.email?'bg-blue-700 text-white':'bg-slate-100 text-slate-800'}`}>
-                        <p>{m.text}</p>
-                        <p className={`text-xs mt-1 ${m.from===profile.email?'text-blue-200':'text-slate-400'}`}>{new Date(m.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p>
+
+        {showNewThread&&(
+          <div className="border-b border-slate-200 bg-white px-3 py-2.5 flex gap-1.5">
+            <input autoFocus value={newEmail} onChange={e=>setNewEmail(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter')startThread();if(e.key==='Escape')setShowNewThread(false)}}
+              placeholder="Enter email address…"
+              className="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
+            <button onClick={startThread}
+              className="rounded-lg bg-blue-700 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-800 transition-colors">
+              Go
+            </button>
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto">
+          {threads.length===0
+            ?<div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                <Icon d={IC.chat} size={18}/>
+              </div>
+              <p className="text-xs font-medium text-slate-600">No conversations yet</p>
+              <p className="text-xs text-slate-400 mt-1">Click + to start chatting</p>
+            </div>
+            :threads.map(t=>{
+              const uc=unreadCount(t.with)
+              const isActive=active===t.with
+              const lastMsg=t.messages.at(-1)
+              return (
+                <button key={t.with} onClick={()=>{setActive(t.with);markThreadRead(t.with)}}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 border-b border-slate-100
+                    ${isActive?'bg-blue-700':'hover:bg-white'}`}>
+                  <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors duration-150
+                    ${isActive?'bg-blue-500 text-white':'bg-blue-100 text-blue-700'}`}>
+                    {t.with[0].toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <p className={`truncate text-xs font-semibold ${isActive?'text-white':uc>0?'text-slate-900':'text-slate-700'}`}>
+                        {t.with}
+                      </p>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        {lastMsg&&(
+                          <p className={`text-[10px] ${isActive?'text-blue-200':'text-slate-400'}`}>
+                            {formatTime(lastMsg.at)}
+                          </p>
+                        )}
+                        {/* unread badge — right side, disappears when read */}
+                        {uc>0&&!isActive&&(
+                          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[9px] font-bold text-white transition-all duration-200">
+                            {uc>9?'9+':uc}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  ))
-                }
-              </div>
-              <div className="border-t border-slate-200 flex gap-2 p-3">
-                <input value={text} onChange={e=>setText(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Type a message…" className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
-                <Btn onClick={send}><Icon d={IC.send} size={13}/>Send</Btn>
-              </div>
-            </>
+                    <p className={`truncate text-[11px] mt-0.5
+                      ${isActive?'text-blue-200':uc>0?'font-semibold text-slate-800':'text-slate-400'}`}>
+                      {lastMsg
+                        ?(lastMsg.from===profile.email
+                          ?<span className="text-slate-400">You: </span>
+                          :'')
+                        :''}
+                      {lastMsg?lastMsg.text:'No messages yet'}
+                    </p>
+                  </div>
+                </button>
+              )
+            })
           }
         </div>
+      </div>
+
+      {/* RIGHT: Chat window */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {!activeThread
+          ?<div className="flex flex-1 flex-col items-center justify-center gap-3 text-center px-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+              <Icon d={IC.chat} size={28}/>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-700">Select a conversation</p>
+              <p className="text-sm text-slate-400 mt-1">Choose from the left or start a new chat with the + button.</p>
+            </div>
+          </div>
+          :<>
+            {/* Chat header */}
+            <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-5 py-3.5 shrink-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                {activeThread.with[0].toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{activeThread.with}</p>
+                <p className="text-xs text-slate-400">{activeThread.messages.length} message{activeThread.messages.length!==1?'s':''}</p>
+              </div>
+            </div>
+
+            {/* Scrollable messages */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1 scroll-smooth">
+              {activeThread.messages.length===0
+                ?<div className="flex h-full items-center justify-center">
+                  <p className="text-sm text-slate-400">Say hello 👋</p>
+                </div>
+                :grouped(activeThread.messages).map((item,idx)=>{
+                  if(item.type==='date') return (
+                    <div key={'d'+idx} className="flex items-center gap-3 py-3">
+                      <div className="flex-1 h-px bg-slate-200"/>
+                      <span className="text-[10px] font-medium text-slate-400 px-2">{item.label}</span>
+                      <div className="flex-1 h-px bg-slate-200"/>
+                    </div>
+                  )
+                  const isMine=item.from===profile.email
+                  const isRead=item.read===true
+                  return (
+                    <div key={item.id} className={`flex ${isMine?'justify-end':'justify-start'} mb-1`}>
+                      {!isMine&&(
+                        <div className="mr-2 flex h-6 w-6 shrink-0 self-end items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700">
+                          {item.from[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div className="max-w-xs lg:max-w-sm xl:max-w-md">
+                        <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm
+                          ${isMine?'rounded-br-md bg-blue-700 text-white':'rounded-bl-md bg-slate-100 text-slate-800'}`}>
+                          <p className="break-words">{item.text}</p>
+                        </div>
+                        {/* timestamp + read receipt — only on outgoing */}
+                        <div className={`mt-0.5 flex items-center gap-1 ${isMine?'justify-end':'justify-start'}`}>
+                          <p className="text-[10px] text-slate-400">{formatTime(item.at)}</p>
+                          {isMine&&(
+                            <span title={isRead?'Seen':'Sent'} className="flex items-center transition-all duration-300">
+                              {isRead
+                                /* blue double check = seen */
+                                ?<svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                                  <path d="M1 5l3 3 5-6" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M5 5l3 3 5-6" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                /* grey double check = delivered */
+                                :<svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                                  <path d="M1 5l3 3 5-6" stroke="#94a3b8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M5 5l3 3 5-6" stroke="#94a3b8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              }
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              }
+              <div ref={bottomRef}/>
+            </div>
+
+            {/* Fixed input bar */}
+            <div className="shrink-0 border-t border-slate-200 bg-white px-4 py-3">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+                <input ref={inputRef} value={text} onChange={e=>setText(e.target.value)}
+                  onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&send()}
+                  placeholder={`Message ${activeThread.with.split('@')[0]}…`}
+                  className="flex-1 bg-transparent text-sm text-slate-900 placeholder-slate-400 focus:outline-none"/>
+                <button onClick={send} disabled={!text.trim()}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-700 text-white transition-all hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95">
+                  <Icon d={IC.send} size={13}/>
+                </button>
+              </div>
+              <p className="mt-1.5 text-center text-[10px] text-slate-300">Press Enter to send</p>
+            </div>
+          </>
+        }
       </div>
     </div>
   )
@@ -1654,10 +1864,17 @@ const navItems=[
                           setNotifDropdown(false)
                           // route by keyword
                           if(msg.includes('message')||msg.includes('chat')){
-                            // try to extract sender email from message text
-                            const match=n.message?.match(/from\s+([\w.@+-]+)/i)
+                            const match=n.message?.match(/from\s+([\w.@+-]+@[\w.+-]+)/i)
+                              ||n.message?.match(/([\w.@+-]+@[\w.+-]+)/)
                             if(match?.[1]){
                               LS.set('student_pending_message_target',match[1])
+                              // mark that thread as read in localStorage immediately
+                              const key='student_messages_'+rawUser.email
+                              LS.set(key,LS.get(key,[]).map(th=>
+                                th.with===match[1]
+                                  ?{...th,messages:th.messages.map(m=>m.from!==rawUser.email?{...m,read:true}:m)}
+                                  :th
+                              ))
                             }
                             setTab('messages')
                           } else if(msg.includes('invitation')||msg.includes('invited')||msg.includes('collab')){
