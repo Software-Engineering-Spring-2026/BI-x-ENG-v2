@@ -60,53 +60,75 @@ const IC = {
   book:'M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z',
  star:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
   download:'M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3',
+  calendar:'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z',
+  settings:'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z',
+  moon:'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z',
+  sun:'M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 5a7 7 0 100 14A7 7 0 0012 5z',
+  shield:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  help:'M12 22a10 10 0 100-20 10 10 0 000 20zM9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01',
+  clock:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2',
+  zap:'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
 }
 
 const Badge = ({ children, color = 'blue' }) => {
-  const map = { blue:'bg-blue-100 text-blue-700', green:'bg-green-100 text-green-700', red:'bg-red-100 text-red-700', yellow:'bg-yellow-100 text-yellow-700', slate:'bg-slate-100 text-slate-600', purple:'bg-purple-100 text-purple-700', orange:'bg-orange-100 text-orange-700' }
+  const map = {
+    blue:'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300',
+    green:'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300',
+    red:'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300',
+    yellow:'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300',
+    slate:'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300',
+    purple:'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300',
+    orange:'bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300',
+  }
   return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${map[color]??map.slate}`}>{children}</span>
 }
 const Btn = ({ children, onClick, variant='primary', size='md', className='', disabled=false }) => {
   const base='inline-flex items-center gap-1.5 rounded-lg font-medium transition focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
   const sizes={sm:'px-3 py-1.5 text-xs',md:'px-4 py-2 text-sm',lg:'px-5 py-2.5 text-sm'}
-  const variants={primary:'bg-blue-700 text-white hover:bg-blue-800',secondary:'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50',danger:'bg-red-600 text-white hover:bg-red-700',ghost:'text-slate-600 hover:bg-slate-100',success:'bg-green-600 text-white hover:bg-green-700'}
+  const variants={
+    primary:'bg-blue-700 text-white hover:bg-blue-800',
+    secondary:'border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600',
+    danger:'bg-red-600 text-white hover:bg-red-700',
+    ghost:'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700',
+    success:'bg-green-600 text-white hover:bg-green-700',
+  }
   return <button type="button" onClick={onClick} disabled={disabled} className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}>{children}</button>
 }
 const Input = ({ label, error, ...props }) => (
   <div className="flex flex-col gap-1">
     {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
-    <input className={`rounded-lg border px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 ${error?'border-red-400 focus:ring-red-400':'border-slate-300 focus:border-blue-500 focus:ring-blue-500'}`} {...props} />
+    <input className={`rounded-lg border px-3 py-2 text-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-700 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 ${error?'border-red-400 focus:ring-red-400':'border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500'}`} {...props} />
     {error && <p className="text-xs text-red-500">{error}</p>}
   </div>
 )
 const Textarea = ({ label, ...props }) => (
   <div className="flex flex-col gap-1">
-    {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
-    <textarea className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" rows={3} {...props} />
+    {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
+    <textarea className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" rows={3} {...props} />
   </div>
 )
 const Sel = ({ label, children, ...props }) => (
   <div className="flex flex-col gap-1">
     {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
-    <select className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" {...props}>{children}</select>
+    <select className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" {...props}>{children}</select>
   </div>
 )
-const Card = ({ children, className='' }) => <div className={`rounded-xl border border-slate-200 bg-white p-5 shadow-sm ${className}`}>{children}</div>
+const Card = ({ children, className='' }) => <div className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm ${className}`}>{children}</div>
 const Modal = ({ title, onClose, children, wide=false }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={e=>e.target===e.currentTarget&&onClose()}>
-    <div className={`w-full ${wide?'max-w-2xl':'max-w-lg'} rounded-xl bg-white shadow-xl flex flex-col max-h-[90vh]`}>
-      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 shrink-0">
-        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-        <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100"><Icon d={IC.x}/></button>
+    <div className={`w-full ${wide?'max-w-2xl':'max-w-lg'} rounded-xl bg-white dark:bg-slate-800 shadow-xl flex flex-col max-h-[90vh]`}>
+<div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4 shrink-0">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h2>
+        <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"><Icon d={IC.x}/></button>
       </div>
-      <div className="overflow-y-auto px-6 py-4">{children}</div>
+      <div className="overflow-y-auto px-6 py-4 dark:bg-slate-800">{children}</div>
     </div>
   </div>
 )
 const EmptyState = ({ message }) => <p className="py-10 text-center text-sm text-slate-400">{message}</p>
 const TagPicker = ({ options, selected, onToggle, label }) => (
   <div className="flex flex-col gap-1">
-    {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
+    {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
     <div className="flex flex-wrap gap-2">
       {options.map(o=>(
         <button key={o} type="button" onClick={()=>onToggle(o)}
@@ -119,7 +141,7 @@ const SearchBar = ({ value, onChange, placeholder }) => (
   <div className="relative flex-1 min-w-48">
     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon d={IC.search} size={14}/></span>
     <input value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
-      className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
+      className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 py-2 pl-9 pr-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
   </div>
 )
 
@@ -228,7 +250,42 @@ function Overview({ user, projects, notifications, setTab }) {
           </div>
         </Card>
       )}
-    </div>
+
+      {/* ── Upcoming Today Widget ── */}
+      {(()=>{
+        const scheduleKey='student_schedule_'+user.email
+        const allEvents=LS.get(scheduleKey,[])
+        const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+        const todayName=DAYS[new Date().getDay()]
+        const todayEvents=allEvents.filter(e=>e.day===todayName).sort((a,b)=>a.time.localeCompare(b.time))
+        const typeColor={class:'blue',deadline:'red',interview:'purple',meeting:'green',reminder:'yellow'}
+        const typeDot={class:'bg-blue-500',deadline:'bg-red-500',interview:'bg-purple-500',meeting:'bg-green-500',reminder:'bg-amber-500'}
+        if(allEvents.length===0)return null
+        return (
+          <Card>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="font-semibold text-slate-800">📅 Upcoming Today</h3>
+              <button onClick={()=>setTab('schedule')} className="text-xs text-blue-600 hover:underline">View schedule</button>
+            </div>
+            {todayEvents.length===0
+              ?<p className="text-sm text-slate-400">Nothing scheduled for today.</p>
+              :<div className="space-y-2">
+                {todayEvents.slice(0,4).map(e=>(
+                  <div key={e.id} className="flex items-center gap-3">
+                    <div className={`h-2 w-2 shrink-0 rounded-full ${typeDot[e.type]}`}/>
+                    <span className="text-xs font-mono text-slate-400 w-10 shrink-0">{e.time}</span>
+                    <span className="text-sm text-slate-700 font-medium truncate">{e.title}</span>
+                    <Badge color={typeColor[e.type]}>{e.type}</Badge>
+                  </div>
+                ))}
+                {todayEvents.length>4&&<p className="text-xs text-slate-400 pl-5">+{todayEvents.length-4} more events today</p>}
+              </div>
+            }
+          </Card>
+        )
+      })()}
+
+      </div>
   )
 }
 
@@ -1090,15 +1147,15 @@ function MessagesSection({ profile, pushNotif }) {
       return (isMsg&&fromMatch)?{...n,read:true}:n
     })
     LS.set(notifKey,updated)
-    // also update sender's outgoing messages to mark as read (receipt)
+    // mark sender's outgoing messages as read (turns their checks blue)
     const senderKey='student_messages_'+email
-    const senderThreads=LS.get(senderKey,[])
-    const senderUpdated=senderThreads.map(t=>
+    LS.set(senderKey,LS.get(senderKey,[]).map(t=>
       t.with===profile.email
         ?{...t,messages:t.messages.map(m=>m.from===email?{...m,read:true}:m)}
         :t
-    )
-    LS.set(senderKey,senderUpdated)
+    ))
+    // force a re-render of threads from localStorage so receipts update
+    setThreads(LS.get('student_messages_'+profile.email,[]))
   }
 
   useEffect(()=>{
@@ -1136,7 +1193,7 @@ function MessagesSection({ profile, pushNotif }) {
 
   const send=()=>{
     if(!text.trim()||!active)return
-    const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString(),read:true}
+    const msg={id:Date.now().toString(),from:profile.email,text:text.trim(),at:new Date().toISOString(),read:false}
     setThreads(p=>p.map(t=>t.with===active?{...t,messages:[...t.messages,msg]}:t))
     const recipientKey='student_messages_'+active
     const recipientThreads=LS.get(recipientKey,[])
@@ -1174,24 +1231,24 @@ function MessagesSection({ profile, pushNotif }) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+<div className="flex h-[calc(100vh-8rem)] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden shadow-sm">
 
       {/* LEFT: Thread list */}
-      <div className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-slate-50">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3.5">
-          <p className="text-sm font-bold text-slate-900">Messages</p>
+      <div className="flex w-64 shrink-0 flex-col border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-4 py-3.5">
+          <p className="text-sm font-bold text-slate-900 dark:text-white">Messages</p>
           <button onClick={()=>setShowNewThread(p=>!p)} title="New conversation"
             className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-700 text-white hover:bg-blue-800 transition-colors">
             <Icon d={IC.plus} size={13}/>
           </button>
         </div>
 
-        {showNewThread&&(
-          <div className="border-b border-slate-200 bg-white px-3 py-2.5 flex gap-1.5">
+       {showNewThread&&(
+          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 flex gap-1.5">
             <input autoFocus value={newEmail} onChange={e=>setNewEmail(e.target.value)}
               onKeyDown={e=>{if(e.key==='Enter')startThread();if(e.key==='Escape')setShowNewThread(false)}}
               placeholder="Enter email address…"
-              className="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
+              className="flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-2.5 py-1.5 text-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
             <button onClick={startThread}
               className="rounded-lg bg-blue-700 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-800 transition-colors">
               Go
@@ -1201,21 +1258,21 @@ function MessagesSection({ profile, pushNotif }) {
 
         <div className="flex-1 overflow-y-auto">
           {threads.length===0
-            ?<div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+?<div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
                 <Icon d={IC.chat} size={18}/>
               </div>
-              <p className="text-xs font-medium text-slate-600">No conversations yet</p>
-              <p className="text-xs text-slate-400 mt-1">Click + to start chatting</p>
+              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">No conversations yet</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Click + to start chatting</p>
             </div>
             :threads.map(t=>{
               const uc=unreadCount(t.with)
               const isActive=active===t.with
               const lastMsg=t.messages.at(-1)
               return (
-                <button key={t.with} onClick={()=>{setActive(t.with);markThreadRead(t.with)}}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 border-b border-slate-100
-                    ${isActive?'bg-blue-700':'hover:bg-white'}`}>
+<button key={t.with} onClick={()=>{setActive(t.with);markThreadRead(t.with)}}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 border-b border-slate-100 dark:border-slate-700/50
+                    ${isActive?'bg-blue-700':'hover:bg-white dark:hover:bg-slate-800'}`}>
                   <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors duration-150
                     ${isActive?'bg-blue-500 text-white':'bg-blue-100 text-blue-700'}`}>
                     {t.with[0].toUpperCase()}
@@ -1259,29 +1316,29 @@ function MessagesSection({ profile, pushNotif }) {
       {/* RIGHT: Chat window */}
       <div className="flex flex-1 flex-col min-w-0">
         {!activeThread
-          ?<div className="flex flex-1 flex-col items-center justify-center gap-3 text-center px-8">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+?<div className="flex flex-1 flex-col items-center justify-center gap-3 text-center px-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/30">
               <Icon d={IC.chat} size={28}/>
             </div>
             <div>
-              <p className="font-semibold text-slate-700">Select a conversation</p>
-              <p className="text-sm text-slate-400 mt-1">Choose from the left or start a new chat with the + button.</p>
+              <p className="font-semibold text-slate-700 dark:text-slate-300">Select a conversation</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Choose from the left or start a new chat with the + button.</p>
             </div>
           </div>
           :<>
             {/* Chat header */}
-            <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-5 py-3.5 shrink-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+<div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-3.5 shrink-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-sm font-bold text-blue-700 dark:text-blue-300">
                 {activeThread.with[0].toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-900">{activeThread.with}</p>
-                <p className="text-xs text-slate-400">{activeThread.messages.length} message{activeThread.messages.length!==1?'s':''}</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">{activeThread.with}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">{activeThread.messages.length} message{activeThread.messages.length!==1?'s':''}</p>
               </div>
             </div>
 
             {/* Scrollable messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1 scroll-smooth">
+<div className="flex-1 overflow-y-auto px-5 py-4 space-y-1 scroll-smooth bg-slate-50 dark:bg-slate-900/50">
               {activeThread.messages.length===0
                 ?<div className="flex h-full items-center justify-center">
                   <p className="text-sm text-slate-400">Say hello 👋</p>
@@ -1304,8 +1361,8 @@ function MessagesSection({ profile, pushNotif }) {
                         </div>
                       )}
                       <div className="max-w-xs lg:max-w-sm xl:max-w-md">
-                        <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm
-                          ${isMine?'rounded-br-md bg-blue-700 text-white':'rounded-bl-md bg-slate-100 text-slate-800'}`}>
+<div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm
+                          ${isMine?'rounded-br-md bg-blue-700 text-white':'rounded-bl-md bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100'}`}>
                           <p className="break-words">{item.text}</p>
                         </div>
                         {/* timestamp + read receipt — only on outgoing */}
@@ -1337,18 +1394,18 @@ function MessagesSection({ profile, pushNotif }) {
             </div>
 
             {/* Fixed input bar */}
-            <div className="shrink-0 border-t border-slate-200 bg-white px-4 py-3">
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+          <div className="shrink-0 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-3 py-2 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
                 <input ref={inputRef} value={text} onChange={e=>setText(e.target.value)}
                   onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&send()}
                   placeholder={`Message ${activeThread.with.split('@')[0]}…`}
-                  className="flex-1 bg-transparent text-sm text-slate-900 placeholder-slate-400 focus:outline-none"/>
+                  className="flex-1 bg-transparent text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"/>
                 <button onClick={send} disabled={!text.trim()}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-700 text-white transition-all hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95">
                   <Icon d={IC.send} size={13}/>
                 </button>
               </div>
-              <p className="mt-1.5 text-center text-[10px] text-slate-300">Press Enter to send</p>
+<p className="mt-1.5 text-center text-[10px] text-slate-300 dark:text-slate-600">Press Enter to send</p>
             </div>
           </>
         }
@@ -1514,30 +1571,115 @@ function InternshipsSection({ profile, pushNotif }) {
   )
 }
 
-function NotificationsSection({ notifications, setNotifications, profileEmail }) {
+function NotificationsSection({ notifications, setNotifications, profileEmail, setTab }) {
   const [notifsOn, setNotifsOn]=useLS('student_notifs_on_'+(profileEmail||'default'),true)
   const unread=notifications.filter(n=>!n.read).length
   const markAll=read=>setNotifications(p=>p.map(n=>({...n,read})))
-  const toggle=id=>setNotifications(p=>p.map(n=>n.id===id?{...n,read:!n.read}:n))
+
+  const resolveRoute=(n)=>{
+    const msg=(n.message||'').toLowerCase()
+    if(msg.includes('message')||msg.includes('chat')){
+      const match=n.message?.match(/from\s+([\w.@+-]+@[\w.+-]+)/i)
+        ||n.message?.match(/([\w.@+-]+@[\w.+-]+)/)
+      if(match?.[1]){
+        LS.set('student_pending_message_target',match[1])
+        const key='student_messages_'+profileEmail
+        LS.set(key,LS.get(key,[]).map(t=>
+          t.with===match[1]
+            ?{...t,messages:t.messages.map(m=>m.from!==profileEmail?{...m,read:true}:m)}
+            :t
+        ))
+      }
+      return 'messages'
+    }
+    if(msg.includes('invitation')||msg.includes('invited')||msg.includes('collab'))return 'invitations'
+    if(msg.includes('internship')||msg.includes('application')||msg.includes('job')||msg.includes('hiring'))return 'internships'
+    if(msg.includes('appeal')||msg.includes('project'))return 'projects'
+    return null
+  }
+
+  const handleClick=(n)=>{
+    setNotifications(p=>p.map(x=>x.id===n.id?{...x,read:true}:x))
+    const dest=resolveRoute(n)
+    if(dest)setTab(dest)
+  }
+
+  const iconFor=(n)=>{
+    const msg=(n.message||'').toLowerCase()
+    if(msg.includes('message')||msg.includes('chat'))return{d:IC.chat,bg:'bg-blue-100 text-blue-600'}
+    if(msg.includes('invitation')||msg.includes('invited'))return{d:IC.users,bg:'bg-purple-100 text-purple-600'}
+    if(msg.includes('internship')||msg.includes('application')||msg.includes('job'))return{d:IC.briefcase,bg:'bg-green-100 text-green-600'}
+    if(msg.includes('appeal')||msg.includes('project'))return{d:IC.folder,bg:'bg-amber-100 text-amber-600'}
+    return{d:IC.bell,bg:'bg-slate-100 text-slate-500'}
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 className="text-2xl font-bold text-slate-900">Notifications </h2>{unread>0&&<p className="mt-0.5 text-sm text-slate-500">{unread} unread</p>}</div>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Notifications</h2>
+          {unread>0&&<p className="mt-0.5 text-sm text-slate-500">{unread} unread</p>}
+        </div>
         <div className="flex flex-wrap gap-2">
           <Btn size="sm" variant="secondary" onClick={()=>markAll(true)}>Mark all read</Btn>
           <Btn size="sm" variant="secondary" onClick={()=>markAll(false)}>Mark all unread</Btn>
-          <Btn size="sm" variant={notifsOn?'danger':'success'} onClick={()=>setNotifsOn(p=>!p)}><Icon d={IC.bell} size={13}/>{notifsOn?'Turn Off Notifications':'Turn On Notifications'}</Btn>
+          <Btn size="sm" variant={notifsOn?'danger':'success'} onClick={()=>setNotifsOn(p=>!p)}>
+            <Icon d={IC.bell} size={13}/>{notifsOn?'Turn Off':'Turn On'}
+          </Btn>
         </div>
       </div>
-      {!notifsOn&&<div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">🔕 Notifications are turned off.</div>}
-      {notifications.length===0?<Card><EmptyState message="No notifications yet."/></Card>:
-        <div className="space-y-2">{notifications.slice().reverse().map(n=>(
-          <div key={n.id} className={`flex items-start gap-3 rounded-xl border px-4 py-3 transition ${n.read?'border-slate-200 bg-white':'border-blue-200 bg-blue-50'}`}>
-            <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read?'bg-slate-300':'bg-blue-600'}`}/>
-            <div className="flex-1 min-w-0"><p className={`text-sm ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>{n.message}</p><p className="text-xs text-slate-400 mt-0.5">{new Date(n.createdAt).toLocaleDateString()}</p></div>
-            <button onClick={()=>toggle(n.id)} className="shrink-0 rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-slate-100">{n.read?'Unread':'Read'}</button>
-          </div>
-        ))}</div>
+
+      {!notifsOn&&(
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+          🔕 Notifications are turned off. New notifications will not be received.
+        </div>
+      )}
+
+      {notifications.length===0
+        ?<Card><EmptyState message="No notifications yet."/></Card>
+        :<div className="space-y-1.5">
+          {notifications.slice().reverse().map(n=>{
+            const {d,bg}=iconFor(n)
+            const dest=resolveRoute(n)
+            const isClickable=!!dest
+            return (
+              <div
+                key={n.id}
+                onClick={()=>handleClick(n)}
+                className={`group flex items-start gap-3 rounded-xl border px-4 py-3.5 transition-all duration-150
+                  ${n.read?'border-slate-200 bg-white':'border-blue-200 bg-blue-50/60'}
+                  ${isClickable?'cursor-pointer hover:border-blue-300 hover:shadow-sm hover:bg-blue-50 active:scale-[0.995]':'cursor-default'}`}>
+                {/* category icon */}
+                <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${bg} transition-transform duration-150 ${isClickable?'group-hover:scale-105':''}`}>
+                  <Icon d={d} size={14}/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm leading-snug ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>
+                    {n.message}
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <p className="text-xs text-slate-400">
+                      {new Date(n.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+                    </p>
+                    {isClickable&&(
+                      <span className="text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        Click to open →
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  {!n.read&&<span className="h-2 w-2 rounded-full bg-blue-600"/>}
+                  <button
+                    onClick={e=>{e.stopPropagation();setNotifications(p=>p.map(x=>x.id===n.id?{...x,read:!x.read}:x))}}
+                    className="rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+                    {n.read?'Unread':'Read'}
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       }
     </div>
   )
@@ -1585,6 +1727,442 @@ function StatsSection({ projects, profile }) {
   )
 }
 
+function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
+  const [darkMode, setDarkMode]=useLS('student_dark_mode_'+rawUser.email, false)
+  const [msgNotifs, setMsgNotifs]=useLS('student_setting_msg_notifs_'+rawUser.email, true)
+  const [internNotifs, setInternNotifs]=useLS('student_setting_intern_notifs_'+rawUser.email, true)
+  const [collabNotifs, setCollabNotifs]=useLS('student_setting_collab_notifs_'+rawUser.email, true)
+  const [profilePublic, setProfilePublic]=useLS('student_setting_profile_public_'+rawUser.email, true)
+  const [cooldown, setCooldown]=useState(false)
+  const [cooldownCount, setCooldownCount]=useState(5)
+  const [tab, setTab]=useState(initialTab)
+
+  // sync if initialTab changes (from dropdown navigation)
+  useEffect(()=>{ setTab(initialTab) },[initialTab])
+
+  const startCooldown=()=>{
+    setCooldown(true);setCooldownCount(5)
+    const t=setInterval(()=>setCooldownCount(c=>{
+      if(c<=1){clearInterval(t);setTimeout(()=>setCooldown(false),400);return 0}
+      return c-1
+    }),1000)
+  }
+
+  // dark mode effect handled globally in StudentDashboard
+
+  const settingsTabs=[
+    {id:'appearance',label:'Appearance',icon:IC.moon},
+    {id:'notifications',label:'Notifications',icon:IC.bell},
+    {id:'wellness',label:'Wellness',icon:IC.zap},
+    {id:'account',label:'Account',icon:IC.shield},
+  ]
+
+  const Toggle=({value,onChange,label,desc})=>(
+    <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
+      <div>
+        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{label}</p>
+        {desc&&<p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{desc}</p>}
+      </div>
+      <button onClick={()=>onChange(!value)}
+        className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none
+          ${value?'bg-blue-600':'bg-slate-200 dark:bg-slate-600'}`}>
+        <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200
+          ${value?'translate-x-5':'translate-x-0'}`}/>
+      </button>
+    </div>
+  )
+
+  return (
+    <div className="space-y-6">
+      {/* Cooldown overlay */}
+      {cooldown&&(
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <div className="relative flex h-32 w-32 items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-4 border-blue-400/30 animate-ping"/>
+              <div className="absolute inset-2 rounded-full border-2 border-blue-300/50"/>
+              <span className="text-4xl font-bold text-white">{cooldownCount}</span>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xl font-light text-white tracking-wide">Take a breath</p>
+              <p className="text-sm text-blue-200">Inhale slowly… exhale gently…</p>
+            </div>
+            <div className="h-1 w-48 rounded-full bg-slate-700">
+              <div className="h-1 rounded-full bg-blue-400 transition-all duration-1000"
+                style={{width:`${(cooldownCount/5)*100}%`}}/>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage your account preferences and platform experience.</p>
+      </div>
+
+      <div className="flex gap-6">
+        {/* Settings sub-nav */}
+        <div className="w-44 shrink-0 space-y-0.5">
+          {settingsTabs.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)}
+              className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
+                ${tab===t.id
+                  ?'bg-blue-700 text-white shadow-sm'
+                  :'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700'}`}>
+              <Icon d={t.icon} size={14}/>{t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Content area */}
+        <div className="flex-1 min-w-0">
+
+          {/* ── Appearance ── */}
+          {tab==='appearance'&&(
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm space-y-6">
+              <div>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Appearance</h3>
+                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">Choose your preferred theme for ProjectHub.</p>
+              </div>
+
+              {/* Visual theme selector — ONLY control */}
+              <div>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Theme</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Light theme card */}
+                  <button onClick={()=>setDarkMode(false)}
+                    className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200
+                      ${!darkMode
+                        ?'border-blue-600 shadow-md shadow-blue-100'
+                        :'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'}`}>
+                    {/* Preview mockup */}
+                    <div className="mb-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                      <div className="flex items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-3 py-2">
+                        <div className="h-2 w-2 rounded-full bg-slate-200"/>
+                        <div className="h-1.5 w-16 rounded bg-slate-200"/>
+                        <div className="ml-auto h-1.5 w-8 rounded bg-blue-200"/>
+                      </div>
+                      <div className="flex gap-2 p-2">
+                        <div className="w-8 space-y-1">
+                          <div className="h-1.5 rounded bg-blue-100"/>
+                          <div className="h-1.5 rounded bg-slate-100"/>
+                          <div className="h-1.5 rounded bg-slate-100"/>
+                        </div>
+                        <div className="flex-1 space-y-1.5">
+                          <div className="h-6 rounded-lg bg-blue-100"/>
+                          <div className="grid grid-cols-2 gap-1">
+                            <div className="h-4 rounded bg-slate-100"/>
+                            <div className="h-4 rounded bg-slate-100"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">Light</p>
+                        <p className="text-xs text-slate-400">Clean and bright</p>
+                      </div>
+                      {!darkMode&&(
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600">
+                          <Icon d={IC.check} size={11}/>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Dark theme card */}
+                  <button onClick={()=>setDarkMode(true)}
+                    className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200
+                      ${darkMode
+                        ?'border-blue-600 shadow-md shadow-blue-900/30'
+                        :'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'}`}>
+                    {/* Preview mockup */}
+                    <div className="mb-3 overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-sm">
+                      <div className="flex items-center gap-1.5 border-b border-slate-700 bg-slate-800 px-3 py-2">
+                        <div className="h-2 w-2 rounded-full bg-slate-600"/>
+                        <div className="h-1.5 w-16 rounded bg-slate-600"/>
+                        <div className="ml-auto h-1.5 w-8 rounded bg-blue-700"/>
+                      </div>
+                      <div className="flex gap-2 p-2">
+                        <div className="w-8 space-y-1">
+                          <div className="h-1.5 rounded bg-blue-900"/>
+                          <div className="h-1.5 rounded bg-slate-700"/>
+                          <div className="h-1.5 rounded bg-slate-700"/>
+                        </div>
+                        <div className="flex-1 space-y-1.5">
+                          <div className="h-6 rounded-lg bg-blue-900"/>
+                          <div className="grid grid-cols-2 gap-1">
+                            <div className="h-4 rounded bg-slate-700"/>
+                            <div className="h-4 rounded bg-slate-700"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Dark</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">Easy on the eyes</p>
+                      </div>
+                      {darkMode&&(
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600">
+                          <Icon d={IC.check} size={11}/>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Current theme indicator */}
+              <div className="flex items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-700/50 px-4 py-3">
+                <Icon d={darkMode?IC.moon:IC.sun} size={14}/>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  Currently using <span className="font-semibold">{darkMode?'Dark':'Light'}</span> mode
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ── Notifications ── */}
+          {tab==='notifications'&&(
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+              <h3 className="mb-0.5 font-semibold text-slate-900 dark:text-white">Notification Preferences</h3>
+              <p className="mb-5 text-xs text-slate-400 dark:text-slate-500">Choose which notifications you want to receive.</p>
+              <Toggle value={msgNotifs} onChange={setMsgNotifs} label="Message Notifications" desc="Get notified when someone sends you a message"/>
+              <Toggle value={internNotifs} onChange={setInternNotifs} label="Internship Alerts" desc="Updates on applications and new listings"/>
+              <Toggle value={collabNotifs} onChange={setCollabNotifs} label="Collaboration Invites" desc="Project invitations and team requests"/>
+            </div>
+          )}
+
+          {/* ── Wellness ── */}
+          {tab==='wellness'&&(
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm space-y-4">
+              <div>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Wellness & Focus</h3>
+                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">Tools to help you stay calm and focused.</p>
+              </div>
+              <div className="rounded-xl border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 p-5 text-center space-y-3">
+                <div className="flex justify-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
+                    <Icon d={IC.zap} size={24}/>
+                  </div>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 dark:text-white">5-Second Cooldown</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
+                    Feeling overwhelmed? A calming overlay will guide you through a quick breathing reset.
+                  </p>
+                </div>
+                <button onClick={startCooldown}
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 active:scale-95 transition-all">
+                  <Icon d={IC.zap} size={14}/>Start Cooldown
+                </button>
+              </div>
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">💡 Wellness Tips</p>
+                <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+                  <li>• Take short breaks every 25 minutes (Pomodoro method)</li>
+                  <li>• Stay hydrated — keep water nearby while studying</li>
+                  <li>• Use the schedule to avoid last-minute deadline stress</li>
+                  <li>• Reach out to collaborators early on projects</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* ── Account ── */}
+          {tab==='account'&&(
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm space-y-5">
+              <div>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Account Settings</h3>
+                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">Manage your account security and visibility.</p>
+              </div>
+              <Toggle value={profilePublic} onChange={setProfilePublic} label="Public Profile" desc="Allow other students to view your portfolio"/>
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Account Info</p>
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">Email</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200">{rawUser.email}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">Role</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200">Student</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">University</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200">GUC</span>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-red-100 dark:border-red-900 bg-red-50 dark:bg-red-950/30 px-4 py-3">
+                  <p className="text-xs font-semibold text-red-700 dark:text-red-400 mb-1">Danger Zone</p>
+                  <p className="text-xs text-red-500 dark:text-red-500">To reset your account data, clear browser localStorage for this site.</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+function ScheduleSection({ profile }) {
+  const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday']
+  const HOURS=['8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00']
+  const [events, setEvents]=useLS('student_schedule_'+profile.email,[])
+  const [modal, setModal]=useState(false)
+  const [form, setForm]=useState({title:'',day:'Sunday',time:'8:00',duration:1,type:'class',location:'',notes:''})
+  const TYPES=['class','deadline','interview','meeting','reminder']
+  const typeColor={
+    class:'bg-blue-100 text-blue-700 border-blue-200',
+    deadline:'bg-red-100 text-red-700 border-red-200',
+    interview:'bg-purple-100 text-purple-700 border-purple-200',
+    meeting:'bg-green-100 text-green-700 border-green-200',
+    reminder:'bg-amber-100 text-amber-700 border-amber-200',
+  }
+  const typeDot={
+    class:'bg-blue-500',deadline:'bg-red-500',interview:'bg-purple-500',meeting:'bg-green-500',reminder:'bg-amber-500'
+  }
+  const save=()=>{
+    if(!form.title.trim())return alert('Event title required.')
+    setEvents(p=>[...p,{...form,id:Date.now().toString(),createdAt:new Date().toISOString()}])
+    setForm({title:'',day:'Sunday',time:'8:00',duration:1,type:'class',location:'',notes:''})
+    setModal(false)
+  }
+  const del=id=>setEvents(p=>p.filter(e=>e.id!==id))
+
+  const todayName=DAYS[new Date().getDay()]||'Sunday'
+  const todayEvents=events.filter(e=>e.day===todayName).sort((a,b)=>a.time.localeCompare(b.time))
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">My Schedule</h2>
+          <p className="mt-1 text-sm text-slate-500">Weekly timetable, deadlines, and upcoming events.</p>
+        </div>
+        <Btn onClick={()=>setModal(true)}><Icon d={IC.plus}/>Add Event</Btn>
+      </div>
+
+      {/* Today's agenda strip */}
+      <div className="rounded-xl border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 p-4">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">Today — {todayName}</p>
+        {todayEvents.length===0
+          ?<p className="text-sm text-slate-400 dark:text-slate-500">Nothing scheduled for today. Enjoy your free time! 🎉</p>
+          :<div className="flex flex-wrap gap-2">
+            {todayEvents.map(e=>(
+              <div key={e.id} className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium ${typeColor[e.type]}`}>
+                <span>{e.time}</span>
+                <span className="font-semibold">{e.title}</span>
+                {e.location&&<span className="opacity-60">· {e.location}</span>}
+              </div>
+            ))}
+          </div>
+        }
+      </div>
+
+      {/* Weekly grid */}
+     <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+        <table className="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr className="border-b border-slate-100 dark:border-slate-700">
+              <th className="w-16 py-3 px-3 text-left text-xs font-semibold text-slate-400 dark:text-slate-500">Time</th>
+              {DAYS.map(d=>(
+                <th key={d} className={`py-3 px-2 text-center text-xs font-semibold ${d===todayName?'text-blue-700':'text-slate-600'}`}>
+                  {d.slice(0,3)}
+                  {d===todayName&&<span className="ml-1 rounded-full bg-blue-600 px-1.5 py-0.5 text-[9px] text-white">Today</span>}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+{HOURS.map(h=>(
+              <tr key={h} className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
+                <td className="py-2 px-3 text-xs text-slate-400 dark:text-slate-500 font-mono">{h}</td>
+                {DAYS.map(d=>{
+                  const ev=events.filter(e=>e.day===d&&e.time===h)
+                  return (
+                    <td key={d} className="py-1.5 px-2 text-center align-top">
+                      {ev.map(e=>(
+                        <div key={e.id}
+                          className={`mb-1 rounded-lg border px-2 py-1 text-xs text-left cursor-default group relative ${typeColor[e.type]}`}>
+                          <p className="font-semibold truncate">{e.title}</p>
+                          {e.location&&<p className="opacity-60 truncate">{e.location}</p>}
+                          <button onClick={()=>del(e.id)}
+                            className="absolute right-1 top-1 hidden group-hover:flex h-4 w-4 items-center justify-center rounded text-red-400 hover:text-red-600">
+                            <Icon d={IC.x} size={10}/>
+                          </button>
+                        </div>
+                      ))}
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Upcoming list */}
+      <div>
+        <p className="mb-3 text-sm font-semibold text-slate-800">All Upcoming Events</p>
+        {events.length===0
+          ?<Card><EmptyState message="No events yet. Add your classes, deadlines, and meetings."/></Card>
+          :<div className="space-y-2">
+            {[...events].sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||a.time.localeCompare(b.time)).map(e=>(
+<div key={e.id} className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3">
+                <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${typeDot[e.type]}`}/>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{e.title}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{e.day} · {e.time}{e.location&&` · ${e.location}`}</p>
+                </div>
+                <Badge color={e.type==='class'?'blue':e.type==='deadline'?'red':e.type==='interview'?'purple':e.type==='meeting'?'green':'yellow'}>
+                  {e.type}
+                </Badge>
+                <button onClick={()=>del(e.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+                  <Icon d={IC.trash} size={13}/>
+                </button>
+              </div>
+            ))}
+          </div>
+        }
+      </div>
+
+      {/* Add event modal */}
+      {modal&&(
+        <Modal title="Add Schedule Event" onClose={()=>setModal(false)}>
+          <div className="space-y-4">
+            <Input label="Event Title *" value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder="e.g. CSEN 401 Lecture"/>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Sel label="Day" value={form.day} onChange={e=>setForm(p=>({...p,day:e.target.value}))}>
+                {DAYS.map(d=><option key={d}>{d}</option>)}
+              </Sel>
+              <Sel label="Time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))}>
+                {HOURS.map(h=><option key={h}>{h}</option>)}
+              </Sel>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Sel label="Type" value={form.type} onChange={e=>setForm(p=>({...p,type:e.target.value}))}>
+                {TYPES.map(t=><option key={t}>{t}</option>)}
+              </Sel>
+              <Input label="Duration (hours)" type="number" min={1} max={4} value={form.duration}
+                onChange={e=>setForm(p=>({...p,duration:+e.target.value}))}/>
+            </div>
+            <Input label="Location (optional)" value={form.location} onChange={e=>setForm(p=>({...p,location:e.target.value}))} placeholder="e.g. Hall C3, Online"/>
+            <Textarea label="Notes (optional)" value={form.notes} onChange={e=>setForm(p=>({...p,notes:e.target.value}))} placeholder="Any extra details…"/>
+          </div>
+          <div className="mt-5 flex gap-2 border-t border-slate-100 pt-4">
+            <Btn onClick={save}><Icon d={IC.check}/>Save Event</Btn>
+            <Btn variant="secondary" onClick={()=>setModal(false)}>Cancel</Btn>
+          </div>
+        </Modal>
+      )}
+    </div>
+  )
+}
+
 export default function StudentDashboard() {
   const navigate=useNavigate()
   const rawUser=getCurrentUser()
@@ -1610,17 +2188,18 @@ const navItems=[
     {id:'overview',label:'Overview',icon:IC.home},
     {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
     {id:'projects',label:'My Projects',icon:IC.folder},
+    {id:'schedule',label:'Schedule',icon:IC.calendar},
     {id:'invitations',label:'Invitations',icon:IC.users,badge:invites},
     {id:'instructors',label:'Find Instructors',icon:IC.book},
     {id:'portfolios',label:'Explore All Portfolios',icon:IC.users},
     {id:'favorites',label:'Favorites',icon:IC.heart},
     {id:'recommended',label:'Recommended',icon:IC.star},
     {id:'internships',label:'Internships',icon:IC.briefcase},
-    {id:'stats',label:'Statistics',icon:IC.chart},
-    // explore is intentionally not in sidebar — accessible via hero CTA
+    // explore accessible via hero CTA; stats moved to profile dropdown
   ]
   const handleLogout=()=>{logoutUser();navigate('/login')}
  const [profileDropdown, setProfileDropdown]=useState(false)
+  const [settingsTab, setSettingsTab]=useState('appearance')
   const [msgDropdown, setMsgDropdown]=useState(false)
   const [notifDropdown, setNotifDropdown]=useState(false)
   const profileRef=useRef(null)
@@ -1649,7 +2228,7 @@ const navItems=[
         <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
           Workspace
         </p>
-        <div className="flex items-center gap-2.5 rounded-xl bg-blue-50 px-3 py-2.5 border border-blue-100">
+        <div className="flex items-center gap-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 px-3 py-2.5 border border-blue-100 dark:border-blue-900">
           {profile.photo
             ?<img src={profile.photo} alt="avatar" className="h-8 w-8 shrink-0 rounded-full object-cover border-2 border-blue-200"/>
             :<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
@@ -1670,7 +2249,7 @@ const navItems=[
             className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150
               ${tab===item.id
                 ?'bg-blue-700 text-white shadow-sm'
-                :'text-slate-600 hover:bg-slate-100 hover:text-blue-700 hover:translate-x-0.5'}`}>
+                :'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700 dark:hover:text-blue-400 hover:translate-x-0.5'}`}>
             <Icon d={item.icon} size={16}/>
             <span>{item.label}</span>
             {item.badge>0&&(
@@ -1685,11 +2264,11 @@ const navItems=[
       <div className="mt-4 border-t border-slate-100 pt-4 space-y-0.5">
         <button onClick={()=>{setTab('profile');setSidebar(false)}}
           className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150
-            ${tab==='profile'?'bg-blue-700 text-white':'text-slate-600 hover:bg-slate-100 hover:text-blue-700 hover:translate-x-0.5'}`}>
+            ${tab==='profile'?'bg-blue-700 text-white':'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700 hover:translate-x-0.5'}`}>
           <Icon d={IC.user} size={16}/><span>My Profile</span>
         </button>
         <button onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-all duration-150 hover:bg-red-50 hover:text-red-600">
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 transition-all duration-150 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600">
           <Icon d={IC.logout} size={16}/><span>Logout</span>
         </button>
       </div>
@@ -1697,10 +2276,18 @@ const navItems=[
   )
 
   const p={...profile,email:rawUser.email}
+  const [darkMode, setDarkModeMain]=useLS('student_dark_mode_'+rawUser.email, false)
+  useEffect(()=>{
+    if(darkMode){
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  },[darkMode])
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className={`flex h-screen overflow-hidden ${darkMode?'dark bg-slate-900':'bg-slate-50'}`}>
       {/* Desktop Sidebar */}
-<aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-5 md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5 md:flex overflow-y-auto">
         <NavContent/>
       </aside>
 
@@ -1708,18 +2295,18 @@ const navItems=[
       {sidebarOpen&&(
         <div className="fixed inset-0 z-40 md:hidden" onClick={()=>setSidebar(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"/>
-<aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 bg-white px-3 py-5"
+<aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5"
             onClick={e=>e.stopPropagation()}>
             <NavContent/>
           </aside>
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+    {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        {/* Top Header */}
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 backdrop-blur-sm px-4 py-3">
+        {/* Top Header — fixed, never scrolls */}
+        <header className="shrink-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-4 py-3">
 {/* Left: Logo + Hamburger (mobile) + Page title */}
           <div className="flex items-center gap-3">
 
@@ -1781,15 +2368,15 @@ const navItems=[
                 })()}
               </button>
               {msgDropdown&&(
-                <div className="absolute right-0 top-11 w-72 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
-                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-                    <p className="text-sm font-semibold text-slate-900">Messages</p>
+                <div className="absolute right-0 top-11 w-72 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg shadow-slate-200/60 dark:shadow-slate-900/60 z-50">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Messages</p>
                     <button onClick={()=>{setTab('messages');setMsgDropdown(false)}}
-                      className="text-xs text-blue-600 hover:underline">Open</button>
+                      className="text-xs text-blue-500 hover:underline">Open</button>
                   </div>
                   {recentThreads.length===0
-                    ?<p className="px-4 py-6 text-center text-xs text-slate-400">No messages yet.</p>
-                    :<ul className="divide-y divide-slate-100">
+                    ?<p className="px-4 py-6 text-center text-xs text-slate-400 dark:text-slate-500">No messages yet.</p>
+                    :<ul className="divide-y divide-slate-100 dark:divide-slate-700">
                       {recentThreads.map(t=>(
                         <li key={t.with}>
                           <button onClick={()=>{
@@ -1798,22 +2385,22 @@ const navItems=[
                             LS.set(key,LS.get(key,[]).map(th=>th.with===t.with?{...th,messages:th.messages.map(m=>m.from!==rawUser.email?{...m,read:true}:m)}:th))
                             setTab('messages')
                             setMsgDropdown(false)
-                          }} className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 text-left">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                          }} className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left transition-colors">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold text-blue-700 dark:text-blue-300">
                               {t.with[0].toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <p className="truncate text-xs font-medium text-slate-800">{t.with}</p>
-                              <p className="truncate text-xs text-slate-400">{t.messages.at(-1)?.text||'No messages'}</p>
+                              <p className="truncate text-xs font-medium text-slate-800 dark:text-slate-200">{t.with}</p>
+                              <p className="truncate text-xs text-slate-400 dark:text-slate-500">{t.messages.at(-1)?.text||'No messages'}</p>
                             </div>
                           </button>
                         </li>
                       ))}
                     </ul>
                   }
-                  <div className="border-t border-slate-100 p-2">
+                  <div className="border-t border-slate-100 dark:border-slate-700 p-2">
                     <button onClick={()=>{setTab('messages');setMsgDropdown(false)}}
-                      className="w-full rounded-lg py-2 text-center text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors">
+                      className="w-full rounded-lg py-2 text-center text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
                       View all messages
                     </button>
                   </div>
@@ -1833,9 +2420,9 @@ const navItems=[
                 )}
               </button>
               {notifDropdown&&(
-                <div className="absolute right-0 top-11 w-80 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
-                  <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-                    <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                <div className="absolute right-0 top-11 w-80 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg shadow-slate-200/60 dark:shadow-slate-900/60 z-50">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</p>
                     <div className="flex items-center gap-2">
                       {unread>0&&(
                         <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">
@@ -1852,9 +2439,9 @@ const navItems=[
                     </div>
                   </div>
 
-                  {notifications.length===0
-                    ?<p className="px-4 py-6 text-center text-xs text-slate-400">No notifications yet.</p>
-                    :<ul className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+{notifications.length===0
+                    ?<p className="px-4 py-6 text-center text-xs text-slate-400 dark:text-slate-500">No notifications yet.</p>
+                    :<ul className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
                       {notifications.slice().reverse().slice(0,6).map(n=>{
                         // ── route resolver ──────────────────────────────
                         const msg=n.message?.toLowerCase()||''
@@ -1906,21 +2493,21 @@ const navItems=[
                           'bg-slate-100 text-slate-500'
                         return (
                           <li key={n.id}>
-                            <button
+                           <button
                               onClick={goTo}
                               className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-all duration-150
                                 ${n.read
-                                  ?'bg-white hover:bg-slate-50'
-                                  :'bg-blue-50/60 hover:bg-blue-50'}`}>
+                                  ?'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700'
+                                  :'bg-blue-50/60 dark:bg-blue-900/20 hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
                               {/* category icon */}
                               <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
                                 <Icon d={iconD} size={12}/>
                               </div>
-                              <div className="min-w-0 flex-1">
-                                <p className={`text-xs leading-snug ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>
+<div className="min-w-0 flex-1">
+                                <p className={`text-xs leading-snug ${n.read?'text-slate-500 dark:text-slate-400':'text-slate-800 dark:text-slate-200 font-medium'}`}>
                                   {n.message}
                                 </p>
-                                <p className="text-[10px] text-slate-400 mt-1">
+                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
                                   {new Date(n.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
                                 </p>
                               </div>
@@ -1935,10 +2522,10 @@ const navItems=[
                     </ul>
                   }
 
-                  <div className="border-t border-slate-100 p-2 flex gap-1">
+                  <div className="border-t border-slate-100 dark:border-slate-700 p-2 flex gap-1">
                     <button
                       onClick={()=>{setTab('notifications');setNotifDropdown(false)}}
-                      className="flex-1 rounded-lg py-2 text-center text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors">
+                      className="flex-1 rounded-lg py-2 text-center text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
                       View all notifications
                     </button>
                   </div>
@@ -1966,15 +2553,27 @@ const navItems=[
                 <svg className="hidden sm:block h-3 w-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
               </button>
               {profileDropdown&&(
-                <div className="absolute right-0 top-11 w-56 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 z-50">
+                <div className="absolute right-0 top-11 w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg shadow-slate-200/60 dark:shadow-slate-900/60 z-50">
                   <div className="border-b border-slate-100 px-4 py-3">
                     <p className="text-sm font-semibold text-slate-900">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
                     <p className="text-xs text-slate-400 truncate">{rawUser.email}</p>
                   </div>
-                  <div className="p-1.5 space-y-0.5">
+                 <div className="p-1.5 space-y-0.5">
                     <button onClick={()=>{setTab('profile');setProfileDropdown(false)}}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
                       <Icon d={IC.user} size={14}/>My Profile
+                    </button>
+                    <button onClick={()=>{setTab('settings');setSettingsTab('appearance');setProfileDropdown(false)}}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      <Icon d={IC.moon} size={14}/>Appearance
+                    </button>
+                    <button onClick={()=>{setTab('settings');setSettingsTab('notifications');setProfileDropdown(false)}}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      <Icon d={IC.bell} size={14}/>Notifications
+                    </button>
+                    <button onClick={()=>{setTab('settings');setSettingsTab('wellness');setProfileDropdown(false)}}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      <Icon d={IC.zap} size={14}/>Wellness
                     </button>
                     <button onClick={()=>{setTab('stats');setProfileDropdown(false)}}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
@@ -1993,8 +2592,8 @@ const navItems=[
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        {/* Page Content — ONLY this scrolls */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
           <div className="mx-auto w-full max-w-5xl">
             {tab==='overview'&&<Overview user={{...rawUser,...profile}} projects={projects} notifications={notifications} setTab={setTab}/>}
             {tab==='profile'&&<ProfileSection profile={p} setProfile={setProfile}/>}
@@ -2008,7 +2607,9 @@ const navItems=[
             {tab==='messages'&&<MessagesSection profile={p} pushNotif={pushNotif}/>}
             {tab==='internships'&&<InternshipsSection profile={p} pushNotif={pushNotif}/>}
             {tab==='stats'&&<StatsSection projects={projects} profile={p}/>}
-            {tab==='notifications'&&<NotificationsSection notifications={notifications} setNotifications={setNotifications} profileEmail={rawUser.email}/>}
+            {tab==='settings'&&<SettingsSection profile={p} rawUser={rawUser} initialTab={settingsTab}/>}
+            {tab==='schedule'&&<ScheduleSection profile={p}/>}
+            {tab==='notifications'&&<NotificationsSection notifications={notifications} setNotifications={setNotifications} profileEmail={rawUser.email} setTab={setTab}/>}
           </div>
         </main>
       </div>
