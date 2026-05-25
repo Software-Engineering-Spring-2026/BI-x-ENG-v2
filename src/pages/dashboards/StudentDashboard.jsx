@@ -7,6 +7,20 @@ const LS = {
   get: (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb } catch { return fb } },
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
 }
+
+// ── Global theme helpers ─────────────────────────────────────────────────────
+const THEME_KEY = 'projecthub_dark_mode'
+const applyTheme = (dark) => {
+  if (dark) {
+    document.documentElement.classList.add('dark')
+    document.documentElement.style.colorScheme = 'dark'
+  } else {
+    document.documentElement.classList.remove('dark')
+    document.documentElement.style.colorScheme = 'light'
+  }
+}
+// Apply immediately on script load (before React renders) to avoid flash
+applyTheme(LS.get(THEME_KEY, false))
 function useLS(key, initial) {
   const [val, setVal] = useState(() => LS.get(key, initial))
   const save = (v) => { const next = typeof v === 'function' ? v(val) : v; LS.set(key, next); setVal(next) }
@@ -125,7 +139,7 @@ const Modal = ({ title, onClose, children, wide=false }) => (
     </div>
   </div>
 )
-const EmptyState = ({ message }) => <p className="py-10 text-center text-sm text-slate-400">{message}</p>
+const EmptyState = ({ message }) => <p className="py-10 text-center text-sm text-slate-400 dark:text-slate-500">{message}</p>
 const TagPicker = ({ options, selected, onToggle, label }) => (
   <div className="flex flex-col gap-1">
     {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
@@ -1728,7 +1742,14 @@ function StatsSection({ projects, profile }) {
 }
 
 function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
-  const [darkMode, setDarkMode]=useLS('student_dark_mode_'+rawUser.email, false)
+  const [darkMode, setDarkMode]=useState(()=>LS.get(THEME_KEY, false))
+  // sync to global state when changed from settings
+  const handleThemeChange=(val)=>{
+    setDarkMode(val)
+    applyTheme(val)
+    LS.set(THEME_KEY, val)
+    LS.set('student_dark_mode_'+rawUser.email, val)
+  }
   const [msgNotifs, setMsgNotifs]=useLS('student_setting_msg_notifs_'+rawUser.email, true)
   const [internNotifs, setInternNotifs]=useLS('student_setting_intern_notifs_'+rawUser.email, true)
   const [collabNotifs, setCollabNotifs]=useLS('student_setting_collab_notifs_'+rawUser.email, true)
@@ -1748,7 +1769,7 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
     }),1000)
   }
 
-  // dark mode effect handled globally in StudentDashboard
+  
 
   const settingsTabs=[
     {id:'appearance',label:'Appearance',icon:IC.moon},
@@ -1830,7 +1851,7 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Theme</p>
                 <div className="grid grid-cols-2 gap-4">
                   {/* Light theme card */}
-                  <button onClick={()=>setDarkMode(false)}
+                  <button onClick={()=>handleThemeChange(false)}
                     className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200
                       ${!darkMode
                         ?'border-blue-600 shadow-md shadow-blue-100'
@@ -1871,7 +1892,7 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
                   </button>
 
                   {/* Dark theme card */}
-                  <button onClick={()=>setDarkMode(true)}
+                  <button onClick={()=>handleThemeChange(true)}
                     className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200
                       ${darkMode
                         ?'border-blue-600 shadow-md shadow-blue-900/30'
@@ -2225,7 +2246,7 @@ const navItems=[
     <>
 {/* Sidebar top spacer to align with header height */}
       <div className="mb-4 mt-1 px-2">
-        <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+        <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
           Workspace
         </p>
         <div className="flex items-center gap-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 px-3 py-2.5 border border-blue-100 dark:border-blue-900">
@@ -2236,10 +2257,10 @@ const navItems=[
             </div>
           }
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-slate-900 leading-tight">
+            <p className="truncate text-sm font-semibold text-slate-900 dark:text-white leading-tight">
               {profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}
             </p>
-            <p className="truncate text-xs text-slate-400 leading-tight">Student · GUC</p>
+            <p className="truncate text-xs text-slate-400 dark:text-slate-500 leading-tight">Student · GUC</p>
           </div>
         </div>
       </div>
@@ -2276,16 +2297,15 @@ const navItems=[
   )
 
   const p={...profile,email:rawUser.email}
-  const [darkMode, setDarkModeMain]=useLS('student_dark_mode_'+rawUser.email, false)
+  const [darkMode, setDarkModeMain]=useState(()=>LS.get(THEME_KEY, false))
   useEffect(()=>{
-    if(darkMode){
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    applyTheme(darkMode)
+    LS.set(THEME_KEY, darkMode)
+    // also write to per-user key so SettingsSection reads it
+    LS.set('student_dark_mode_'+rawUser.email, darkMode)
   },[darkMode])
   return (
-    <div className={`flex h-screen overflow-hidden ${darkMode?'dark bg-slate-900':'bg-slate-50'}`}>
+    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${darkMode?'bg-slate-900':'bg-slate-50'}`}>
       {/* Desktop Sidebar */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5 md:flex overflow-y-auto">
         <NavContent/>
@@ -2324,10 +2344,10 @@ const navItems=[
                 <Icon d={IC.folder} size={14}/>
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-blue-600 hidden sm:block">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400 hidden sm:block">
                   BI × ENG V2
                 </span>
-                <span className="text-sm font-bold text-slate-900 leading-tight">
+                <span className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
                   ProjectHub
                 </span>
               </div>
@@ -2336,9 +2356,9 @@ const navItems=[
 {/* Breadcrumb — desktop only */}
             <div className="hidden md:flex items-center gap-1.5">
               <span className="text-slate-300 text-sm select-none">/</span>
-              <span className="text-xs font-medium text-slate-400 select-none">Dashboard</span>
-              <span className="text-slate-300 text-sm select-none">/</span>
-              <span className="text-xs font-semibold text-slate-600 capitalize">
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 select-none">Dashboard</span>
+              <span className="text-slate-300 dark:text-slate-600 text-sm select-none">/</span>
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 capitalize">
                 {navItems.find(n=>n.id===tab)?.label
                   || (tab==='profile'?'My Profile'
                   : tab==='explore'?'Explore Projects'
@@ -2554,29 +2574,29 @@ const navItems=[
               </button>
               {profileDropdown&&(
                 <div className="absolute right-0 top-11 w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg shadow-slate-200/60 dark:shadow-slate-900/60 z-50">
-                  <div className="border-b border-slate-100 px-4 py-3">
-                    <p className="text-sm font-semibold text-slate-900">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
-                    <p className="text-xs text-slate-400 truncate">{rawUser.email}</p>
+                  <div className="border-b border-slate-100 dark:border-slate-700 px-4 py-3">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{profile.firstName||rawUser.firstName} {profile.lastName||rawUser.lastName}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{rawUser.email}</p>
                   </div>
                  <div className="p-1.5 space-y-0.5">
                     <button onClick={()=>{setTab('profile');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                       <Icon d={IC.user} size={14}/>My Profile
                     </button>
                     <button onClick={()=>{setTab('settings');setSettingsTab('appearance');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                       <Icon d={IC.moon} size={14}/>Appearance
                     </button>
                     <button onClick={()=>{setTab('settings');setSettingsTab('notifications');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                       <Icon d={IC.bell} size={14}/>Notifications
                     </button>
                     <button onClick={()=>{setTab('settings');setSettingsTab('wellness');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                       <Icon d={IC.zap} size={14}/>Wellness
                     </button>
                     <button onClick={()=>{setTab('stats');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                       <Icon d={IC.chart} size={14}/>Statistics
                     </button>
                   </div>
