@@ -76,34 +76,34 @@ function ExploreProjects() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-slate-900">Explore Projects</h1>
-      <p className="mt-2 text-slate-600">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Explore Projects</h1>
+      <p className="mt-2 text-slate-600 dark:text-slate-400">
         Browse graduation and course projects submitted by GUC students.
       </p>
 
-      <div className="mt-5 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="mt-5 grid gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 sm:grid-cols-2 lg:grid-cols-6">
         <input
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder="Search by title, student, email..."
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700 focus:outline-none lg:col-span-2"
+          className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-3 py-2 text-sm focus:border-blue-700 focus:outline-none lg:col-span-2"
         />
         
-        <select value={domainFilter} onChange={(e) => setDomainFilter(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700">
+        <select value={domainFilter} onChange={(e) => setDomainFilter(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700">
           {domains.map((domain) => <option key={domain} value={domain}>{domain === 'all' ? 'All Domains' : domain}</option>)}
         </select>
 
-        <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700">
+        <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700">
           {courses.map((course) => <option key={course} value={course}>{course === 'all' ? 'All Courses' : course}</option>)}
         </select>
 
-        <select value={instructorFilter} onChange={(e) => setInstructorFilter(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700">
+        <select value={instructorFilter} onChange={(e) => setInstructorFilter(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700">
           {instructors.map((instructor) => <option key={instructor} value={instructor}>{instructor === 'all' ? 'All Instructors' : instructor}</option>)}
         </select>
 
-        <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700 text-slate-600" title="Filter by Creation Date" />
+        <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-2 text-sm focus:border-blue-700" title="Filter by Creation Date" />
 
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700 font-semibold bg-slate-50">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700 font-semibold">
           <option value="default">Sort by...</option>
           <option value="dateDesc">Newest First</option>
           <option value="dateAsc">Oldest First</option>
@@ -115,7 +115,7 @@ function ExploreProjects() {
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredProjects.map((project) => (
           <Card key={project.id} title={project.title} subtitle={`${project.student} • ${project.domain}`}>
-            <p className="text-sm text-slate-600 line-clamp-2">{project.summary}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{project.summary}</p>
             
             {/* Instructor Rating visible to all */}
             <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider">
@@ -135,8 +135,8 @@ function ExploreProjects() {
       </div>
 
       {filteredProjects.length === 0 && (
-        <div className="mt-10 text-center p-10 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-          <p className="text-slate-500 font-medium">No projects match your search and filter criteria.</p>
+        <div className="mt-10 text-center p-10 bg-slate-50 dark:bg-slate-800 rounded-xl border border-dashed border-slate-300 dark:border-slate-600">
+          <p className="text-slate-500 dark:text-slate-400 font-medium">No projects match your search and filter criteria.</p>
         </div>
       )}
     </div>

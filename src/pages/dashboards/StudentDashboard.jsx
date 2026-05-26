@@ -1,3 +1,4 @@
+import { useTheme } from '../../context/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logoutUser } from '../../data/authStorage'
@@ -8,19 +9,9 @@ const LS = {
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
 }
 
-// ── Global theme helpers ─────────────────────────────────────────────────────
+// Theme is now managed globally by ThemeProvider in main.jsx
 const THEME_KEY = 'projecthub_dark_mode'
-const applyTheme = (dark) => {
-  if (dark) {
-    document.documentElement.classList.add('dark')
-    document.documentElement.style.colorScheme = 'dark'
-  } else {
-    document.documentElement.classList.remove('dark')
-    document.documentElement.style.colorScheme = 'light'
-  }
-}
-// Apply immediately on script load (before React renders) to avoid flash
-applyTheme(LS.get(THEME_KEY, false))
+
 function useLS(key, initial) {
   const [val, setVal] = useState(() => LS.get(key, initial))
   const save = (v) => { const next = typeof v === 'function' ? v(val) : v; LS.set(key, next); setVal(next) }
@@ -1742,13 +1733,9 @@ function StatsSection({ projects, profile }) {
 }
 
 function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
-  const [darkMode, setDarkMode]=useState(()=>LS.get(THEME_KEY, false))
-  // sync to global state when changed from settings
-  const handleThemeChange=(val)=>{
-    setDarkMode(val)
-    applyTheme(val)
-    LS.set(THEME_KEY, val)
-    LS.set('student_dark_mode_'+rawUser.email, val)
+  const { isDark: darkMode, setTheme } = useTheme()
+  const handleThemeChange = (val) => {
+    setTheme(val)
   }
   const [msgNotifs, setMsgNotifs]=useLS('student_setting_msg_notifs_'+rawUser.email, true)
   const [internNotifs, setInternNotifs]=useLS('student_setting_intern_notifs_'+rawUser.email, true)
@@ -2297,15 +2284,11 @@ const navItems=[
   )
 
   const p={...profile,email:rawUser.email}
-  const [darkMode, setDarkModeMain]=useState(()=>LS.get(THEME_KEY, false))
-  useEffect(()=>{
-    applyTheme(darkMode)
-    LS.set(THEME_KEY, darkMode)
-    // also write to per-user key so SettingsSection reads it
-    LS.set('student_dark_mode_'+rawUser.email, darkMode)
-  },[darkMode])
+  const { isDark: darkMode, setTheme } = useTheme()
+
+
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${darkMode?'bg-slate-900':'bg-slate-50'}`}>
+    <div className="flex h-screen overflow-hidden transition-colors duration-200 bg-slate-50 dark:bg-slate-900">
       {/* Desktop Sidebar */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5 md:flex overflow-y-auto">
         <NavContent/>

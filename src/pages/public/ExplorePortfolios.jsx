@@ -106,29 +106,29 @@ function ExplorePortfolios() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-slate-900">Explore Portfolios</h1>
-      <p className="mt-2 text-slate-600">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Explore Portfolios</h1>
+      <p className="mt-2 text-slate-600 dark:text-slate-400">
         Discover talented GUC students and their technical strengths.
       </p>
 
       {/* Filter Section */}
-      <div className="mt-5 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 grid gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 sm:grid-cols-2 lg:grid-cols-4">
         <input
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder="Search by student name, email, or headline..."
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700 focus:outline-none"
+          className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-3 py-2 text-sm focus:border-blue-700 focus:outline-none"
         />
         
-        <select value={majorFilter} onChange={(e) => setMajorFilter(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700">
+        <select value={majorFilter} onChange={(e) => setMajorFilter(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700">
           {majors.map((major) => <option key={major} value={major}>{major === 'all' ? 'All Majors' : major}</option>)}
         </select>
 
-        <select value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700">
+        <select value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700">
           {availableSkills.map((skill) => <option key={skill} value={skill}>{skill === 'all' ? 'All Skills' : skill}</option>)}
         </select>
 
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-700 font-semibold bg-slate-50">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-700 font-semibold">
           <option value="default">Sort by...</option>
           <option value="projectsDesc">Most Projects</option>
           <option value="projectsAsc">Fewest Projects</option>
@@ -143,7 +143,7 @@ function ExplorePortfolios() {
             title={student.name}
             subtitle={`${student.major} • Class of ${student.graduationYear || 'N/A'}`}
           >
-            <p className="text-sm text-slate-600 line-clamp-2">{student.headline}</p>
+           <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{student.headline}</p>
             
             <div className="mt-3 flex items-center gap-2">
                <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider">
@@ -159,8 +159,8 @@ function ExplorePortfolios() {
       </div>
 
       {filteredStudents.length === 0 && (
-        <div className="mt-10 text-center p-10 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-          <p className="text-slate-500 font-medium">No portfolios match your search and filter criteria.</p>
+        <div className="mt-10 text-center p-10 bg-slate-50 dark:bg-slate-800 rounded-xl border border-dashed border-slate-300 dark:border-slate-600">
+          <p className="text-slate-500 dark:text-slate-400 font-medium">No portfolios match your search and filter criteria.</p>
         </div>
       )}
     </div>

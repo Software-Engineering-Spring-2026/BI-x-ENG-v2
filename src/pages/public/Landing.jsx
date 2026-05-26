@@ -80,7 +80,7 @@ function Landing() {
       </section>
 
       <section>
-        <h2 className="mb-4 text-2xl font-semibold text-slate-900">
+        <h2 className="mb-4 text-2xl font-semibold text-slate-900 dark:text-white">
           Featured Projects
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -90,14 +90,14 @@ function Landing() {
               title={project.title}
               subtitle={`${project.domain} • ${project.year}`}
             >
-              <p className="text-sm text-slate-600">{project.summary}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{project.summary}</p>
             </Card>
           ))}
         </div>
       </section>
 
       <section>
-        <h2 className="mb-4 text-2xl font-semibold text-slate-900">
+        <h2 className="mb-4 text-2xl font-semibold text-slate-900 dark:text-white">
           Top Student Profiles
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -107,7 +107,7 @@ function Landing() {
               title={student.name}
               subtitle={`${student.major} • Class of ${student.graduationYear}`}
             >
-              <p className="text-sm text-slate-600">{student.headline}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{student.headline}</p>
             </Card>
           ))}
         </div>
