@@ -94,14 +94,14 @@ const Btn = ({ children, onClick, variant='primary', size='md', className='', di
     primary:'bg-blue-700 text-white hover:bg-blue-800',
     secondary:'border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600',
     danger:'bg-red-600 text-white hover:bg-red-700',
-    ghost:'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700',
+    ghost:'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
     success:'bg-green-600 text-white hover:bg-green-700',
   }
   return <button type="button" onClick={onClick} disabled={disabled} className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}>{children}</button>
 }
 const Input = ({ label, error, ...props }) => (
   <div className="flex flex-col gap-1">
-    {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
+    {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
     <input className={`rounded-lg border px-3 py-2 text-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-700 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 ${error?'border-red-400 focus:ring-red-400':'border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500'}`} {...props} />
     {error && <p className="text-xs text-red-500">{error}</p>}
   </div>
@@ -114,22 +114,24 @@ const Textarea = ({ label, ...props }) => (
 )
 const Sel = ({ label, children, ...props }) => (
   <div className="flex flex-col gap-1">
-    {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
+    {label && <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
     <select className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" {...props}>{children}</select>
   </div>
 )
 const Card = ({ children, className='' }) => <div className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm ${className}`}>{children}</div>
+
 const Modal = ({ title, onClose, children, wide=false }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={e=>e.target===e.currentTarget&&onClose()}>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4" onClick={e=>e.target===e.currentTarget&&onClose()}>
     <div className={`w-full ${wide?'max-w-2xl':'max-w-lg'} rounded-xl bg-white dark:bg-slate-800 shadow-xl flex flex-col max-h-[90vh]`}>
-<div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4 shrink-0">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h2>
         <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"><Icon d={IC.x}/></button>
       </div>
-      <div className="overflow-y-auto px-6 py-4 dark:bg-slate-800">{children}</div>
+      <div className="overflow-y-auto px-6 py-4">{children}</div>
     </div>
   </div>
 )
+
 const EmptyState = ({ message }) => <p className="py-10 text-center text-sm text-slate-400 dark:text-slate-500">{message}</p>
 const TagPicker = ({ options, selected, onToggle, label }) => (
   <div className="flex flex-col gap-1">
@@ -137,7 +139,7 @@ const TagPicker = ({ options, selected, onToggle, label }) => (
     <div className="flex flex-wrap gap-2">
       {options.map(o=>(
         <button key={o} type="button" onClick={()=>onToggle(o)}
-          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${selected.includes(o)?'border-blue-700 bg-blue-700 text-white':'border-slate-300 text-slate-600 hover:border-blue-400'}`}>{o}</button>
+          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${selected.includes(o)?'border-blue-700 bg-blue-700 text-white':'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-blue-400 dark:hover:border-blue-500'}`}>{o}</button>
       ))}
     </div>
   </div>
@@ -206,19 +208,19 @@ function Overview({ user, projects, notifications, setTab }) {
         {stats.map(s=>(
           <button key={s.label} onClick={()=>setTab(s.tab)}
             className={`group rounded-xl border-0 p-5 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${s.bg}`}>
-            <p className="text-sm text-slate-500">{s.label}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
             <p className={`mt-1 text-3xl font-bold ${s.color}`}>{s.value}</p>
           </button>
         ))}
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <h3 className="mb-4 font-semibold text-slate-800">Languages Used</h3>
+          <h3 className="mb-4 font-semibold text-slate-800 dark:text-slate-200">Languages Used</h3>
           {Object.keys(langs).length===0?<EmptyState message="Add projects with languages to see stats."/>:
             <div className="space-y-3">
               {Object.entries(langs).sort((a,b)=>b[1]-a[1]).map(([lang,count])=>(
                 <div key={lang}>
-                  <div className="mb-1 flex justify-between text-sm"><span className="font-medium text-slate-700">{lang}</span><span className="text-slate-400">{Math.round(count/total*100)}%</span></div>
+                  <div className="mb-1 flex justify-between text-sm"><span className="font-medium text-slate-700 dark:text-slate-300">{lang}</span><span className="text-slate-400 dark:text-slate-500">{Math.round(count/total*100)}%</span></div>
                   <div className="h-2 w-full rounded-full bg-slate-100"><div className="h-2 rounded-full bg-blue-600" style={{width:`${Math.round(count/total*100)}%`}}/></div>
                 </div>
               ))}
@@ -227,7 +229,7 @@ function Overview({ user, projects, notifications, setTab }) {
         </Card>
         <Card>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-800">Recent Notifications</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-200">Recent Notifications</h3>
             <button onClick={()=>setTab('notifications')} className="text-xs text-blue-600 hover:underline">View all</button>
           </div>
           {notifications.length===0?<EmptyState message="No notifications yet."/>:
@@ -235,7 +237,7 @@ function Overview({ user, projects, notifications, setTab }) {
               {notifications.slice().reverse().slice(0,5).map(n=>(
                 <li key={n.id} className="flex items-start gap-2.5 text-sm">
                   <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read?'bg-slate-300':'bg-blue-600'}`}/>
-                  <div><p className={n.read?'text-slate-400':'text-slate-700'}>{n.message}</p><p className="text-xs text-slate-400">{new Date(n.createdAt).toLocaleDateString()}</p></div>
+                  <div><p className={n.read?'text-slate-400 dark:text-slate-500':'text-slate-700 dark:text-slate-300'}>{n.message}</p><p className="text-xs text-slate-400 dark:text-slate-500">{new Date(n.createdAt).toLocaleDateString()}</p></div>
                 </li>
               ))}
             </ul>
@@ -244,12 +246,12 @@ function Overview({ user, projects, notifications, setTab }) {
       </div>
       {topCollabs.length>0&&(
         <Card>
-          <h3 className="mb-3 font-semibold text-slate-800">Top Collaborators</h3>
+          <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Top Collaborators</h3>
           <div className="flex flex-wrap gap-3">
             {topCollabs.map(([email,count])=>(
-              <div key={email} className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">{email[0].toUpperCase()}</div>
-                <div><p className="text-xs font-medium text-slate-700">{email}</p><p className="text-xs text-slate-400">{count} project{count>1?'s':''}</p></div>
+              <div key={email} className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold text-blue-700 dark:text-blue-300">{email[0].toUpperCase()}</div>
+                <div><p className="text-xs font-medium text-slate-700 dark:text-slate-300">{email}</p><p className="text-xs text-slate-400 dark:text-slate-500">{count} project{count>1?'s':''}</p></div>
               </div>
             ))}
           </div>
@@ -269,17 +271,17 @@ function Overview({ user, projects, notifications, setTab }) {
         return (
           <Card>
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-semibold text-slate-800">📅 Upcoming Today</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-200">📅 Upcoming Today</h3>
               <button onClick={()=>setTab('schedule')} className="text-xs text-blue-600 hover:underline">View schedule</button>
             </div>
             {todayEvents.length===0
-              ?<p className="text-sm text-slate-400">Nothing scheduled for today.</p>
+              ?<p className="text-sm text-slate-400 dark:text-slate-500">Nothing scheduled for today.</p>
               :<div className="space-y-2">
                 {todayEvents.slice(0,4).map(e=>(
                   <div key={e.id} className="flex items-center gap-3">
                     <div className={`h-2 w-2 shrink-0 rounded-full ${typeDot[e.type]}`}/>
-                    <span className="text-xs font-mono text-slate-400 w-10 shrink-0">{e.time}</span>
-                    <span className="text-sm text-slate-700 font-medium truncate">{e.title}</span>
+                    <span className="text-xs font-mono text-slate-400 dark:text-slate-500 w-10 shrink-0">{e.time}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium truncate">{e.title}</span>
                     <Badge color={typeColor[e.type]}>{e.type}</Badge>
                   </div>
                 ))}
@@ -305,7 +307,7 @@ function ProfileSection({ profile, setProfile }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-900">My Profile</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Profile</h2>
         {!editing&&<Btn onClick={()=>{setForm(profile);setEditing(true)}}><Icon d={IC.edit}/>Edit Profile</Btn>}
       </div>
       <Card>
@@ -346,12 +348,12 @@ function ProfileSection({ profile, setProfile }) {
               </>
             ):(
               <div className="space-y-2.5">
-                <p className="text-xl font-semibold text-slate-900">{profile.firstName} {profile.lastName}</p>
-                <p className="text-sm text-slate-500">{profile.email}</p>
-                {profile.major&&<p className="text-sm"><span className="font-medium text-slate-700">Major:</span> {profile.major}</p>}
+                <p className="text-xl font-semibold text-slate-900 dark:text-white">{profile.firstName} {profile.lastName}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{profile.email}</p>
+                {profile.major&&<p className="text-sm dark:text-slate-300"><span className="font-medium text-slate-700 dark:text-slate-300">Major:</span> {profile.major}</p>}
                 {profile.linkedin&&<a href={profile.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline"><Icon d={IC.link} size={13}/>{profile.linkedin}</a>}
                 {(profile.skills||[]).length>0&&<div className="flex flex-wrap gap-1.5 pt-1">{profile.skills.map(s=><Badge key={s}>{s}</Badge>)}</div>}
-                {!profile.major&&!profile.linkedin&&!(profile.skills||[]).length&&<p className="text-sm text-slate-400">No profile info yet. Click Edit Profile to add details.</p>}
+                {!profile.major&&!profile.linkedin&&!(profile.skills||[]).length&&<p className="text-sm text-slate-400 dark:text-slate-500">No profile info yet. Click Edit Profile to add details.</p>}
               </div>
             )}
           </div>
@@ -372,7 +374,7 @@ function InstructorsSection() {
   })
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Find Instructors</h2><p className="mt-1 text-sm text-slate-500">Search by name or course.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900 dark:text-white">Find Instructors</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Search by name or course.</p></div>
       <SearchBar value={search} onChange={setSearch} placeholder="Search by name or course…"/>
       {displayed.length===0?<Card><EmptyState message="No instructors found."/></Card>:
         <div className="space-y-3">
@@ -382,8 +384,8 @@ function InstructorsSection() {
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-base font-bold text-blue-700">{(i.firstName?.[0]||'I').toUpperCase()}</div>
                   <div>
-                    <p className="font-semibold text-slate-900">{i.firstName} {i.lastName}</p>
-                    <p className="text-sm text-slate-500">{i.email}</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">{i.firstName} {i.lastName}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{i.email}</p>
                     <div className="flex flex-wrap gap-1 mt-1">{(i.linkedCourses||[]).map(c=><Badge key={c} color="blue">{c}</Badge>)}</div>
                   </div>
                 </div>
@@ -425,7 +427,7 @@ function AppealSection({ project, setProjects, pushNotif }) {
   }
   return (
     <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
-      <p className="mb-1 text-xs font-semibold text-red-700">⚑ Flagged{project.flagReason?`: ${project.flagReason}`:''}</p>
+      <p className="mb-1 text-xs font-semibold text-red-700 dark:text-red-400">⚑ Flagged{project.flagReason?`: ${project.flagReason}`:''}</p>
       {sent?<p className="text-xs text-green-700">✓ Appeal submitted.</p>:
         <><Textarea value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Explain your point of view…"/>
         <div className="mt-2"><Btn size="sm" variant="danger" onClick={send}><Icon d={IC.send} size={13}/>Send Appeal</Btn></div></>
@@ -471,10 +473,10 @@ function TasksModal({ project, setProjects, profile, onClose }) {
                 className={`rounded-lg border border-slate-200 bg-white p-3 ${isOwner?'cursor-grab active:cursor-grabbing':''}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-800">{t.title}</p>
-                    {t.description&&<p className="text-xs text-slate-500 mt-0.5">{t.description}</p>}
-                    {t.assignee&&<p className="text-xs text-slate-400 mt-1">👤 {t.assignee}</p>}
-                    {t.deadline&&<p className="text-xs text-slate-400">📅 Due {t.deadline}</p>}
+                    <p className="font-medium text-slate-800 dark:text-slate-200">{t.title}</p>
+                    {t.description&&<p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t.description}</p>}
+                    {t.assignee&&<p className="text-xs text-slate-400 dark:text-slate-500 mt-1">👤 {t.assignee}</p>}
+                    {t.deadline&&<p className="text-xs text-slate-400 dark:text-slate-500">📅 Due {t.deadline}</p>}
                     {t.instructorComment&&<div className="mt-1 rounded bg-blue-50 px-2 py-1 text-xs text-blue-800">💬 <strong>Instructor:</strong> {t.instructorComment}</div>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -548,7 +550,7 @@ function CollabsModal({ project, setProjects, profile, pushNotif, onClose }) {
             <ul className="space-y-2">
               {collabs.map(c=>(
                 <li key={c.email} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5">
-                  <div><p className="text-sm font-medium text-slate-800">{c.email}</p><p className="text-xs text-slate-400">Invited {new Date(c.invitedAt).toLocaleDateString()}</p></div>
+                  <div><p className="text-sm font-medium text-slate-800 dark:text-slate-200">{c.email}</p><p className="text-xs text-slate-400 dark:text-slate-500">Invited {new Date(c.invitedAt).toLocaleDateString()}</p></div>
                   <div className="flex items-center gap-2">
                     <Badge color={stColor[c.status]||'slate'}>{c.status}</Badge>
                     {c.status==='pending'&&<button onClick={()=>remove(c.email)} className="text-xs text-red-500 hover:underline">Cancel</button>}
@@ -603,8 +605,8 @@ const [draftName, setDraftName]=useState('')
             {drafts.map(d=>(
               <li key={d.id} className={`flex items-center justify-between rounded-lg border px-3 py-2.5 ${d.isFinal?'border-blue-300 bg-blue-50':'border-slate-200'}`}>
                 <div>
-                  <div className="flex items-center gap-2"><Icon d={IC.fileText} size={14}/><span className="text-sm font-medium text-slate-800">{d.name}</span>{d.isFinal&&<Badge color="blue">Final Draft</Badge>}{hasFinal&&!d.isFinal&&<Badge color="slate">Private</Badge>}</div>
-                  <p className="text-xs text-slate-400 mt-0.5">{new Date(d.uploadedAt).toLocaleDateString()}</p>
+                  <div className="flex items-center gap-2"><Icon d={IC.fileText} size={14}/><span className="text-sm font-medium text-slate-800 dark:text-slate-200">{d.name}</span>{d.isFinal&&<Badge color="blue">Final Draft</Badge>}{hasFinal&&!d.isFinal&&<Badge color="slate">Private</Badge>}</div>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{new Date(d.uploadedAt).toLocaleDateString()}</p>
                 </div>
 <div className="flex items-center gap-2">
                   {d.fileData&&(
@@ -658,7 +660,7 @@ const [sortDate, setSortDate]=useState('newest')
   const toggleVisibility=id=>setProjects(p=>p.map(x=>x.id===id?{...x,visibility:x.visibility==='public'?'private':'public'}:x))
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold text-slate-900">My Projects</h2><Btn onClick={openCreate}><Icon d={IC.plus}/>New Project</Btn></div>
+      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Projects</h2><Btn onClick={openCreate}><Icon d={IC.plus}/>New Project</Btn></div>
 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         {/* Search */}
         <div className="flex-1 min-w-48">
@@ -667,7 +669,7 @@ const [sortDate, setSortDate]=useState('newest')
 
         {/* Course filter */}
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500 px-0.5">Course</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-400 px-0.5">Course</label>
           <select value={filterCourse} onChange={e=>setFilterCourse(e.target.value)}
             className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-300 transition-colors">
             <option value="">All Courses</option>
@@ -714,15 +716,15 @@ const [sortDate, setSortDate]=useState('newest')
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-semibold text-slate-900">{p.title}</h3>
+                      <h3 className="font-semibold text-slate-900 dark:text-white">{p.title}</h3>
                       <Badge color={p.visibility==='public'?'green':'slate'}>{p.visibility}</Badge>
                       <Badge color="blue">{p.course}</Badge>
                       {p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}
                       {p.flagged&&<Badge color="red">⚑ Flagged</Badge>}
                     </div>
-                    {p.description&&<p className="text-sm text-slate-500 line-clamp-2">{p.description}</p>}
+                    {p.description&&<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{p.description}</p>}
                     <div className="flex flex-wrap gap-1">{(p.languages||[]).map(l=><Badge key={l} color="slate">{l}</Badge>)}</div>
-                    <p className="text-xs text-slate-400">Created {new Date(p.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">Created {new Date(p.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
                     <Btn size="sm" variant="ghost" onClick={()=>{setSelected(p);setModal('view')}}><Icon d={IC.eye} size={13}/>View</Btn>
@@ -793,17 +795,17 @@ function InvitationsSection({ profile, projects, setProjects, pushNotif }) {
   }
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Project Invitations</h2><p className="mt-1 text-sm text-slate-500">Accept or reject project invitations.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900 dark:text-white">Project Invitations</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Accept or reject project invitations.</p></div>
       {myInvites.length===0?<Card><EmptyState message="No pending invitations."/></Card>:
         <div className="space-y-3">
           {myInvites.map(({project,collab})=>(
             <Card key={project.id}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
-                  <p className="font-semibold text-slate-900">{project.title}</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">{project.title}</p>
                   <div className="flex flex-wrap gap-2"><Badge color="blue">{project.course}</Badge><Badge color="slate">From: {project.owner}</Badge></div>
-                  {project.description&&<p className="text-sm text-slate-500 line-clamp-2">{project.description}</p>}
-                  <p className="text-xs text-slate-400">Invited {new Date(collab.invitedAt).toLocaleDateString()}</p>
+                  {project.description&&<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{project.description}</p>}
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Invited {new Date(collab.invitedAt).toLocaleDateString()}</p>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <Btn size="sm" variant="success" onClick={()=>respond(project.id,'accepted')}><Icon d={IC.check} size={13}/>Accept</Btn>
@@ -847,7 +849,7 @@ const [sortDate, setSortDate]=useState('newest')
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Explore All Projects</h2><p className="mt-1 text-sm text-slate-500"> Search, filter by course/instructor/date, sort, view details.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900 dark:text-white">Explore All Projects</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Search, filter by course/instructor/date, sort, view details.</p></div>
 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
 
         {/* Search */}
@@ -928,10 +930,10 @@ const [sortDate, setSortDate]=useState('newest')
             <Card key={p.id}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1.5 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900">{p.title}</h3>{p.featured && <Badge color="purple">Featured</Badge>}<Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div>
-                  {p.description&&<p className="text-sm text-slate-500 line-clamp-2">{p.description}</p>}
+                  <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900 dark:text-white">{p.title}</h3>{p.featured && <Badge color="purple">Featured</Badge>}<Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div>
+                  {p.description&&<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{p.description}</p>}
                   <div className="flex flex-wrap gap-1">{(p.languages||[]).map(l=><Badge key={l} color="slate">{l}</Badge>)}</div>
-                  <p className="text-xs text-slate-400">By {p.owner} · {new Date(p.createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">By {p.owner} · {new Date(p.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <Btn size="sm" variant="secondary" onClick={()=>setSelected(p)}><Icon d={IC.eye} size={13}/>View</Btn>
@@ -979,16 +981,16 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios, s
   const toggleFav=email=>setFavPortfolios(p=>p.includes(email)?p.filter(x=>x!==email):[...p,email])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Explore All Portfolios</h2><p className="mt-1 text-sm text-slate-500">Search by name/email, filter by major/skills, sort by project count.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900 dark:text-white">Explore All Portfolios</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Search by name/email, filter by major/skills, sort by project count.</p></div>
 <div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name or email…"/>
-        <select value={filterMajor} onChange={e=>setFilterMajor(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <select value={filterMajor} onChange={e=>setFilterMajor(e.target.value)} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Majors</option>{majors.map(m=><option key={m}>{m}</option>)}
         </select>
-        <select value={filterSkill} onChange={e=>setFilterSkill(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <select value={filterSkill} onChange={e=>setFilterSkill(e.target.value)} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Skills</option>{allSkills.map(s=><option key={s}>{s}</option>)}
         </select>
-        <select value={sortByPortfolio} onChange={e=>setSortByPortfolio(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <select value={sortByPortfolio} onChange={e=>setSortByPortfolio(e.target.value)} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="most">Most Projects</option>
           <option value="least">Least Projects</option>
         </select>
@@ -1004,8 +1006,8 @@ function ExplorePortfoliosSection({ projects, favPortfolios, setFavPortfolios, s
   : <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-700">{(p.firstName?.[0]||p.email[0]).toUpperCase()}</div>
 }
                   <div className="min-w-0">
-                    <p className="font-semibold text-slate-900">{p.firstName} {p.lastName}</p>
-                    <p className="text-sm text-slate-500">{p.email}</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">{p.firstName} {p.lastName}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{p.email}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">{p.major&&<Badge color="blue">{p.major}</Badge>}<span className="text-xs text-slate-400">{p.projectCount} public project{p.projectCount!==1?'s':''}</span></div>
                     <div className="flex flex-wrap gap-1 mt-1">{(p.skills||[]).slice(0,4).map(s=><Badge key={s} color="slate">{s}</Badge>)}</div>
                   </div>
@@ -1063,27 +1065,27 @@ function FavoritesSection({ projects, favProjects, setFavProjects, favPortfolios
   const savedPortfolios=favPortfolios.map(email=>{const p=allProfiles.find(x=>x.email===email);return p?{...p,projectCount:projects.filter(pr=>pr.owner===email&&pr.visibility==='public').length}:null}).filter(Boolean)
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">My Favorites</h2>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Favorites</h2>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
-          <h3 className="mb-3 font-semibold text-slate-800">Saved Projects ({savedProjects.length})</h3>
+          <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Saved Projects ({savedProjects.length})</h3>
           {savedProjects.length===0?<Card><EmptyState message="No saved projects. Heart a project in Explore All Projects."/></Card>:
             <div className="space-y-2">{savedProjects.map(p=>(
               <Card key={p.id} className="flex items-center justify-between gap-3">
-                <div className="min-w-0"><p className="font-medium text-slate-800 truncate">{p.title}</p><div className="flex gap-1.5 mt-0.5"><Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div></div>
+                <div className="min-w-0"><p className="font-medium text-slate-800 dark:text-slate-200 truncate">{p.title}</p><div className="flex gap-1.5 mt-0.5"><Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div></div>
                 <button onClick={()=>setFavProjects(prev=>prev.filter(id=>id!==p.id))} className="shrink-0 text-red-400 hover:text-red-600"><Icon d={IC.x} size={14}/></button>
               </Card>
             ))}</div>
           }
         </div>
         <div>
-          <h3 className="mb-3 font-semibold text-slate-800">Saved Portfolios ({savedPortfolios.length})</h3>
+          <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Saved Portfolios ({savedPortfolios.length})</h3>
           {savedPortfolios.length===0?<Card><EmptyState message="No saved portfolios. Heart a portfolio in Explore All Portfolios."/></Card>:
             <div className="space-y-2">{savedPortfolios.map(p=>(
               <Card key={p.email} className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">{(p.firstName?.[0]||p.email[0]).toUpperCase()}</div>
-                  <div className="min-w-0"><p className="font-medium text-slate-800 truncate">{p.firstName} {p.lastName}</p><p className="text-xs text-slate-400 truncate">{p.email} · {p.projectCount} projects</p></div>
+                  <div className="min-w-0"><p className="font-medium text-slate-800 dark:text-slate-200 truncate">{p.firstName} {p.lastName}</p><p className="text-xs text-slate-400 dark:text-slate-500 truncate">{p.email} · {p.projectCount} projects</p></div>
                 </div>
                 <button onClick={()=>setFavPortfolios(prev=>prev.filter(e=>e!==p.email))} className="shrink-0 text-red-400 hover:text-red-600"><Icon d={IC.x} size={14}/></button>
               </Card>
@@ -1101,16 +1103,16 @@ function RecommendedSection({ profile, projects, favProjects, setFavProjects }) 
   const toggleFav=id=>setFavProjects(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id])
   return (
     <div className="space-y-6">
-      <div><h2 className="text-2xl font-bold text-slate-900">Recommended Projects</h2><p className="mt-1 text-sm text-slate-500">Projects matching your programming languages.</p></div>
+      <div><h2 className="text-2xl font-bold text-slate-900 dark:text-white">Recommended Projects</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Projects matching your programming languages.</p></div>
       {scored.length===0?<Card><EmptyState message="No recommendations yet. Add projects with languages to get personalized recommendations."/></Card>:
         <div className="space-y-3">{scored.slice(0,10).map(p=>(
           <Card key={p.id}>
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1.5 min-w-0">
-                <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900">{p.title}</h3><Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div>
-                {p.description&&<p className="text-sm text-slate-500 line-clamp-2">{p.description}</p>}
+                <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900 dark:text-white">{p.title}</h3><Badge color="blue">{p.course}</Badge>{p.rating>0&&<Badge color="yellow">★ {p.rating}/5</Badge>}</div>
+                {p.description&&<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{p.description}</p>}
                 <div className="flex flex-wrap gap-1">{(p.languages||[]).map(l=><Badge key={l} color={myLangs.has(l)?'green':'slate'}>{l}</Badge>)}</div>
-                <p className="text-xs text-slate-400">By {p.owner}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">By {p.owner}</p>
               </div>
               <button onClick={()=>toggleFav(p.id)} className={`shrink-0 rounded-lg p-1.5 transition ${favProjects.includes(p.id)?'text-red-500':'text-slate-300 hover:text-red-400'}`}><Icon d={IC.heart} size={16}/></button>
             </div>
@@ -1284,7 +1286,7 @@ function MessagesSection({ profile, pushNotif }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-1">
-                      <p className={`truncate text-xs font-semibold ${isActive?'text-white':uc>0?'text-slate-900':'text-slate-700'}`}>
+                      <p className={`truncate text-xs font-semibold ${isActive?'text-white':uc>0?'text-slate-900 dark:text-white':'text-slate-700 dark:text-slate-300'}`}>
                         {t.with}
                       </p>
                       <div className="flex shrink-0 items-center gap-1.5">
@@ -1302,7 +1304,7 @@ function MessagesSection({ profile, pushNotif }) {
                       </div>
                     </div>
                     <p className={`truncate text-[11px] mt-0.5
-                      ${isActive?'text-blue-200':uc>0?'font-semibold text-slate-800':'text-slate-400'}`}>
+                      ${isActive?'text-blue-200':uc>0?'font-semibold text-slate-800 dark:text-slate-200':'text-slate-400 dark:text-slate-500'}`}>
                       {lastMsg
                         ?(lastMsg.from===profile.email
                           ?<span className="text-slate-400">You: </span>
@@ -1352,7 +1354,7 @@ function MessagesSection({ profile, pushNotif }) {
                   if(item.type==='date') return (
                     <div key={'d'+idx} className="flex items-center gap-3 py-3">
                       <div className="flex-1 h-px bg-slate-200"/>
-                      <span className="text-[10px] font-medium text-slate-400 px-2">{item.label}</span>
+                      <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 px-2">{item.label}</span>
                       <div className="flex-1 h-px bg-slate-200"/>
                     </div>
                   )
@@ -1410,7 +1412,7 @@ function MessagesSection({ profile, pushNotif }) {
                   <Icon d={IC.send} size={13}/>
                 </button>
               </div>
-<p className="mt-1.5 text-center text-[10px] text-slate-300 dark:text-slate-600">Press Enter to send</p>
+          <p className="mt-1.5 text-center text-[10px] text-slate-400 dark:text-slate-600">Press Enter to send</p>
             </div>
           </>
         }
@@ -1523,7 +1525,7 @@ function InternshipsSection({ profile, pushNotif }) {
   const stColor={pending:'yellow',nominated:'purple',accepted:'green',rejected:'red'}
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Internships</h2>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Internships</h2>
       {completedInternships.length>0&&(
         <Card className="border-green-200 bg-green-50">
           <p className="font-semibold text-green-800 mb-2">✓ Completed Internships on Portfolio</p>
@@ -1532,13 +1534,13 @@ function InternshipsSection({ profile, pushNotif }) {
       )}
 <div className="flex flex-wrap gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by title or company…"/>
-        <select value={filterComp} onChange={e=>setFilterComp(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <select value={filterComp} onChange={e=>setFilterComp(e.target.value)} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Companies</option>{companies.map(c=><option key={c}>{c}</option>)}
         </select>
-        <select value={filterDur} onChange={e=>setFilterDur(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <select value={filterDur} onChange={e=>setFilterDur(e.target.value)} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="">All Durations</option>{durations.map(d=><option key={d}>{d}</option>)}
         </select>
-        <select value={sortIntern} onChange={e=>setSortIntern(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+        <select value={sortIntern} onChange={e=>setSortIntern(e.target.value)} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
         </select>
@@ -1551,10 +1553,10 @@ function InternshipsSection({ profile, pushNotif }) {
             <Card key={intern.id}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1.5 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900">{intern.title}</h3><Badge color="blue">{intern.companyName||intern.companyEmail}</Badge><Badge color="slate">{intern.duration}</Badge><Badge color={intern.status==='hiring'?'green':'slate'}>{intern.status==='hiring'?'Currently Hiring':'Position Filled'}</Badge></div>
-                  {intern.details&&<p className="text-sm text-slate-500 line-clamp-2">{intern.details}</p>}
+                  <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-slate-900 dark:text-white">{intern.title}</h3><Badge color="blue">{intern.companyName||intern.companyEmail}</Badge><Badge color="slate">{intern.duration}</Badge><Badge color={intern.status==='hiring'?'green':'slate'}>{intern.status==='hiring'?'Currently Hiring':'Position Filled'}</Badge></div>
+                  {intern.details&&<p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{intern.details}</p>}
                   <div className="flex flex-wrap gap-1">{(intern.skills||[]).map(s=><Badge key={s} color="slate">{s}</Badge>)}{(intern.languages||[]).map(l=><Badge key={l} color="blue">{l}</Badge>)}</div>
-                  <p className="text-xs text-slate-400">Posted {new Date(intern.postedAt).toLocaleDateString()} · Deadline {intern.deadline?new Date(intern.deadline).toLocaleDateString():'N/A'}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Posted {new Date(intern.postedAt).toLocaleDateString()} · Deadline {intern.deadline?new Date(intern.deadline).toLocaleDateString():'N/A'}</p>
                   {updatedApp&&<div className="flex items-center gap-2 pt-1"><span className="text-xs text-slate-500">Your application:</span><Badge color={stColor[updatedApp.status]||'slate'}>{updatedApp.status}</Badge></div>}
                 </div>
                 {!app?<Btn size="sm" onClick={()=>{setSelected(intern);setModal('apply')}}><Icon d={IC.briefcase} size={13}/>Apply</Btn>:<span className="text-xs text-slate-400 shrink-0">Applied {new Date(app.appliedAt).toLocaleDateString()}</span>}
@@ -1622,8 +1624,8 @@ function NotificationsSection({ notifications, setNotifications, profileEmail, s
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Notifications</h2>
-          {unread>0&&<p className="mt-0.5 text-sm text-slate-500">{unread} unread</p>}
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Notifications</h2>
+          {unread>0&&<p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{unread} unread</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <Btn size="sm" variant="secondary" onClick={()=>markAll(true)}>Mark all read</Btn>
@@ -1659,7 +1661,7 @@ function NotificationsSection({ notifications, setNotifications, profileEmail, s
                   <Icon d={d} size={14}/>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm leading-snug ${n.read?'text-slate-500':'text-slate-800 font-medium'}`}>
+                  <p className={`text-sm leading-snug ${n.read?'text-slate-500 dark:text-slate-400':'text-slate-800 dark:text-slate-200 font-medium'}`}>
                     {n.message}
                   </p>
                   <div className="mt-1 flex items-center gap-2">
@@ -1683,7 +1685,7 @@ function NotificationsSection({ notifications, setNotifications, profileEmail, s
                 </div>
               </div>
             )
-          })}
+          })}1
         </div>
       }
     </div>
@@ -1700,28 +1702,28 @@ function StatsSection({ projects, profile }) {
   const topCollabs=Object.entries(colMap).sort((a,b)=>b[1]-a[1]).slice(0,5)
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">My Statistics </h2>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Statistics</h2>
       <div className="grid gap-4 sm:grid-cols-3">
         {[{label:'Total Projects',value:myProjects.length},{label:'Public Projects',value:myProjects.filter(p=>p.visibility==='public').length},{label:'Collaborators',value:Object.keys(colMap).length}].map(s=>(
-          <Card key={s.label} className="text-center"><p className="text-4xl font-bold text-blue-700">{s.value}</p><p className="mt-1 text-sm text-slate-500">{s.label}</p></Card>
+          <Card key={s.label} className="text-center"><p className="text-4xl font-bold text-blue-700 dark:text-blue-400">{s.value}</p><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{s.label}</p></Card>
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <h3 className="mb-4 font-semibold text-slate-800">Languages Used (%)</h3>
+          <h3 className="mb-4 font-semibold text-slate-800 dark:text-slate-200">Languages Used (%)</h3>
           {Object.keys(langs).length===0?<EmptyState message="No language data yet."/>:
             <div className="space-y-3">{Object.entries(langs).sort((a,b)=>b[1]-a[1]).map(([lang,count])=>(
-              <div key={lang}><div className="flex justify-between mb-1 text-sm"><span className="font-medium text-slate-700">{lang}</span><span className="text-slate-400">{Math.round(count/total*100)}%</span></div>
+             <div key={lang}><div className="flex justify-between mb-1 text-sm"><span className="font-medium text-slate-700 dark:text-slate-300">{lang}</span><span className="text-slate-400 dark:text-slate-500">{Math.round(count/total*100)}%</span></div>
               <div className="h-2.5 w-full rounded-full bg-slate-100"><div className="h-2.5 rounded-full bg-blue-600" style={{width:`${Math.round(count/total*100)}%`}}/></div></div>
             ))}</div>
           }
         </Card>
         <Card>
-          <h3 className="mb-4 font-semibold text-slate-800">Top Collaborators per Project</h3>
+          <h3 className="mb-4 font-semibold text-slate-800 dark:text-slate-200">Top Collaborators per Project</h3>
           {topCollabs.length===0?<EmptyState message="No accepted collaborators yet."/>:
             <ul className="space-y-2">{topCollabs.map(([email,count])=>(
               <li key={email} className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2">
-                <div className="flex items-center gap-2"><div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">{email[0].toUpperCase()}</div><span className="text-sm text-slate-700">{email}</span></div>
+                <div className="flex items-center gap-2"><div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-sm font-bold text-blue-700 dark:text-blue-300">{email[0].toUpperCase()}</div><span className="text-sm text-slate-700 dark:text-slate-300">{email}</span></div>
                 <Badge color="blue">{count} project{count>1?'s':''}</Badge>
               </li>
             ))}</ul>
@@ -1816,7 +1818,7 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
               className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
                 ${tab===t.id
                   ?'bg-blue-700 text-white shadow-sm'
-                  :'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700'}`}>
+                  :'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700'}`}>
               <Icon d={t.icon} size={14}/>{t.label}
             </button>
           ))}
@@ -1868,7 +1870,7 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-slate-800">Light</p>
-                        <p className="text-xs text-slate-400">Clean and bright</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">Clean and bright</p>
                       </div>
                       {!darkMode&&(
                         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600">
@@ -2048,8 +2050,8 @@ function ScheduleSection({ profile }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">My Schedule</h2>
-          <p className="mt-1 text-sm text-slate-500">Weekly timetable, deadlines, and upcoming events.</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Schedule</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Weekly timetable, deadlines, and upcoming events.</p>
         </div>
         <Btn onClick={()=>setModal(true)}><Icon d={IC.plus}/>Add Event</Btn>
       </div>
@@ -2115,7 +2117,7 @@ function ScheduleSection({ profile }) {
 
       {/* Upcoming list */}
       <div>
-        <p className="mb-3 text-sm font-semibold text-slate-800">All Upcoming Events</p>
+        <p className="mb-3 text-sm font-semibold text-slate-800 dark:text-slate-200">All Upcoming Events</p>
         {events.length===0
           ?<Card><EmptyState message="No events yet. Add your classes, deadlines, and meetings."/></Card>
           :<div className="space-y-2">
@@ -2257,7 +2259,7 @@ const navItems=[
             className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150
               ${tab===item.id
                 ?'bg-blue-700 text-white shadow-sm'
-                :'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700 dark:hover:text-blue-400 hover:translate-x-0.5'}`}>
+                :'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700 dark:hover:text-blue-400 hover:translate-x-0.5'}`}>
             <Icon d={item.icon} size={16}/>
             <span>{item.label}</span>
             {item.badge>0&&(
@@ -2272,11 +2274,11 @@ const navItems=[
       <div className="mt-4 border-t border-slate-100 pt-4 space-y-0.5">
         <button onClick={()=>{setTab('profile');setSidebar(false)}}
           className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150
-            ${tab==='profile'?'bg-blue-700 text-white':'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700 hover:translate-x-0.5'}`}>
+            ${tab==='profile'?'bg-blue-700 text-white':'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-700 hover:translate-x-0.5'}`}>
           <Icon d={IC.user} size={16}/><span>My Profile</span>
         </button>
         <button onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 transition-all duration-150 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600">
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition-all duration-150 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400">
           <Icon d={IC.logout} size={16}/><span>Logout</span>
         </button>
       </div>
@@ -2309,7 +2311,7 @@ const navItems=[
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Top Header — fixed, never scrolls */}
-        <header className="shrink-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-4 py-3">
+<header className="shrink-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 backdrop-blur-sm px-4 py-3">
 {/* Left: Logo + Hamburger (mobile) + Page title */}
           <div className="flex items-center gap-3">
 
@@ -2563,29 +2565,29 @@ const navItems=[
                   </div>
                  <div className="p-1.5 space-y-0.5">
                     <button onClick={()=>{setTab('profile');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <Icon d={IC.user} size={14}/>My Profile
                     </button>
                     <button onClick={()=>{setTab('settings');setSettingsTab('appearance');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <Icon d={IC.moon} size={14}/>Appearance
                     </button>
                     <button onClick={()=>{setTab('settings');setSettingsTab('notifications');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <Icon d={IC.bell} size={14}/>Notifications
                     </button>
                     <button onClick={()=>{setTab('settings');setSettingsTab('wellness');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <Icon d={IC.zap} size={14}/>Wellness
                     </button>
                     <button onClick={()=>{setTab('stats');setProfileDropdown(false)}}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <Icon d={IC.chart} size={14}/>Statistics
                     </button>
                   </div>
                   <div className="border-t border-slate-100 p-1.5">
                     <button onClick={handleLogout}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                       <Icon d={IC.logout} size={14}/>Sign out
                     </button>
                   </div>
@@ -2596,7 +2598,7 @@ const navItems=[
         </header>
 
         {/* Page Content — ONLY this scrolls */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-900/50">
           <div className="mx-auto w-full max-w-5xl">
             {tab==='overview'&&<Overview user={{...rawUser,...profile}} projects={projects} notifications={notifications} setTab={setTab}/>}
             {tab==='profile'&&<ProfileSection profile={p} setProfile={setProfile}/>}
