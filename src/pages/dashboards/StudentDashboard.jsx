@@ -2207,7 +2207,11 @@ const navItems=[
     {id:'internships',label:'Internships',icon:IC.briefcase},
     // explore accessible via hero CTA; stats moved to profile dropdown
   ]
-  const handleLogout=()=>{logoutUser();navigate('/login')}
+  const handleLogout=()=>{
+    setTheme(false)
+    logoutUser()
+    navigate('/')
+  }
  const [profileDropdown, setProfileDropdown]=useState(false)
   const [settingsTab, setSettingsTab]=useState('appearance')
   const [msgDropdown, setMsgDropdown]=useState(false)
@@ -2552,8 +2556,8 @@ const navItems=[
                   </div>
                 }
                 <div className="hidden sm:block text-left">
-                  <p className="text-xs font-semibold text-slate-900 leading-tight">{profile.firstName||rawUser.firstName}</p>
-                  <p className="text-xs text-slate-400 leading-tight">Student</p>
+                  <p className="text-xs font-semibold text-slate-900 dark:text-white leading-tight">{profile.firstName||rawUser.firstName}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-400 leading-tight">Student</p>
                 </div>
                 <svg className="hidden sm:block h-3 w-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
               </button>
