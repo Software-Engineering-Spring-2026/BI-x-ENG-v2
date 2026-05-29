@@ -455,7 +455,7 @@ function EmployerDashboard() {
     { id: 'settings',             label: 'Settings',           icon: IC.settings },
   ]
 
-  const NavContent = () => (
+  const renderNav = () => (
     <>
       <div className="mb-4 mt-1 px-2">
         <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">Employer Portal</p>
@@ -490,7 +490,7 @@ function EmployerDashboard() {
 
       {/* Desktop Sidebar */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5 md:flex overflow-y-auto">
-        <NavContent />
+        {renderNav()}
       </aside>
 
       {/* Mobile Sidebar */}
@@ -498,7 +498,7 @@ function EmployerDashboard() {
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setSidebar(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <aside className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-5" onClick={e => e.stopPropagation()}>
-            <NavContent />
+            {renderNav()}
           </aside>
         </div>
       )}
