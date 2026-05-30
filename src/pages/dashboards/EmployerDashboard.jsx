@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getCurrentUser, getEmployerProfile, saveEmployerProfile } from '../../data/authStorage'
+import { getCurrentUser, logoutUser, getEmployerProfile, saveEmployerProfile } from '../../data/authStorage'
 import projectsData from '../../data/projects'
 import studentsData from '../../data/students'
 import { useTheme } from '../../context/ThemeContext'
@@ -227,7 +227,8 @@ function EmployerDashboard() {
     } else if (profileForm.mapLocation) {
       setMapSrc(`https://maps.google.com/maps?q=${encodeURIComponent(profileForm.mapLocation)}&output=embed`)
     }
-  }, [user])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email])
 
   const pageTitleClass = 'text-2xl font-bold text-slate-900 dark:text-white'
   const pageSubClass = 'text-sm text-slate-500 dark:text-slate-400 mt-1'
@@ -252,7 +253,7 @@ function EmployerDashboard() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const handleLogout = () => { setTheme(false); try { localStorage.removeItem('guc_current_user') } catch {} navigate('/') }
+  const handleLogout = () => { setTheme(false); logoutUser(); navigate('/') }
 
   const markAsRead = (id) => setUserNotifications(userNotifications.map(n => n.id === id ? { ...n, read: true } : n))
   const markAllRead = () => { setUserNotifications(userNotifications.map(n => ({ ...n, read: true }))); showSuccess('All notifications marked as read.') }
@@ -749,28 +750,28 @@ function EmployerDashboard() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1">
                               <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Website</label>
-                              <input value={profileForm.website} onChange={e => setProfileForm({ ...profileForm, website: e.target.value })} placeholder="https://" className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                              <input value={profileForm.website} onChange={e => setProfileForm(prev => ({ ...prev, website: e.target.value }))} placeholder="https://" className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
                             </div>
                             <div className="flex flex-col gap-1">
                               <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Phone (11 digits)</label>
-                              <input type="tel" value={profileForm.phone} maxLength={11} onChange={e => setProfileForm({ ...profileForm, phone: e.target.value.replace(/\D/g, '') })} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                              <input type="tel" value={profileForm.phone} maxLength={11} onChange={e => setProfileForm(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
                             </div>
                           </div>
                           <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Company Address</label>
-                            <input value={profileForm.address} onChange={e => setProfileForm({ ...profileForm, address: e.target.value })} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                            <input value={profileForm.address} onChange={e => setProfileForm(prev => ({ ...prev, address: e.target.value }))} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
                           </div>
                           <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Biography</label>
-                            <textarea value={profileForm.bio} onChange={e => setProfileForm({ ...profileForm, bio: e.target.value })} rows={3} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                            <textarea value={profileForm.bio} onChange={e => setProfileForm(prev => ({ ...prev, bio: e.target.value }))} rows={3} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
                           </div>
                           <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Research Interests</label>
-                            <textarea value={profileForm.researchInterests} onChange={e => setProfileForm({ ...profileForm, researchInterests: e.target.value })} rows={2} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                            <textarea value={profileForm.researchInterests} onChange={e => setProfileForm(prev => ({ ...prev, researchInterests: e.target.value }))} rows={2} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
                           </div>
                           <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Company Background</label>
-                            <textarea value={profileForm.education} onChange={e => setProfileForm({ ...profileForm, education: e.target.value })} rows={2} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                            <textarea value={profileForm.education} onChange={e => setProfileForm(prev => ({ ...prev, education: e.target.value }))} rows={2} className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
                           </div>
                           <label className="cursor-pointer flex items-center gap-2 rounded-lg border border-dashed border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/40 px-4 py-3 text-sm text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-950/60 transition-colors">
                             <Icon d={IC.upload} size={14} />Upload Tax Certificate (PDF)
@@ -1308,12 +1309,22 @@ function EmployerDashboard() {
             )}
 
             {/* ── Settings ── */}
-            {activeTab === 'settings' && (() => {
-              const [settTab, setSettTab] = useState('appearance')
-              const [cooldown, setCooldown] = useState(false)
-              const [cooldownCount, setCooldownCount] = useState(5)
-              const startCooldown = () => { setCooldown(true); setCooldownCount(5); const t = setInterval(() => setCooldownCount(c => { if (c <= 1) { clearInterval(t); setTimeout(() => setCooldown(false), 400); return 0 } return c - 1 }), 1000) }
-              return (
+            {activeTab === 'settings' && (
+              <SettingsTab isDark={isDark} setTheme={setTheme} user={user} pageTitleClass={pageTitleClass} pageSubClass={pageSubClass} />
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
+
+function SettingsTab({ isDark, setTheme, user, pageTitleClass, pageSubClass }) {
+  const [settTab, setSettTab] = useState('appearance')
+  const [cooldown, setCooldown] = useState(false)
+  const [cooldownCount, setCooldownCount] = useState(5)
+  const startCooldown = () => { setCooldown(true); setCooldownCount(5); const t = setInterval(() => setCooldownCount(c => { if (c <= 1) { clearInterval(t); setTimeout(() => setCooldown(false), 400); return 0 } return c - 1 }), 1000) }
+  return (
                 <div className="space-y-6">
                   {cooldown && (
                     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md">
@@ -1386,13 +1397,6 @@ function EmployerDashboard() {
                   </div>
                 </div>
               )
-            })()}
-
-          </div>
-        </main>
-      </div>
-    </div>
-  )
 }
 
 export default EmployerDashboard
