@@ -43,14 +43,15 @@ const IC = {
   download: 'M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3',
 }
 
-function Button({ children, onClick, type = 'button', className = '', variant = 'primary' }) {
+function Button({ children, onClick, type = 'button', className = '', variant = 'primary', disabled = false }) {
   const variants = {
     primary: 'bg-blue-700 text-white hover:bg-blue-800',
     secondary: 'border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
   }
   return (
-    <button type={type} onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none ${variants[variant] || variants.primary} ${className}`}>
+    <button type={type} onClick={onClick} disabled={disabled}
+      className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant] || variants.primary} ${className}`}>
       {children}
     </button>
   )

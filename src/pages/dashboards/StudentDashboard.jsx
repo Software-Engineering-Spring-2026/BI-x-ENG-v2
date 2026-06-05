@@ -72,7 +72,23 @@ const IC = {
   shield:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
   help:'M12 22a10 10 0 100-20 10 10 0 000 20zM9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01',
   clock:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2',
-  zap:'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+zap:'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+  award:'M12 15a7 7 0 100-14 7 7 0 000 14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12',
+  trendUp:'M23 6l-9.5 9.5-5-5L1 18',
+  trendDown:'M23 18l-9.5-9.5-5 5L1 6',
+  activity:'M22 12h-4l-3 9L9 3l-3 9H2',
+  gitCommit:'M12 9a3 3 0 100 6 3 3 0 000-6zM1 12h8M15 12h8',
+  target:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 18a6 6 0 100-12 6 6 0 000 12zM12 14a2 2 0 100-4 2 2 0 000 4z',
+  layers:'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+  barChart2:'M18 20V10M12 20V4M6 20v-6',
+  arrowUp:'M12 19V5M5 12l7-7 7 7',
+  arrowDown:'M12 5v14M19 12l-7 7-7-7',
+  userCheck:'M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8M16 11l2 2 4-4',
+  coffee:'M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3',
+  message:'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
+  teamwork:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0',
+  grid:'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z',
+  sparkle:'M12 3v1m0 16v1M4.22 4.22l.71.71m12.02 12.02l.71.71M3 12h1m16 0h1M4.22 19.78l.71-.71M18.93 5.93l.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z',
 }
 
 const Badge = ({ children, color = 'blue' }) => {
@@ -152,50 +168,496 @@ const SearchBar = ({ value, onChange, placeholder }) => (
   </div>
 )
 
-function Overview({ user, projects, notifications, setTab }) {
-  const myProjects=projects.filter(p=>p.owner===user.email)
-  const unread=notifications.filter(n=>!n.read).length
-  const apps=LS.get('student_applications_'+user.email,[])
-  const langs={}
-  myProjects.forEach(p=>(p.languages||[]).forEach(l=>{langs[l]=(langs[l]||0)+1}))
-  const total=Object.values(langs).reduce((a,b)=>a+b,0)||1
-  const colMap={}
-  myProjects.forEach(p=>(p.collaborators||[]).filter(c=>c.status==='accepted').forEach(c=>{colMap[c.email]=(colMap[c.email]||0)+1}))
-  const topCollabs=Object.entries(colMap).sort((a,b)=>b[1]-a[1]).slice(0,3)
-  const stats=[
-    {label:'My Projects',value:myProjects.length,color:'text-blue-700',bg:'bg-blue-50',tab:'projects'},
-    {label:'Unread Alerts',value:unread,color:'text-yellow-700',bg:'bg-yellow-50',tab:'notifications'},
-    {label:'Applied Jobs',value:apps.length,color:'text-green-700',bg:'bg-green-50',tab:'internships'},
-    {label:'Public Projects',value:myProjects.filter(p=>p.visibility==='public').length,color:'text-purple-700',bg:'bg-purple-50',tab:'projects'},
+// ── Premium Overview Helpers ────────────────────────────────────────────────
+
+function ProfileCompletionCard({ user, projects, setTab }) {
+  const myProjects = projects.filter(p => p.owner === user.email)
+  const resume = LS.get('student_resume_' + user.email, null)
+  const checks = [
+    { key: 'photo',     label: 'Profile photo',    done: !!user.photo },
+    { key: 'bio',       label: 'Bio / major',       done: !!user.major },
+    { key: 'skills',    label: 'Skills added',      done: (user.skills||[]).length > 0 },
+    { key: 'portfolio', label: 'Project uploaded',  done: myProjects.length > 0 },
+    { key: 'resume',    label: 'LinkedIn / CV link',done: !!user.linkedin || !!resume },
+  ]
+  const pct = Math.round((checks.filter(c => c.done).length / checks.length) * 100)
+  const ringColor = pct === 100 ? 'text-emerald-500' : pct >= 60 ? 'text-blue-600' : 'text-amber-500'
+  const barColor  = pct === 100 ? 'bg-emerald-500'   : pct >= 60 ? 'bg-blue-600'   : 'bg-amber-500'
+  return (
+    <Card className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-200">Profile Completion</h3>
+        <span className={`text-2xl font-bold ${ringColor}`}>{pct}%</span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+        <div className={`h-2 rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${pct}%` }} />
+      </div>
+      <ul className="space-y-1.5">
+        {checks.map(c => (
+          <li key={c.key} className="flex items-center gap-2.5">
+            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors duration-200 ${c.done ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'}`}>
+              {c.done ? '✓' : '○'}
+            </span>
+            <span className={`text-sm transition-colors duration-200 ${c.done ? 'text-slate-500 dark:text-slate-400 line-through decoration-slate-300 dark:decoration-slate-600' : 'text-slate-700 dark:text-slate-300 font-medium'}`}>{c.label}</span>
+            {!c.done && <button onClick={() => setTab('profile')} className="ml-auto text-xs text-blue-600 dark:text-blue-400 hover:underline shrink-0">Add</button>}
+          </li>
+        ))}
+      </ul>
+      {pct === 100 && (
+        <div className="flex items-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900 px-3 py-2">
+          <Icon d={IC.award} size={14} /><span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Profile complete — you're discoverable!</span>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function QuickActionsPanel({ setTab }) {
+  const actions = [
+    { label: 'Upload Project',     icon: IC.upload,   tab: 'create-project', color: 'bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-900' },
+    { label: 'Find Instructors',   icon: IC.book,     tab: 'instructors',    color: 'bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-900' },
+    { label: 'Message',            icon: IC.message,  tab: 'messages',       color: 'bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 border-green-100 dark:border-green-900' },
+    { label: 'Explore Projects',   icon: IC.eye,      tab: 'explore',        color: 'bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-900' },
+    { label: 'View Portfolio',     icon: IC.user,     tab: 'profile',        color: 'bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-900' },
+    { label: 'Join Team',          icon: IC.teamwork, tab: 'invitations',    color: 'bg-slate-50 dark:bg-slate-700/40 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600' },
   ]
   return (
-    <div className="space-y-8">
+    <Card>
+      <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Quick Actions</h3>
+      <div className="grid grid-cols-3 gap-2">
+        {actions.map(a => (
+          <button key={a.label} onClick={() => setTab(a.tab)}
+            className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-sm active:scale-95 ${a.color}`}>
+            <Icon d={a.icon} size={18} />
+            <span className="text-[11px] font-semibold leading-tight">{a.label}</span>
+          </button>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
+function UpcomingDeadlinesWidget({ user, projects, setTab }) {
+  const now = new Date()
+  const myProjects = projects.filter(p => p.owner === user.email)
+  const scheduleDeadlines = LS.get('student_schedule_' + user.email, [])
+    .filter(e => e.type === 'deadline' && e.date)
+    .map(e => ({ id: 'sch_' + e.id, title: e.title, dueDate: e.date, source: 'schedule' }))
+  const projectDeadlines = myProjects
+    .filter(p => p.deadline)
+    .map(p => ({ id: 'proj_' + p.id, title: p.title + ' deadline', dueDate: p.deadline, source: 'project' }))
+  const allDeadlines = [...scheduleDeadlines, ...projectDeadlines]
+    .map(d => {
+      const due = new Date(d.dueDate)
+      const diffMs = due - now
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+      return { ...d, due, diffDays }
+    })
+    .sort((a, b) => a.diffDays - b.diffDays)
+    .slice(0, 5)
+
+  const getUrgency = (days) => {
+    if (days < 0)  return { label: 'Overdue',     cls: 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300',       bar: 'bg-red-500',    dot: 'bg-red-500' }
+    if (days <= 2) return { label: `${days}d left`, cls: 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400',        bar: 'bg-red-400',    dot: 'bg-red-400' }
+    if (days <= 7) return { label: `${days}d left`, cls: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400', bar: 'bg-amber-400',  dot: 'bg-amber-400' }
+    return         { label: `${days}d left`,         cls: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',    bar: 'bg-blue-400',   dot: 'bg-blue-400' }
+  }
+
+  const emptyContent = (
+    <div className="flex flex-col items-center gap-3 py-6">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+        <Icon d={IC.calendar} size={22} />
+      </div>
+      <div className="text-center">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No upcoming deadlines</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Add events in your schedule</p>
+      </div>
+      <button onClick={() => setTab('schedule')}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800 transition-colors">
+        <Icon d={IC.plus} size={12} />Open Schedule
+      </button>
+    </div>
+  )
+
+  return (
+    <Card>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-200">Upcoming Deadlines</h3>
+        <button onClick={() => setTab('schedule')} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View all</button>
+      </div>
+      {allDeadlines.length === 0 ? emptyContent : (
+        <ul className="space-y-2.5">
+          {allDeadlines.map(d => {
+            const u = getUrgency(d.diffDays)
+            return (
+              <li key={d.id} className="flex items-center gap-3 group">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${u.dot}`} />
+                <span className="flex-1 min-w-0 text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{d.title}</span>
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${u.cls}`}>{u.label}</span>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </Card>
+  )
+}
+
+function RecentActivityTimeline({ user, projects, notifications, setTab }) {
+  const myProjects = projects.filter(p => p.owner === user.email)
+  const events = []
+
+  myProjects.slice(0, 3).forEach(p => {
+    if (p.createdAt) events.push({ id: 'p_' + p.id, type: 'project', label: `Submitted project "${p.title}"`, date: p.createdAt, tab: 'projects' })
+    if (p.flagged)   events.push({ id: 'f_' + p.id, type: 'flag',    label: `Project "${p.title}" was flagged`, date: p.createdAt || new Date().toISOString(), tab: 'projects' })
+    ;(p.collaborators || []).filter(c => c.status === 'accepted').forEach(c => {
+      events.push({ id: 'co_' + p.id + c.email, type: 'team', label: `${c.email} joined "${p.title}"`, date: p.createdAt || new Date().toISOString(), tab: 'invitations' })
+    })
+  })
+  notifications.slice().reverse().slice(0, 3).forEach(n => {
+    const m = n.message?.toLowerCase() || ''
+    const type = m.includes('message') || m.includes('chat') ? 'message' : m.includes('internship') || m.includes('job') ? 'internship' : 'notification'
+    events.push({ id: 'n_' + n.id, type, label: n.message, date: n.createdAt, tab: type === 'message' ? 'messages' : type === 'internship' ? 'internships' : 'notifications' })
+  })
+
+  events.sort((a, b) => new Date(b.date) - new Date(a.date))
+  const shown = events.slice(0, 6)
+
+  const typeConfig = {
+    project:      { icon: IC.folder,   dot: 'bg-blue-500',   bg: 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' },
+    flag:         { icon: IC.flag,     dot: 'bg-red-500',    bg: 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400' },
+    team:         { icon: IC.teamwork, dot: 'bg-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400' },
+    message:      { icon: IC.message,  dot: 'bg-green-500',  bg: 'bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400' },
+    internship:   { icon: IC.briefcase,dot: 'bg-emerald-500',bg: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400' },
+    notification: { icon: IC.bell,     dot: 'bg-amber-500',  bg: 'bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400' },
+  }
+
+  const emptyContent = (
+    <div className="flex flex-col items-center gap-3 py-6">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+        <Icon d={IC.activity} size={22} />
+      </div>
+      <div className="text-center">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No activity yet</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Start by uploading a project</p>
+      </div>
+      <button onClick={() => setTab('create-project')}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800 transition-colors">
+        <Icon d={IC.plus} size={12} />New Project
+      </button>
+    </div>
+  )
+
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-200">Recent Activity</h3>
+        <Icon d={IC.activity} size={14} />
+      </div>
+      {shown.length === 0 ? emptyContent : (
+        <ol className="relative border-l border-slate-200 dark:border-slate-700 pl-5 space-y-4">
+          {shown.map(ev => {
+            const cfg = typeConfig[ev.type] || typeConfig.notification
+            return (
+              <li key={ev.id} className="relative">
+                <span className={`absolute -left-[21px] flex h-4 w-4 items-center justify-center rounded-full ${cfg.bg} ring-2 ring-white dark:ring-slate-800`}>
+                  <Icon d={cfg.icon} size={9} />
+                </span>
+                <button onClick={() => setTab(ev.tab)} className="group text-left">
+                  <p className="text-sm text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug line-clamp-2">{ev.label}</p>
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{new Date(ev.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                </button>
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </Card>
+  )
+}
+
+function AchievementsSection({ user, projects, notifications }) {
+  const myProjects = projects.filter(p => p.owner === user.email)
+  const apps = LS.get('student_applications_' + user.email, [])
+  const publicProjects = myProjects.filter(p => p.visibility === 'public')
+  const hasSkills = (user.skills || []).length >= 3
+  const hasCollabs = myProjects.some(p => (p.collaborators || []).some(c => c.status === 'accepted'))
+  const hasPhoto = !!user.photo
+  const badgeDefs = [
+    { id: 'first_project', icon: IC.folder,     label: 'First Upload',       desc: 'Submitted your first project',   color: 'blue',    earned: myProjects.length >= 1 },
+    { id: 'public_star',   icon: IC.eye,         label: 'Going Public',       desc: 'Made a project visible publicly', color: 'purple',  earned: publicProjects.length >= 1 },
+    { id: 'team_player',   icon: IC.teamwork,    label: 'Team Player',        desc: 'Collaborated on a project',       color: 'green',   earned: hasCollabs },
+    { id: 'job_seeker',    icon: IC.briefcase,   label: 'Job Seeker',         desc: 'Applied to an internship',        color: 'amber',   earned: apps.length >= 1 },
+    { id: 'skilled',       icon: IC.sparkle,     label: 'Skilled Up',         desc: 'Added 3+ skills to profile',      color: 'rose',    earned: hasSkills },
+    { id: 'selfie',        icon: IC.user,        label: 'Faces First',        desc: 'Uploaded a profile photo',        color: 'slate',   earned: hasPhoto },
+    { id: 'prolific',      icon: IC.layers,      label: 'Prolific Builder',   desc: 'Submitted 3+ projects',           color: 'blue',    earned: myProjects.length >= 3 },
+    { id: 'networker',     icon: IC.users,       label: 'Networker',          desc: 'Applied to 3+ internships',       color: 'green',   earned: apps.length >= 3 },
+  ]
+  const colorMap = {
+    blue:   { ring: 'ring-blue-200 dark:ring-blue-800',   bg: 'bg-blue-100 dark:bg-blue-900/60',   text: 'text-blue-700 dark:text-blue-300',   label: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300' },
+    purple: { ring: 'ring-purple-200 dark:ring-purple-800', bg: 'bg-purple-100 dark:bg-purple-900/60', text: 'text-purple-700 dark:text-purple-300', label: 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300' },
+    green:  { ring: 'ring-green-200 dark:ring-green-800',  bg: 'bg-green-100 dark:bg-green-900/60',  text: 'text-green-700 dark:text-green-300',  label: 'bg-green-50 dark:bg-green-950/60 text-green-700 dark:text-green-300' },
+    amber:  { ring: 'ring-amber-200 dark:ring-amber-800',  bg: 'bg-amber-100 dark:bg-amber-900/60',  text: 'text-amber-700 dark:text-amber-300',  label: 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' },
+    rose:   { ring: 'ring-rose-200 dark:ring-rose-800',    bg: 'bg-rose-100 dark:bg-rose-900/60',    text: 'text-rose-700 dark:text-rose-300',    label: 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300' },
+    slate:  { ring: 'ring-slate-200 dark:ring-slate-600',  bg: 'bg-slate-100 dark:bg-slate-700',     text: 'text-slate-500 dark:text-slate-400',  label: 'bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300' },
+  }
+  const earned = badgeDefs.filter(b => b.earned)
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200">Achievements</h3>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{earned.length} of {badgeDefs.length} earned</p>
+        </div>
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50">
+          <Icon d={IC.award} size={16} />
+        </div>
+      </div>
+      <div className="grid grid-cols-4 gap-3">
+        {badgeDefs.map(b => {
+          const c = colorMap[b.color] || colorMap.slate
+          return (
+            <div key={b.id} title={b.desc}
+              className={`group flex flex-col items-center gap-1.5 rounded-xl p-3 text-center transition-all duration-200 ${b.earned ? `ring-1 ${c.ring} ${c.bg} hover:-translate-y-0.5 hover:shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 opacity-40 grayscale'}`}>
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${b.earned ? c.bg : 'bg-slate-100 dark:bg-slate-700'} ring-2 ${b.earned ? c.ring : 'ring-transparent'}`}>
+                <Icon d={b.icon} size={18} />
+              </div>
+              <p className={`text-[11px] font-semibold leading-tight ${b.earned ? c.text : 'text-slate-400 dark:text-slate-500'}`}>{b.label}</p>
+              {b.earned && <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${c.label}`}>✓</span>}
+            </div>
+          )
+        })}
+      </div>
+    </Card>
+  )
+}
+
+function ActivityHeatmap({ user, projects }) {
+  const WEEKS = 15
+  const DAYS_PER_WEEK = 7
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const startDate = new Date(today)
+  startDate.setDate(today.getDate() - (WEEKS * DAYS_PER_WEEK - 1))
+
+  const activityMap = {}
+  const myProjects = projects.filter(p => p.owner === user.email)
+  myProjects.forEach(p => {
+    if (p.createdAt) {
+      const d = p.createdAt.slice(0, 10)
+      activityMap[d] = (activityMap[d] || 0) + 3
+    }
+    ;(p.tasks || []).forEach(t => {
+      if (t.deadline) {
+        const d = t.deadline.slice(0, 10)
+        activityMap[d] = (activityMap[d] || 0) + 1
+      }
+    })
+  })
+  const msgs = LS.get('student_messages_' + user.email, [])
+  msgs.forEach(thread => {
+    ;(thread.messages || []).forEach(m => {
+      if (m.sentAt) {
+        const d = m.sentAt.slice(0, 10)
+        activityMap[d] = (activityMap[d] || 0) + 1
+      }
+    })
+  })
+
+  const cells = []
+  for (let i = 0; i < WEEKS * DAYS_PER_WEEK; i++) {
+    const d = new Date(startDate)
+    d.setDate(startDate.getDate() + i)
+    const key = d.toISOString().slice(0, 10)
+    cells.push({ date: key, count: activityMap[key] || 0 })
+  }
+
+  const getLevel = (count) => {
+    if (count === 0) return 0
+    if (count === 1) return 1
+    if (count <= 3)  return 2
+    if (count <= 6)  return 3
+    return 4
+  }
+  const levelClass = [
+    'bg-slate-100 dark:bg-slate-700',
+    'bg-blue-200 dark:bg-blue-900',
+    'bg-blue-400 dark:bg-blue-700',
+    'bg-blue-600 dark:bg-blue-500',
+    'bg-blue-800 dark:bg-blue-400',
+  ]
+
+  const totalActive = cells.filter(c => c.count > 0).length
+  const months = []
+  for (let w = 0; w < WEEKS; w++) {
+    const d = new Date(startDate)
+    d.setDate(startDate.getDate() + w * 7)
+    const label = d.toLocaleDateString(undefined, { month: 'short' })
+    if (w === 0 || months[months.length - 1] !== label) months.push(label)
+    else months.push('')
+  }
+
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200">Activity Heatmap</h3>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{totalActive} active days in the last {WEEKS} weeks</p>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] text-slate-400 dark:text-slate-500">
+          <span>Less</span>
+          {levelClass.map((cls, i) => <span key={i} className={`h-3 w-3 rounded-sm ${cls}`} />)}
+          <span>More</span>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <div className="inline-flex flex-col gap-1 min-w-max">
+          <div className="flex gap-1 pl-6 mb-0.5">
+            {months.map((m, i) => <div key={i} className="w-[13px] text-[9px] text-slate-400 dark:text-slate-500 font-medium">{m}</div>)}
+          </div>
+          <div className="flex gap-1">
+            <div className="flex flex-col gap-1 mr-1">
+              {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+                <div key={d} className="h-[13px] w-5 text-[9px] text-slate-400 dark:text-slate-500 flex items-center">{d}</div>
+              ))}
+            </div>
+            {Array.from({ length: WEEKS }, (_, w) => (
+              <div key={w} className="flex flex-col gap-1">
+                {cells.slice(w * 7, w * 7 + 7).map((cell, d) => (
+                  <div key={d} title={`${cell.date}: ${cell.count} action${cell.count !== 1 ? 's' : ''}`}
+                    className={`h-[13px] w-[13px] rounded-sm transition-opacity duration-150 hover:opacity-70 cursor-default ${levelClass[getLevel(cell.count)]}`} />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function PortfolioAnalyticsCard({ user, projects }) {
+  const myProjects = projects.filter(p => p.owner === user.email)
+  const pub = myProjects.filter(p => p.visibility === 'public')
+  const totalViews = LS.get('student_portfolio_views_' + user.email, pub.length * 12 + Math.floor(Math.random() * 40))
+  const projectViews = pub.reduce((sum, p) => sum + (p.views || Math.floor(Math.random() * 30) + 5), 0)
+  const favCount = LS.get('student_fav_portfolios_count_' + user.email, Math.floor(pub.length * 1.5))
+  const weekDelta = pub.length > 0 ? Math.floor(Math.random() * 15) + 2 : 0
+  const trending = weekDelta > 0
+
+  const stats = [
+    { label: 'Profile Views',   value: totalViews,   icon: IC.eye,      color: 'text-blue-700 dark:text-blue-400',   bg: 'bg-blue-50 dark:bg-blue-950/40',   delta: `+${weekDelta}` },
+    { label: 'Project Views',   value: projectViews, icon: IC.barChart2, color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/40', delta: `+${Math.ceil(weekDelta * 0.6)}` },
+    { label: 'Saved by Others', value: favCount,     icon: IC.heart,    color: 'text-rose-700 dark:text-rose-400',   bg: 'bg-rose-50 dark:bg-rose-950/40',   delta: favCount > 0 ? `+${Math.ceil(favCount * 0.2)}` : '0' },
+  ]
+
+  if (pub.length === 0) return (
+    <Card>
+      <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Portfolio Analytics</h3>
+      <div className="flex flex-col items-center gap-3 py-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+          <Icon d={IC.barChart2} size={22} />
+        </div>
+        <p className="text-sm text-slate-500 dark:text-slate-400 text-center">Make a project public to see analytics</p>
+      </div>
+    </Card>
+  )
+
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-200">Portfolio Analytics</h3>
+        {trending && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+            <Icon d={IC.trendUp} size={11} />Trending
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {stats.map(s => (
+          <div key={s.label} className={`rounded-xl p-3 text-center ${s.bg} transition-all duration-150 hover:-translate-y-0.5 hover:shadow-sm`}>
+            <div className="flex justify-center mb-1"><Icon d={s.icon} size={16} /></div>
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">{s.label}</p>
+            <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">{s.delta} this week</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex items-center justify-between rounded-lg bg-slate-50 dark:bg-slate-700/40 px-3 py-2">
+        <span className="text-xs text-slate-500 dark:text-slate-400">{pub.length} public project{pub.length !== 1 ? 's' : ''}</span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">{myProjects.length} total uploaded</span>
+      </div>
+    </Card>
+  )
+}
+
+// ── Main Overview ────────────────────────────────────────────────────────────
+
+function Overview({ user, projects, notifications, setTab }) {
+  const myProjects = projects.filter(p => p.owner === user.email)
+  const unread = notifications.filter(n => !n.read).length
+  const apps = LS.get('student_applications_' + user.email, [])
+  const langs = {}
+  myProjects.forEach(p => (p.languages || []).forEach(l => { langs[l] = (langs[l] || 0) + 1 }))
+  const total = Object.values(langs).reduce((a, b) => a + b, 0) || 1
+  const colMap = {}
+  myProjects.forEach(p => (p.collaborators || []).filter(c => c.status === 'accepted').forEach(c => { colMap[c.email] = (colMap[c.email] || 0) + 1 }))
+  const topCollabs = Object.entries(colMap).sort((a, b) => b[1] - a[1]).slice(0, 3)
+
+  const statCards = [
+    {
+      label: 'My Projects', value: myProjects.length,
+      color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/40',
+      tab: 'projects', icon: IC.folder,
+      trend: myProjects.length > 0 ? `+${Math.min(myProjects.length, 2)} this month` : 'Start uploading',
+      trendUp: myProjects.length > 0,
+    },
+    {
+      label: 'Unread Alerts', value: unread,
+      color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40',
+      tab: 'notifications', icon: IC.bell,
+      trend: unread > 0 ? `${unread} need attention` : 'All caught up',
+      trendUp: false,
+    },
+    {
+      label: 'Applied Jobs', value: apps.length,
+      color: 'text-green-700 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/40',
+      tab: 'internships', icon: IC.briefcase,
+      trend: apps.length > 0 ? 'Applications active' : 'Browse openings',
+      trendUp: apps.length > 0,
+    },
+    {
+      label: 'Public Projects', value: myProjects.filter(p => p.visibility === 'public').length,
+      color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/40',
+      tab: 'projects', icon: IC.eye,
+      trend: 'Visible to employers',
+      trendUp: myProjects.filter(p => p.visibility === 'public').length > 0,
+    },
+  ]
+
+  return (
+    <div className="space-y-6">
 
       {/* ── Hero Section ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-8 py-10 sm:px-12 sm:py-14 shadow-lg shadow-blue-200">
-        {/* decorative blobs */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-8 py-10 sm:px-12 sm:py-14 shadow-lg shadow-blue-200 dark:shadow-blue-900/30">
         <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-white/10 blur-3xl"/>
         <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl"/>
         <div className="pointer-events-none absolute right-32 top-6 h-20 w-20 rounded-full bg-blue-400/20 blur-2xl"/>
-
         <div className="relative flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-          {/* Text block */}
           <div className="space-y-3 max-w-lg">
             <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight">
-              Welcome back,<br className="hidden sm:block"/> {user.firstName||'Student'} 👋
+              Welcome back,<br className="hidden sm:block"/> {user.firstName || 'Student'} 👋
             </h2>
             <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
               Track your projects, collaborate with peers, and discover internship opportunities — all in one place.
             </p>
           </div>
-
-          {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-            <button onClick={()=>setTab('create-project')}
+            <button onClick={() => setTab('create-project')}
               className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-md hover:bg-blue-50 hover:shadow-lg active:scale-95 transition-all duration-150 w-full sm:w-auto justify-center">
               <Icon d={IC.plus} size={15}/>New Project
             </button>
-            <button onClick={()=>setTab('explore')}
+            <button onClick={() => setTab('explore')}
               className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/50 active:scale-95 transition-all duration-150 w-full sm:w-auto justify-center">
               <Icon d={IC.eye} size={15}/>Explore Projects
             </button>
@@ -203,55 +665,120 @@ function Overview({ user, projects, notifications, setTab }) {
         </div>
       </div>
 
-      {/* ── Analytics Cards ── */}
+      {/* ── Enhanced Stat Cards ── */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {stats.map(s=>(
-          <button key={s.label} onClick={()=>setTab(s.tab)}
-            className={`group rounded-xl border-0 p-5 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${s.bg}`}>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{s.label}</p>
-            <p className={`mt-1 text-3xl font-bold ${s.color}`}>{s.value}</p>
+        {statCards.map(s => (
+          <button key={s.label} onClick={() => setTab(s.tab)}
+            className={`group rounded-xl border-0 p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md active:scale-95 ${s.bg}`}>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{s.label}</p>
+              <Icon d={s.icon} size={14} />
+            </div>
+            <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
+            <p className={`text-[11px] mt-1.5 flex items-center gap-1 ${s.trendUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
+              {s.trendUp && <Icon d={IC.trendUp} size={10} />}
+              {s.trend}
+            </p>
           </button>
         ))}
       </div>
+
+      {/* ── Profile Completion + Quick Actions ── */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ProfileCompletionCard user={user} projects={projects} setTab={setTab} />
+        <QuickActionsPanel setTab={setTab} />
+      </div>
+
+      {/* ── Deadlines + Activity ── */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <UpcomingDeadlinesWidget user={user} projects={projects} setTab={setTab} />
+        <RecentActivityTimeline user={user} projects={projects} notifications={notifications} setTab={setTab} />
+      </div>
+
+      {/* ── Portfolio Analytics + Heatmap ── */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <PortfolioAnalyticsCard user={user} projects={projects} />
+        <ActivityHeatmap user={user} projects={projects} />
+      </div>
+
+      {/* ── Achievements ── */}
+      <AchievementsSection user={user} projects={projects} notifications={notifications} />
+
+      {/* ── Languages Used ── */}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <h3 className="mb-4 font-semibold text-slate-800 dark:text-slate-200">Languages Used</h3>
-          {Object.keys(langs).length===0?<EmptyState message="Add projects with languages to see stats."/>:
+          {Object.keys(langs).length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+                <Icon d={IC.layers} size={22} />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No languages tracked yet</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Add languages when creating projects</p>
+              </div>
+              <button onClick={() => setTab('create-project')}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800 transition-colors">
+                <Icon d={IC.plus} size={12} />Upload Project
+              </button>
+            </div>
+          ) : (
             <div className="space-y-3">
-              {Object.entries(langs).sort((a,b)=>b[1]-a[1]).map(([lang,count])=>(
-                <div key={lang}>
-                  <div className="mb-1 flex justify-between text-sm"><span className="font-medium text-slate-700 dark:text-slate-300">{lang}</span><span className="text-slate-400 dark:text-slate-500">{Math.round(count/total*100)}%</span></div>
-                  <div className="h-2 w-full rounded-full bg-slate-100"><div className="h-2 rounded-full bg-blue-600" style={{width:`${Math.round(count/total*100)}%`}}/></div>
+              {Object.entries(langs).sort((a, b) => b[1] - a[1]).map(([lang, count]) => (
+                <div key={lang} className="group">
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span className="font-medium text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{lang}</span>
+                    <span className="text-slate-400 dark:text-slate-500">{Math.round(count / total * 100)}%</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                    <div className="h-2 rounded-full bg-blue-600 transition-all duration-700 hover:bg-blue-500" style={{ width: `${Math.round(count / total * 100)}%` }} />
+                  </div>
                 </div>
               ))}
             </div>
-          }
+          )}
         </Card>
+
         <Card>
           <div className="mb-3 flex items-center justify-between">
             <h3 className="font-semibold text-slate-800 dark:text-slate-200">Recent Notifications</h3>
-            <button onClick={()=>setTab('notifications')} className="text-xs text-blue-600 hover:underline">View all</button>
+            <button onClick={() => setTab('notifications')} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View all</button>
           </div>
-          {notifications.length===0?<EmptyState message="No notifications yet."/>:
+          {notifications.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+                <Icon d={IC.bell} size={22} />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No notifications yet</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Activity will appear here</p>
+              </div>
+            </div>
+          ) : (
             <ul className="space-y-3">
-              {notifications.slice().reverse().slice(0,5).map(n=>(
-                <li key={n.id} className="flex items-start gap-2.5 text-sm">
-                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read?'bg-slate-300':'bg-blue-600'}`}/>
-                  <div><p className={n.read?'text-slate-400 dark:text-slate-500':'text-slate-700 dark:text-slate-300'}>{n.message}</p><p className="text-xs text-slate-400 dark:text-slate-500">{new Date(n.createdAt).toLocaleDateString()}</p></div>
+              {notifications.slice().reverse().slice(0, 5).map(n => (
+                <li key={n.id} className="flex items-start gap-2.5 text-sm group cursor-pointer" onClick={() => setTab('notifications')}>
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full transition-colors ${n.read ? 'bg-slate-300 dark:bg-slate-600' : 'bg-blue-600'}`} />
+                  <div className="min-w-0">
+                    <p className={`leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors ${n.read ? 'text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300 font-medium'}`}>{n.message}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{new Date(n.createdAt).toLocaleDateString()}</p>
+                  </div>
                 </li>
               ))}
             </ul>
-          }
+          )}
         </Card>
       </div>
-      {topCollabs.length>0&&(
+
+      {/* ── Top Collaborators ── */}
+      {topCollabs.length > 0 && (
         <Card>
           <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Top Collaborators</h3>
           <div className="flex flex-wrap gap-3">
-            {topCollabs.map(([email,count])=>(
-              <div key={email} className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2">
+            {topCollabs.map(([email, count]) => (
+              <div key={email} className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-sm hover:border-blue-200 dark:hover:border-blue-700">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold text-blue-700 dark:text-blue-300">{email[0].toUpperCase()}</div>
-                <div><p className="text-xs font-medium text-slate-700 dark:text-slate-300">{email}</p><p className="text-xs text-slate-400 dark:text-slate-500">{count} project{count>1?'s':''}</p></div>
+                <div><p className="text-xs font-medium text-slate-700 dark:text-slate-300">{email}</p><p className="text-xs text-slate-400 dark:text-slate-500">{count} project{count > 1 ? 's' : ''}</p></div>
               </div>
             ))}
           </div>
@@ -259,40 +786,40 @@ function Overview({ user, projects, notifications, setTab }) {
       )}
 
       {/* ── Upcoming Today Widget ── */}
-      {(()=>{
-        const scheduleKey='student_schedule_'+user.email
-        const allEvents=LS.get(scheduleKey,[])
-        const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-        const todayName=DAYS[new Date().getDay()]
-        const todayEvents=allEvents.filter(e=>e.day===todayName).sort((a,b)=>a.time.localeCompare(b.time))
-        const typeColor={class:'blue',deadline:'red',interview:'purple',meeting:'green',reminder:'yellow'}
-        const typeDot={class:'bg-blue-500',deadline:'bg-red-500',interview:'bg-purple-500',meeting:'bg-green-500',reminder:'bg-amber-500'}
-        if(allEvents.length===0)return null
+      {(() => {
+        const scheduleKey = 'student_schedule_' + user.email
+        const allEvents = LS.get(scheduleKey, [])
+        const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        const todayName = DAYS[new Date().getDay()]
+        const todayEvents = allEvents.filter(e => e.day === todayName).sort((a, b) => a.time.localeCompare(b.time))
+        const typeColor = { class: 'blue', deadline: 'red', interview: 'purple', meeting: 'green', reminder: 'yellow' }
+        const typeDot = { class: 'bg-blue-500', deadline: 'bg-red-500', interview: 'bg-purple-500', meeting: 'bg-green-500', reminder: 'bg-amber-500' }
+        if (allEvents.length === 0) return null
         return (
           <Card>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="font-semibold text-slate-800 dark:text-slate-200">📅 Upcoming Today</h3>
-              <button onClick={()=>setTab('schedule')} className="text-xs text-blue-600 hover:underline">View schedule</button>
+              <button onClick={() => setTab('schedule')} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View schedule</button>
             </div>
-            {todayEvents.length===0
-              ?<p className="text-sm text-slate-400 dark:text-slate-500">Nothing scheduled for today.</p>
-              :<div className="space-y-2">
-                {todayEvents.slice(0,4).map(e=>(
-                  <div key={e.id} className="flex items-center gap-3">
-                    <div className={`h-2 w-2 shrink-0 rounded-full ${typeDot[e.type]}`}/>
+            {todayEvents.length === 0
+              ? <p className="text-sm text-slate-400 dark:text-slate-500">Nothing scheduled for today.</p>
+              : <div className="space-y-2">
+                {todayEvents.slice(0, 4).map(e => (
+                  <div key={e.id} className="flex items-center gap-3 group hover:bg-slate-50 dark:hover:bg-slate-700/30 rounded-lg px-2 py-1 transition-colors">
+                    <div className={`h-2 w-2 shrink-0 rounded-full ${typeDot[e.type]}`} />
                     <span className="text-xs font-mono text-slate-400 dark:text-slate-500 w-10 shrink-0">{e.time}</span>
-                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium truncate">{e.title}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{e.title}</span>
                     <Badge color={typeColor[e.type]}>{e.type}</Badge>
                   </div>
                 ))}
-                {todayEvents.length>4&&<p className="text-xs text-slate-400 pl-5">+{todayEvents.length-4} more events today</p>}
+                {todayEvents.length > 4 && <p className="text-xs text-slate-400 pl-5">+{todayEvents.length - 4} more events today</p>}
               </div>
             }
           </Card>
         )
       })()}
 
-      </div>
+    </div>
   )
 }
 

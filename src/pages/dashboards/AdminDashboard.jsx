@@ -308,7 +308,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const cu = getCurrentUser()
-    if (!cu||cu.role!=='admin') { navigate('/login'); return }
+    if (!cu||cu.role!=='admin') { navigate('/'); return }
     refreshUsers(); setProjects(buildProjects(adminState.projectOverrides)); syncExternalLinkRequests()
   }, [navigate, refreshUsers, syncExternalLinkRequests]) // eslint-disable-line
 
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
   const pendingApprovals = employers.filter(e=>e.status==='pending').length
   const stats = { totalUsers:platformUsers.length, totalEmployers:platformUsers.filter(u=>u.role==='employer').length, totalStudents:platformUsers.filter(u=>u.role==='student').length, totalInstructors:platformUsers.filter(u=>u.role==='instructor').length, totalProjects:projects.length, totalCourses:adminState.courses.length }
 
-  const handleLogout = () => { setTheme(false); logoutUser(); navigate('/login') }
+  const handleLogout = () => { setTheme(false); logoutUser(); navigate('/') }
   const updateNotificationRead = (id,read) => setAdminState(prev => ({ ...prev, notifications:prev.notifications.map(n=>n.id===id?{...n,read}:n) }))
   const markAllNotifications = read => setAdminState(prev => ({ ...prev, notifications:prev.notifications.map(n=>({...n,read})) }))
   const toggleNotificationsEnabled = () => setAdminState(prev => ({ ...prev, notificationsEnabled:!prev.notificationsEnabled }))
