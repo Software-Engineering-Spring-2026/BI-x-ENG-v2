@@ -2543,7 +2543,655 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
     </div>
   )
 }
+// ═══════════════════════════════════════════════════════════════════════════
+// LEARNING HUB — seed data helpers
+// ═══════════════════════════════════════════════════════════════════════════
 
+const LH_COURSES = [
+  {
+    id: 'csen401', code: 'CSEN 401', name: 'Computer Programming Lab',
+    instructor: 'Dr. Sherif Aly', description: 'Advanced programming techniques using modern languages and tools. Topics include data structures, algorithms, and software design patterns.',
+    color: 'blue', progress: 72, totalMaterials: 38,
+  },
+  {
+    id: 'csen501', code: 'CSEN 501', name: 'Software Engineering',
+    instructor: 'Dr. Mervat Abuelkheir', description: 'Software development lifecycle, requirements engineering, design patterns, testing methodologies, and project management.',
+    color: 'purple', progress: 55, totalMaterials: 44,
+  },
+  {
+    id: 'csen603', code: 'CSEN 603', name: 'Computer Networks',
+    instructor: 'Dr. Nora Samir', description: 'Network architectures, protocols, TCP/IP stack, routing algorithms, network security fundamentals, and wireless communications.',
+    color: 'green', progress: 40, totalMaterials: 31,
+  },
+  {
+    id: 'dmet501', code: 'DMET 501', name: 'Database Systems',
+    instructor: 'Dr. Karim Fathy', description: 'Relational and non-relational databases, SQL, normalization theory, query optimization, and modern NoSQL approaches.',
+    color: 'amber', progress: 88, totalMaterials: 27,
+  },
+  {
+    id: 'csen701', code: 'CSEN 701', name: 'Artificial Intelligence',
+    instructor: 'Dr. Ahmed Hassan', description: 'Foundations of AI including search algorithms, machine learning, neural networks, natural language processing, and computer vision.',
+    color: 'rose', progress: 30, totalMaterials: 52,
+  },
+]
+
+function buildCourseData(courseId) {
+  const seed = courseId.charCodeAt(0) + courseId.charCodeAt(courseId.length - 1)
+  const rng = (n, offset = 0) => ((seed * (n + 1) * 31) % 89) + offset
+
+  const weeks = ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6','Week 7','Week 8']
+  const instructors = {
+    csen401: 'Dr. Sherif Aly', csen501: 'Dr. Mervat Abuelkheir',
+    csen603: 'Dr. Nora Samir', dmet501: 'Dr. Karim Fathy', csen701: 'Dr. Ahmed Hassan',
+  }
+  const inst = instructors[courseId] || 'Dr. GUC Instructor'
+
+  const lectures = weeks.slice(0, 6).map((w, i) => ({
+    id: `lec_${courseId}_${i}`, title: [
+      'Introduction & Course Overview','Core Concepts & Fundamentals','Deep Dive: Part I',
+      'Deep Dive: Part II','Advanced Topics','Case Studies & Applications',
+    ][i],
+    week: w, uploadDate: `2026-0${Math.min(i + 2, 9)}-${String(10 + i * 3).padStart(2,'0')}`,
+    instructor: inst, bookmarked: i === 1,
+  }))
+
+  const tutorials = weeks.slice(0, 4).map((w, i) => ({
+    id: `tut_${courseId}_${i}`, title: ['Tutorial 1: Basics','Tutorial 2: Problem Solving','Tutorial 3: Practice Problems','Tutorial 4: Exam Prep'][i],
+    week: w, uploadDate: `2026-0${Math.min(i + 2, 9)}-${String(14 + i * 4).padStart(2,'0')}`,
+    instructor: inst, bookmarked: false,
+  }))
+
+  const now = new Date()
+  const assignmentDefs = [
+    { title: 'Assignment 1: Foundations', daysOffset: -20, status: 'submitted', grade: 88 + (seed % 8), max: 100 },
+    { title: 'Assignment 2: Core Implementation', daysOffset: -7, status: 'submitted', grade: 79 + (seed % 12), max: 100 },
+    { title: 'Assignment 3: Advanced Challenge', daysOffset: 5, status: 'in-progress', grade: null, max: 100 },
+    { title: 'Assignment 4: Final Project', daysOffset: 18, status: 'not-started', grade: null, max: 100 },
+  ]
+  const assignments = assignmentDefs.map((a, i) => {
+    const due = new Date(now); due.setDate(now.getDate() + a.daysOffset)
+    const diffDays = Math.ceil((due - now) / 86400000)
+    const isLate = diffDays < 0 && a.status !== 'submitted'
+    return {
+      id: `asgn_${courseId}_${i}`, title: a.title,
+      dueDate: due.toISOString().slice(0, 10),
+      status: isLate ? 'late' : a.status,
+      grade: a.grade, max: a.max,
+    }
+  })
+
+  const resources = [
+    { id: `res_${courseId}_0`, title: 'Course Textbook (PDF)', type: 'pdf',     size: '12.4 MB', uploadDate: '2026-02-01' },
+    { id: `res_${courseId}_1`, title: 'Lab Manual',            type: 'pdf',     size: '3.2 MB',  uploadDate: '2026-02-05' },
+    { id: `res_${courseId}_2`, title: 'Lecture Slides Pack',   type: 'zip',     size: '28.7 MB', uploadDate: '2026-03-10' },
+    { id: `res_${courseId}_3`, title: 'Grade Sheet Template',  type: 'excel',   size: '0.4 MB',  uploadDate: '2026-02-08' },
+    { id: `res_${courseId}_4`, title: 'Project Specification', type: 'word',    size: '1.1 MB',  uploadDate: '2026-04-01' },
+    { id: `res_${courseId}_5`, title: 'Reference Documentation', type: 'link',  url: 'https://docs.example.com', uploadDate: '2026-02-15' },
+  ]
+
+  const recordings = lectures.slice(0, 5).map((l, i) => ({
+    id: `rec_${courseId}_${i}`, title: l.title + ' (Recording)',
+    duration: `${40 + rng(i, 10)}:${String(rng(i + 7, 5)).padStart(2,'0')}`,
+    uploadDate: l.uploadDate, url: 'https://youtu.be/dQw4w9WgXcQ',
+  }))
+
+  const quizGrades = [
+    { id: `q_${courseId}_0`, title: 'Quiz 1', grade: 14 + (seed % 6), max: 20, date: '2026-03-05' },
+    { id: `q_${courseId}_1`, title: 'Quiz 2', grade: 17 + (seed % 3), max: 20, date: '2026-04-10' },
+    { id: `q_${courseId}_2`, title: 'Midterm Exam', grade: 68 + (seed % 15), max: 100, date: '2026-04-20' },
+  ]
+  const projectGrade = { id: `pg_${courseId}_0`, title: 'Course Project', grade: 82 + (seed % 10), max: 100, date: '2026-05-15' }
+
+  const announcements = [
+    { id: `ann_${courseId}_0`, title: 'Office Hours Updated', message: 'Office hours for this week have been moved to Thursday 3–5 PM.', date: '2026-05-28', type: 'info' },
+    { id: `ann_${courseId}_1`, title: 'Assignment 3 Extended', message: 'Due to the midterm, Assignment 3 deadline has been extended by 3 days.', date: '2026-05-25', type: 'warning' },
+    { id: `ann_${courseId}_2`, title: 'New Tutorial Uploaded', message: 'Tutorial 4 covering exam preparation topics is now available.', date: '2026-05-22', type: 'success' },
+  ]
+
+  return { lectures, tutorials, assignments, resources, recordings, quizGrades, projectGrade, announcements }
+}
+
+// ── Learning Hub Main Component ─────────────────────────────────────────────
+
+function LearningHubSection({ profile }) {
+  const [selectedCourseId, setSelectedCourseId] = useState(LH_COURSES[0].id)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [bookmarks, setBookmarks] = useLS('lh_bookmarks_' + profile.email, {})
+  const [submissions, setSubmissions] = useLS('lh_submissions_' + profile.email, {})
+
+  const course = LH_COURSES.find(c => c.id === selectedCourseId) || LH_COURSES[0]
+  const data = buildCourseData(selectedCourseId)
+
+  const toggleBookmark = (itemId) => setBookmarks(prev => ({ ...prev, [itemId]: !prev[itemId] }))
+  const submitAssignment = (aId) => setSubmissions(prev => ({ ...prev, [aId]: 'submitted' }))
+
+  const colorMap = {
+    blue:   { bg: 'bg-blue-50 dark:bg-blue-950/40',   text: 'text-blue-700 dark:text-blue-300',   bar: 'bg-blue-600',     dot: 'bg-blue-500',     border: 'border-blue-200 dark:border-blue-800',   icon: 'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300' },
+    purple: { bg: 'bg-purple-50 dark:bg-purple-950/40',text: 'text-purple-700 dark:text-purple-300',bar: 'bg-purple-600',   dot: 'bg-purple-500',   border: 'border-purple-200 dark:border-purple-800', icon: 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300' },
+    green:  { bg: 'bg-green-50 dark:bg-green-950/40',  text: 'text-green-700 dark:text-green-300',  bar: 'bg-green-600',    dot: 'bg-green-500',    border: 'border-green-200 dark:border-green-800',   icon: 'bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300' },
+    amber:  { bg: 'bg-amber-50 dark:bg-amber-950/40',  text: 'text-amber-700 dark:text-amber-300',  bar: 'bg-amber-500',    dot: 'bg-amber-500',    border: 'border-amber-200 dark:border-amber-800',   icon: 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300' },
+    rose:   { bg: 'bg-rose-50 dark:bg-rose-950/40',    text: 'text-rose-700 dark:text-rose-300',    bar: 'bg-rose-600',     dot: 'bg-rose-500',     border: 'border-rose-200 dark:border-rose-800',     icon: 'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300' },
+  }
+  const cc = colorMap[course.color] || colorMap.blue
+
+  const TABS = [
+    { id: 'overview',     label: 'Overview',     icon: IC.home },
+    { id: 'lectures',     label: 'Lectures',     icon: IC.bookOpen },
+    { id: 'tutorials',    label: 'Tutorials',    icon: IC.book },
+    { id: 'assignments',  label: 'Assignments',  icon: IC.task },
+    { id: 'resources',    label: 'Resources',    icon: IC.paperclip },
+    { id: 'recordings',   label: 'Recordings',   icon: IC.video },
+    { id: 'grades',       label: 'Grades',       icon: IC.trophy },
+  ]
+
+  return (
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+
+      {/* ── Left Panel: Course List ── */}
+      <aside className="w-full lg:w-56 shrink-0">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+          <div className="border-b border-slate-100 dark:border-slate-700 px-4 py-3 bg-slate-50 dark:bg-slate-700/30">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">My Courses</p>
+          </div>
+          <nav className="p-2 space-y-0.5">
+            {LH_COURSES.map(c => {
+              const cm = colorMap[c.color] || colorMap.blue
+              const isActive = c.id === selectedCourseId
+              return (
+                <button key={c.id} onClick={() => { setSelectedCourseId(c.id); setActiveTab('overview') }}
+                  className={`group w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all duration-150 ${isActive ? 'bg-blue-700 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:translate-x-0.5'}`}>
+                  <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${isActive ? 'bg-white' : cm.dot}`} />
+                  <div className="min-w-0">
+                    <p className={`text-xs font-semibold leading-tight ${isActive ? 'text-white' : 'text-slate-800 dark:text-slate-200'}`}>{c.code}</p>
+                    <p className={`text-[11px] leading-snug mt-0.5 truncate ${isActive ? 'text-blue-200' : 'text-slate-400 dark:text-slate-500'}`}>{c.name}</p>
+                    <div className={`mt-1.5 h-1 w-full rounded-full overflow-hidden ${isActive ? 'bg-blue-500' : 'bg-slate-100 dark:bg-slate-600'}`}>
+                      <div className={`h-1 rounded-full transition-all duration-500 ${isActive ? 'bg-white' : cm.bar}`} style={{ width: `${c.progress}%` }} />
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+      </aside>
+
+      {/* ── Right Panel: Course Workspace ── */}
+      <div className="flex-1 min-w-0 space-y-5">
+
+        {/* Course Header */}
+        <div className={`rounded-xl border ${cc.border} ${cc.bg} p-5`}>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${cc.icon}`}>{course.code}</span>
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{course.name}</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{course.instructor}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl">{course.description}</p>
+            </div>
+            <div className="shrink-0 flex flex-col items-end gap-2 min-w-[120px]">
+              <div className="text-right">
+                <p className={`text-3xl font-bold ${cc.text}`}>{course.progress}%</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">complete</p>
+              </div>
+              <div className="w-28 h-2 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
+                <div className={`h-2 rounded-full transition-all duration-700 ${cc.bar}`} style={{ width: `${course.progress}%` }} />
+              </div>
+              <p className="text-xs text-slate-400 dark:text-slate-500">{course.totalMaterials} materials</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Bar */}
+        <div className="flex gap-1 overflow-x-auto rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${activeTab === t.id ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+              <Icon d={t.icon} size={13} />
+              <span className="hidden sm:inline">{t.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && <LHOverviewTab course={course} data={data} cc={cc} />}
+        {activeTab === 'lectures' && <LHMaterialsTab items={data.lectures} kind="Lecture" bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+        {activeTab === 'tutorials' && <LHMaterialsTab items={data.tutorials} kind="Tutorial" bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+        {activeTab === 'assignments' && <LHAssignmentsTab assignments={data.assignments} submissions={submissions} onSubmit={submitAssignment} />}
+        {activeTab === 'resources' && <LHResourcesTab resources={data.resources} bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+        {activeTab === 'recordings' && <LHRecordingsTab recordings={data.recordings} />}
+        {activeTab === 'grades' && <LHGradesTab assignments={data.assignments} quizzes={data.quizGrades} project={data.projectGrade} submissions={submissions} course={course} cc={cc} />}
+      </div>
+    </div>
+  )
+}
+
+// ── Overview Tab ─────────────────────────────────────────────────────────────
+
+function LHOverviewTab({ course, data, cc }) {
+  const { announcements, lectures, tutorials, assignments, resources } = data
+  const pending = assignments.filter(a => a.status === 'not-started' || a.status === 'in-progress')
+  const annTypeStyle = {
+    info:    { bg: 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800',   text: 'text-blue-700 dark:text-blue-300',   icon: IC.bell },
+    warning: { bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800', text: 'text-amber-700 dark:text-amber-300', icon: IC.alertCircle },
+    success: { bg: 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300', icon: IC.check },
+  }
+  const statCards = [
+    { label: 'Lectures',    value: lectures.length,   icon: IC.bookOpen,  color: 'text-blue-700 dark:text-blue-400',   bg: 'bg-blue-50 dark:bg-blue-950/40' },
+    { label: 'Tutorials',   value: tutorials.length,  icon: IC.book,      color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/40' },
+    { label: 'Assignments', value: assignments.length,icon: IC.task,      color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40' },
+    { label: 'Resources',   value: resources.length,  icon: IC.paperclip, color: 'text-green-700 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/40' },
+  ]
+  return (
+    <div className="space-y-5">
+      {/* Stat mini cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {statCards.map(s => (
+          <div key={s.label} className={`rounded-xl p-4 ${s.bg} transition-all duration-150 hover:-translate-y-0.5 hover:shadow-sm`}>
+            <div className="flex items-center justify-between mb-1"><Icon d={s.icon} size={14} /></div>
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Announcements */}
+      <Card>
+        <div className="mb-3 flex items-center gap-2">
+          <Icon d={IC.megaphone} size={15} />
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200">Recent Announcements</h3>
+        </div>
+        <div className="space-y-2.5">
+          {announcements.map(a => {
+            const s = annTypeStyle[a.type] || annTypeStyle.info
+            return (
+              <div key={a.id} className={`rounded-lg border px-4 py-3 ${s.bg}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Icon d={s.icon} size={13} />
+                    <p className={`text-sm font-semibold ${s.text}`}>{a.title}</p>
+                  </div>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">{a.date}</span>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">{a.message}</p>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+
+      {/* Recent uploads + Upcoming deadlines */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Recent Uploads</h3>
+          <ul className="space-y-2.5">
+            {[...data.lectures.slice(-2), ...data.tutorials.slice(-1)].map(item => (
+              <li key={item.id} className="flex items-center gap-3 group">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                  <Icon d={IC.bookOpen} size={14} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.title}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{item.week} · {item.uploadDate}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        <Card>
+          <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Upcoming Deadlines</h3>
+          {pending.length === 0
+            ? <p className="text-sm text-slate-400 dark:text-slate-500 py-4 text-center">No pending assignments 🎉</p>
+            : <ul className="space-y-2.5">
+              {pending.map(a => {
+                const due = new Date(a.dueDate)
+                const diff = Math.ceil((due - new Date()) / 86400000)
+                const urgency = diff < 0 ? 'red' : diff <= 3 ? 'red' : diff <= 7 ? 'yellow' : 'slate'
+                return (
+                  <li key={a.id} className="flex items-center gap-3">
+                    <span className={`h-2 w-2 rounded-full shrink-0 ${urgency === 'red' ? 'bg-red-500' : urgency === 'yellow' ? 'bg-amber-400' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">Due {a.dueDate}</p>
+                    </div>
+                    <Badge color={urgency === 'red' ? 'red' : urgency === 'yellow' ? 'yellow' : 'slate'}>
+                      {diff < 0 ? 'Overdue' : `${diff}d left`}
+                    </Badge>
+                  </li>
+                )
+              })}
+            </ul>
+          }
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+// ── Materials Tab (Lectures & Tutorials) ─────────────────────────────────────
+
+function LHMaterialsTab({ items, kind, bookmarks, onBookmark }) {
+  const [search, setSearch] = useState('')
+  const filtered = items.filter(i => i.title.toLowerCase().includes(search.toLowerCase()) || i.week.toLowerCase().includes(search.toLowerCase()))
+  return (
+    <div className="space-y-4">
+      <SearchBar value={search} onChange={setSearch} placeholder={`Search ${kind.toLowerCase()}s…`} />
+      {filtered.length === 0
+        ? (
+          <Card>
+            <div className="flex flex-col items-center gap-3 py-8">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+                <Icon d={kind === 'Lecture' ? IC.bookOpen : IC.book} size={24} />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No {kind.toLowerCase()}s found</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{search ? 'Try a different search term' : `${kind}s will appear here when uploaded`}</p>
+              </div>
+            </div>
+          </Card>
+        )
+        : (
+          <div className="space-y-3">
+            {filtered.map(item => (
+              <Card key={item.id} className="group hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                      <Icon d={kind === 'Lecture' ? IC.bookOpen : IC.book} size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{item.title}</p>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <Badge color="blue">{item.week}</Badge>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">{item.uploadDate}</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">· {item.instructor}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => onBookmark(item.id)} title={bookmarks[item.id] ? 'Remove bookmark' : 'Bookmark'}
+                      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks[item.id] ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-500' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
+                      <Icon d={IC.star} size={14} />
+                    </button>
+                    <Btn size="sm" variant="secondary"><Icon d={IC.download} size={13} />Download</Btn>
+                    <Btn size="sm"><Icon d={IC.eye} size={13} />View</Btn>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  )
+}
+
+// ── Assignments Tab ───────────────────────────────────────────────────────────
+
+function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
+  const statusConfig = {
+    'submitted':   { label: 'Submitted',   color: 'green',  icon: IC.check },
+    'in-progress': { label: 'In Progress', color: 'blue',   icon: IC.edit },
+    'not-started': { label: 'Not Started', color: 'slate',  icon: IC.clock },
+    'late':        { label: 'Late',        color: 'red',    icon: IC.alertCircle },
+  }
+  return (
+    <div className="space-y-3">
+      {assignments.length === 0
+        ? (
+          <Card>
+            <div className="flex flex-col items-center gap-3 py-8">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+                <Icon d={IC.task} size={24} />
+              </div>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No assignments yet</p>
+            </div>
+          </Card>
+        )
+        : assignments.map(a => {
+          const effectiveStatus = submissions[a.id] === 'submitted' ? 'submitted' : a.status
+          const sc = statusConfig[effectiveStatus] || statusConfig['not-started']
+          const due = new Date(a.dueDate)
+          const diff = Math.ceil((due - new Date()) / 86400000)
+          const isSubmitted = effectiveStatus === 'submitted'
+          return (
+            <Card key={a.id} className={`group transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${effectiveStatus === 'late' ? 'border-red-200 dark:border-red-900' : ''}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${isSubmitted ? 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' : effectiveStatus === 'late' ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' : 'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                    <Icon d={sc.icon} size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">{a.title}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <Badge color={sc.color}>{sc.label}</Badge>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">Due {a.dueDate}</span>
+                      {!isSubmitted && (
+                        <span className={`text-xs font-medium ${diff < 0 ? 'text-red-500 dark:text-red-400' : diff <= 3 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                          {diff < 0 ? `${Math.abs(diff)}d overdue` : `${diff}d remaining`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Btn size="sm" variant="secondary"><Icon d={IC.eye} size={13} />View</Btn>
+                  {!isSubmitted && (
+                    <Btn size="sm" variant="success" onClick={() => onSubmit(a.id)}>
+                      <Icon d={IC.upload} size={13} />Submit
+                    </Btn>
+                  )}
+                  {isSubmitted && <span className="inline-flex items-center gap-1 rounded-lg bg-green-50 dark:bg-green-950/40 px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300"><Icon d={IC.check} size={11} />Submitted</span>}
+                </div>
+              </div>
+            </Card>
+          )
+        })
+      }
+    </div>
+  )
+}
+
+// ── Resources Tab ─────────────────────────────────────────────────────────────
+
+function LHResourcesTab({ resources, bookmarks, onBookmark }) {
+  const typeConfig = {
+    pdf:   { icon: IC.filePdf,        label: 'PDF',   bg: 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' },
+    word:  { icon: IC.fileText,       label: 'Word',  bg: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400' },
+    excel: { icon: IC.fileSpreadsheet,label: 'Excel', bg: 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' },
+    zip:   { icon: IC.archive,        label: 'ZIP',   bg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' },
+    link:  { icon: IC.externalLink,   label: 'Link',  bg: 'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400' },
+  }
+  return (
+    <div className="space-y-3">
+      {resources.length === 0
+        ? <Card><div className="flex flex-col items-center gap-3 py-8"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700"><Icon d={IC.paperclip} size={24}/></div><p className="text-sm font-medium text-slate-600 dark:text-slate-400">No resources uploaded yet</p></div></Card>
+        : resources.map(r => {
+          const tc = typeConfig[r.type] || typeConfig.link
+          return (
+            <Card key={r.id} className="group hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tc.bg}`}>
+                    <Icon d={tc.icon} size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{r.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Badge color={r.type === 'pdf' ? 'red' : r.type === 'link' ? 'purple' : r.type === 'zip' ? 'yellow' : r.type === 'excel' ? 'green' : 'blue'}>{tc.label}</Badge>
+                      {r.size && <span className="text-xs text-slate-400 dark:text-slate-500">{r.size}</span>}
+                      <span className="text-xs text-slate-400 dark:text-slate-500">{r.uploadDate}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => onBookmark(r.id)} title={bookmarks[r.id] ? 'Remove bookmark' : 'Bookmark'}
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks[r.id] ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-500' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
+                    <Icon d={IC.star} size={14} />
+                  </button>
+                  {r.type === 'link'
+                    ? <a href={r.url || '#'} target="_blank" rel="noreferrer"><Btn size="sm"><Icon d={IC.externalLink} size={13} />Open</Btn></a>
+                    : <><Btn size="sm" variant="secondary"><Icon d={IC.eye} size={13} />View</Btn><Btn size="sm"><Icon d={IC.download} size={13} />Download</Btn></>
+                  }
+                </div>
+              </div>
+            </Card>
+          )
+        })
+      }
+    </div>
+  )
+}
+
+// ── Recordings Tab ────────────────────────────────────────────────────────────
+
+function LHRecordingsTab({ recordings }) {
+  return (
+    <div className="space-y-3">
+      {recordings.length === 0
+        ? <Card><div className="flex flex-col items-center gap-3 py-8"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700"><Icon d={IC.video} size={24}/></div><p className="text-sm font-medium text-slate-600 dark:text-slate-400">No recordings available yet</p></div></Card>
+        : recordings.map(r => (
+          <Card key={r.id} className="group hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-900 dark:bg-slate-700 text-white">
+                  <Icon d={IC.playCircle} size={22} />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{r.title}</p>
+                  <div className="flex items-center gap-3 mt-0.5">
+                    <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
+                      <Icon d={IC.clock} size={11} />{r.duration}
+                    </span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">{r.uploadDate}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <a href={r.url} target="_blank" rel="noreferrer">
+                  <Btn size="sm"><Icon d={IC.playCircle} size={13} />Watch</Btn>
+                </a>
+                <a href={r.url} target="_blank" rel="noreferrer">
+                  <Btn size="sm" variant="secondary"><Icon d={IC.externalLink} size={13} />Open Link</Btn>
+                </a>
+              </div>
+            </div>
+          </Card>
+        ))
+      }
+    </div>
+  )
+}
+
+// ── Grades Tab ────────────────────────────────────────────────────────────────
+
+function LHGradesTab({ assignments, quizzes, project, submissions, course, cc }) {
+  const submittedAssignments = assignments.filter(a => (submissions[a.id] === 'submitted' || a.status === 'submitted') && a.grade != null)
+  const allGradedItems = [
+    ...submittedAssignments.map(a => ({ ...a, category: 'assignment', pct: Math.round((a.grade / a.max) * 100) })),
+    ...quizzes.map(q => ({ ...q, category: 'quiz', pct: Math.round((q.grade / q.max) * 100) })),
+    { ...project, category: 'project', pct: Math.round((project.grade / project.max) * 100) },
+  ]
+  const courseAvg = allGradedItems.length > 0 ? Math.round(allGradedItems.reduce((s, i) => s + i.pct, 0) / allGradedItems.length) : 0
+  const studentAvg = courseAvg - 3 + Math.floor(Math.random() * 6)
+
+  const gradeColor = (pct) => pct >= 85 ? 'text-green-700 dark:text-green-400' : pct >= 70 ? 'text-blue-700 dark:text-blue-400' : pct >= 50 ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'
+  const gradeBg    = (pct) => pct >= 85 ? 'bg-green-50 dark:bg-green-950/40' : pct >= 70 ? 'bg-blue-50 dark:bg-blue-950/40' : pct >= 50 ? 'bg-amber-50 dark:bg-amber-950/40' : 'bg-red-50 dark:bg-red-950/40'
+  const gradeLetter = (pct) => pct >= 90 ? 'A+' : pct >= 85 ? 'A' : pct >= 80 ? 'A-' : pct >= 75 ? 'B+' : pct >= 70 ? 'B' : pct >= 65 ? 'B-' : pct >= 60 ? 'C+' : pct >= 55 ? 'C' : 'F'
+
+  return (
+    <div className="space-y-5">
+      {/* Summary analytics */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className={`rounded-xl p-4 ${gradeBg(courseAvg)} transition-all hover:-translate-y-0.5 hover:shadow-sm`}>
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Course Average</p>
+          <p className={`text-3xl font-bold ${gradeColor(courseAvg)}`}>{courseAvg}%</p>
+          <p className={`text-sm font-semibold mt-1 ${gradeColor(courseAvg)}`}>{gradeLetter(courseAvg)}</p>
+        </div>
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-700/40 transition-all hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Class Average</p>
+          <p className="text-3xl font-bold text-slate-700 dark:text-slate-300">{studentAvg}%</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">{gradeLetter(studentAvg)}</p>
+        </div>
+        <div className="col-span-2 sm:col-span-1 rounded-xl p-4 bg-slate-50 dark:bg-slate-700/40 transition-all hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Graded Items</p>
+          <p className="text-3xl font-bold text-slate-700 dark:text-slate-300">{allGradedItems.length}</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">of {assignments.length + quizzes.length + 1} total</p>
+        </div>
+      </div>
+
+      {/* Assignment Grades */}
+      {submittedAssignments.length > 0 && (
+        <Card>
+          <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Assignment Grades</h3>
+          <div className="space-y-3">
+            {submittedAssignments.map(a => (
+              <div key={a.id} className="flex items-center gap-3 group">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      <span className={`text-sm font-bold ${gradeColor(Math.round((a.grade / a.max) * 100))}`}>{a.grade}/{a.max}</span>
+                      <span className={`text-xs font-semibold ${gradeColor(Math.round((a.grade / a.max) * 100))}`}>{Math.round((a.grade / a.max) * 100)}%</span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                    <div className={`h-1.5 rounded-full transition-all duration-700 ${Math.round((a.grade / a.max) * 100) >= 85 ? 'bg-green-500' : Math.round((a.grade / a.max) * 100) >= 70 ? 'bg-blue-500' : 'bg-amber-500'}`} style={{ width: `${(a.grade / a.max) * 100}%` }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Quiz / Exam Grades */}
+      <Card>
+        <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Quiz & Exam Grades</h3>
+        <div className="space-y-3">
+          {quizzes.map(q => (
+            <div key={q.id} className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{q.title}</p>
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <span className={`text-sm font-bold ${gradeColor(Math.round((q.grade / q.max) * 100))}`}>{q.grade}/{q.max}</span>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gradeBg(Math.round((q.grade / q.max) * 100))} ${gradeColor(Math.round((q.grade / q.max) * 100))}`}>{gradeLetter(Math.round((q.grade / q.max) * 100))}</span>
+                  </div>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                  <div className={`h-1.5 rounded-full transition-all duration-700 ${Math.round((q.grade / q.max) * 100) >= 85 ? 'bg-green-500' : Math.round((q.grade / q.max) * 100) >= 70 ? 'bg-blue-500' : 'bg-amber-500'}`} style={{ width: `${(q.grade / q.max) * 100}%` }} />
+                </div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{q.date}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Project Grade */}
+      <Card>
+        <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Project Grade</h3>
+        <div className={`rounded-xl p-4 ${gradeBg(project.pct || Math.round((project.grade / project.max) * 100))}`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-slate-800 dark:text-slate-200">{project.title}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{project.date}</p>
+            </div>
+            <div className="text-right">
+              <p className={`text-3xl font-bold ${gradeColor(Math.round((project.grade / project.max) * 100))}`}>{project.grade}/{project.max}</p>
+              <p className={`text-sm font-semibold ${gradeColor(Math.round((project.grade / project.max) * 100))}`}>{gradeLetter(Math.round((project.grade / project.max) * 100))} · {Math.round((project.grade / project.max) * 100)}%</p>
+            </div>
+          </div>
+          <div className="mt-3 h-2 w-full rounded-full bg-white/50 dark:bg-slate-600/50 overflow-hidden">
+            <div className={`h-2 rounded-full transition-all duration-700 ${Math.round((project.grade / project.max) * 100) >= 85 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${(project.grade / project.max) * 100}%` }} />
+          </div>
+        </div>
+      </Card>
+    </div>
+  )
+}
 
 function ScheduleSection({ profile }) {
   const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday']
@@ -2725,6 +3373,7 @@ const navItems=[
     {id:'overview',label:'Overview',icon:IC.home},
     {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
     {id:'projects',label:'My Projects',icon:IC.folder},
+    {id:'learning',label:'Learning Hub',icon:IC.graduationCap},
     {id:'schedule',label:'Schedule',icon:IC.calendar},
     {id:'invitations',label:'Invitations',icon:IC.users,badge:invites},
     {id:'instructors',label:'Find Instructors',icon:IC.book},
@@ -3145,7 +3794,8 @@ const navItems=[
             {tab==='stats'&&<StatsSection projects={projects} profile={p}/>}
             {tab==='settings'&&<SettingsSection profile={p} rawUser={rawUser} initialTab={settingsTab}/>}
             {tab==='schedule'&&<ScheduleSection profile={p}/>}
-            {tab==='notifications'&&<NotificationsSection notifications={notifications} setNotifications={setNotifications} profileEmail={rawUser.email} setTab={setTab}/>}
+{tab==='notifications'&&<NotificationsSection notifications={notifications} setNotifications={setNotifications} profileEmail={rawUser.email} setTab={setTab}/>}
+            {tab==='learning'&&<LearningHubSection profile={p}/>}
           </div>
         </main>
       </div>
