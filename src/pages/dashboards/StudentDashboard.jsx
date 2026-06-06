@@ -89,24 +89,6 @@ zap:'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
   teamwork:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0',
   grid:'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z',
   sparkle:'M12 3v1m0 16v1M4.22 4.22l.71.71m12.02 12.02l.71.71M3 12h1m16 0h1M4.22 19.78l.71-.71M18.93 5.93l.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z',
-  graduationCap:'M22 10v6M2 10l10-5 10 5-10 5z M6 12v5c3 3 9 3 12 0v-5',
-  playCircle:'M12 22a10 10 0 100-20 10 10 0 000 20zM10 8l6 4-6 4V8z',
-  video:'M23 7l-7 5 7 5V7zM1 5h15a2 2 0 012 2v10a2 2 0 01-2 2H1V5z',
-  paperclip:'M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48',
-  externalLink:'M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3',
-  filePdf:'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M9 13h6M9 17h6M9 9h1',
-  fileSpreadsheet:'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8M8 9h2',
-  archive:'M21 8v13H3V8M23 3H1v5h22V3zM10 12h4',
-  trophy:'M8.21 13.89L7 23l5-3 5 3-1.21-9.12M12 2a7 7 0 100 14A7 7 0 0012 2z',
-  bookOpen:'M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z',
-  alertCircle:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 8v4M12 16h.01',
-  megaphone:'M3 11l19-9-9 19-2-8-8-2zM11 13l3-3',
-  history:'M12 8v4l3 3M3.05 11a9 9 0 109-8.77',
-  bookmark:'M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z',
-  bookmarkFilled:'M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z',
-  info:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 16v-4M12 8h.01',
-  filter:'M22 3H2l8 9.46V19l4 2v-8.54L22 3z',
-  percent:'M19 5L5 19M6.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z',
 }
 
 const Badge = ({ children, color = 'blue' }) => {
@@ -2230,7 +2212,7 @@ function NotificationsSection({ notifications, setNotifications, profileEmail, s
                 </div>
               </div>
             )
-          })}
+          })}1
         </div>
       }
     </div>
@@ -2560,114 +2542,263 @@ function SettingsSection({ profile, rawUser, initialTab='appearance' }) {
       </div>
     </div>
   )
+}
 // ═══════════════════════════════════════════════════════════════════════════
-// LEARNING HUB
+// LEARNING HUB — seed data helpers
 // ═══════════════════════════════════════════════════════════════════════════
 
 const LH_COURSES = [
-  { id:'csen401', code:'CSEN 401', name:'Computer Programming Lab',    instructor:'Dr. Sherif Aly',        description:'Advanced programming techniques using modern languages and tools. Topics include data structures, algorithms, and software design patterns.', color:'blue',   progress:72, totalMaterials:38 },
-  { id:'csen501', code:'CSEN 501', name:'Software Engineering',        instructor:'Dr. Mervat Abuelkheir', description:'Software development lifecycle, requirements engineering, design patterns, testing methodologies, and project management.',                    color:'purple', progress:55, totalMaterials:44 },
-  { id:'csen603', code:'CSEN 603', name:'Computer Networks',           instructor:'Dr. Nora Samir',        description:'Network architectures, protocols, TCP/IP stack, routing algorithms, network security fundamentals, and wireless communications.',              color:'green',  progress:40, totalMaterials:31 },
-  { id:'dmet501', code:'DMET 501', name:'Database Systems',            instructor:'Dr. Karim Fathy',       description:'Relational and non-relational databases, SQL, normalization theory, query optimization, and modern NoSQL approaches.',                        color:'amber',  progress:88, totalMaterials:27 },
-  { id:'csen701', code:'CSEN 701', name:'Artificial Intelligence',     instructor:'Dr. Ahmed Hassan',      description:'Foundations of AI including search algorithms, machine learning, neural networks, natural language processing, and computer vision.',           color:'rose',   progress:30, totalMaterials:52 },
+  {
+    id: 'csen401', code: 'CSEN 401', name: 'Computer Programming Lab',
+    instructor: 'Dr. Sherif Aly', description: 'Advanced programming techniques using modern languages and tools. Topics include data structures, algorithms, and software design patterns.',
+    color: 'blue', progress: 72, totalMaterials: 38,
+  },
+  {
+    id: 'csen501', code: 'CSEN 501', name: 'Software Engineering',
+    instructor: 'Dr. Mervat Abuelkheir', description: 'Software development lifecycle, requirements engineering, design patterns, testing methodologies, and project management.',
+    color: 'purple', progress: 55, totalMaterials: 44,
+  },
+  {
+    id: 'csen603', code: 'CSEN 603', name: 'Computer Networks',
+    instructor: 'Dr. Nora Samir', description: 'Network architectures, protocols, TCP/IP stack, routing algorithms, network security fundamentals, and wireless communications.',
+    color: 'green', progress: 40, totalMaterials: 31,
+  },
+  {
+    id: 'dmet501', code: 'DMET 501', name: 'Database Systems',
+    instructor: 'Dr. Karim Fathy', description: 'Relational and non-relational databases, SQL, normalization theory, query optimization, and modern NoSQL approaches.',
+    color: 'amber', progress: 88, totalMaterials: 27,
+  },
+  {
+    id: 'csen701', code: 'CSEN 701', name: 'Artificial Intelligence',
+    instructor: 'Dr. Ahmed Hassan', description: 'Foundations of AI including search algorithms, machine learning, neural networks, natural language processing, and computer vision.',
+    color: 'rose', progress: 30, totalMaterials: 52,
+  },
 ]
-
-const LH_COLOR_MAP = {
-  blue:   { bg:'bg-blue-50 dark:bg-blue-950/40',     text:'text-blue-700 dark:text-blue-300',     bar:'bg-blue-600',   dot:'bg-blue-500',   border:'border-blue-200 dark:border-blue-800',     icon:'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300' },
-  purple: { bg:'bg-purple-50 dark:bg-purple-950/40', text:'text-purple-700 dark:text-purple-300', bar:'bg-purple-600', dot:'bg-purple-500', border:'border-purple-200 dark:border-purple-800', icon:'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300' },
-  green:  { bg:'bg-green-50 dark:bg-green-950/40',   text:'text-green-700 dark:text-green-300',   bar:'bg-green-600',  dot:'bg-green-500',  border:'border-green-200 dark:border-green-800',   icon:'bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300' },
-  amber:  { bg:'bg-amber-50 dark:bg-amber-950/40',   text:'text-amber-700 dark:text-amber-300',   bar:'bg-amber-500',  dot:'bg-amber-500',  border:'border-amber-200 dark:border-amber-800',   icon:'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300' },
-  rose:   { bg:'bg-rose-50 dark:bg-rose-950/40',     text:'text-rose-700 dark:text-rose-300',     bar:'bg-rose-600',   dot:'bg-rose-500',   border:'border-rose-200 dark:border-rose-800',     icon:'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300' },
-}
 
 function buildCourseData(courseId) {
   const seed = courseId.charCodeAt(0) + courseId.charCodeAt(courseId.length - 1)
   const rng = (n, offset = 0) => ((seed * (n + 1) * 31) % 89) + offset
+
   const weeks = ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6','Week 7','Week 8']
   const instructors = {
-    csen401:'Dr. Sherif Aly', csen501:'Dr. Mervat Abuelkheir',
-    csen603:'Dr. Nora Samir', dmet501:'Dr. Karim Fathy', csen701:'Dr. Ahmed Hassan',
+    csen401: 'Dr. Sherif Aly', csen501: 'Dr. Mervat Abuelkheir',
+    csen603: 'Dr. Nora Samir', dmet501: 'Dr. Karim Fathy', csen701: 'Dr. Ahmed Hassan',
   }
   const inst = instructors[courseId] || 'Dr. GUC Instructor'
 
   const lectures = weeks.slice(0, 6).map((w, i) => ({
-    id:`lec_${courseId}_${i}`, type:'lecture',
-    title:['Introduction & Course Overview','Core Concepts & Fundamentals','Deep Dive: Part I','Deep Dive: Part II','Advanced Topics','Case Studies & Applications'][i],
-    week:w, uploadDate:`2026-0${Math.min(i+2,9)}-${String(10+i*3).padStart(2,'0')}`, instructor:inst, courseId,
+    id: `lec_${courseId}_${i}`, title: [
+      'Introduction & Course Overview','Core Concepts & Fundamentals','Deep Dive: Part I',
+      'Deep Dive: Part II','Advanced Topics','Case Studies & Applications',
+    ][i],
+    week: w, uploadDate: `2026-0${Math.min(i + 2, 9)}-${String(10 + i * 3).padStart(2,'0')}`,
+    instructor: inst, bookmarked: i === 1,
   }))
+
   const tutorials = weeks.slice(0, 4).map((w, i) => ({
-    id:`tut_${courseId}_${i}`, type:'tutorial',
-    title:['Tutorial 1: Basics','Tutorial 2: Problem Solving','Tutorial 3: Practice Problems','Tutorial 4: Exam Prep'][i],
-    week:w, uploadDate:`2026-0${Math.min(i+2,9)}-${String(14+i*4).padStart(2,'0')}`, instructor:inst, courseId,
+    id: `tut_${courseId}_${i}`, title: ['Tutorial 1: Basics','Tutorial 2: Problem Solving','Tutorial 3: Practice Problems','Tutorial 4: Exam Prep'][i],
+    week: w, uploadDate: `2026-0${Math.min(i + 2, 9)}-${String(14 + i * 4).padStart(2,'0')}`,
+    instructor: inst, bookmarked: false,
   }))
+
   const now = new Date()
-  const assignments = [
-    { title:'Assignment 1: Foundations',         daysOffset:-20, status:'submitted',   grade:88+(seed%8),  max:100 },
-    { title:'Assignment 2: Core Implementation', daysOffset:-7,  status:'submitted',   grade:79+(seed%12), max:100 },
-    { title:'Assignment 3: Advanced Challenge',  daysOffset:5,   status:'in-progress', grade:null,         max:100 },
-    { title:'Assignment 4: Final Project',       daysOffset:18,  status:'not-started', grade:null,         max:100 },
-  ].map((a, i) => {
+  const assignmentDefs = [
+    { title: 'Assignment 1: Foundations', daysOffset: -20, status: 'submitted', grade: 88 + (seed % 8), max: 100 },
+    { title: 'Assignment 2: Core Implementation', daysOffset: -7, status: 'submitted', grade: 79 + (seed % 12), max: 100 },
+    { title: 'Assignment 3: Advanced Challenge', daysOffset: 5, status: 'in-progress', grade: null, max: 100 },
+    { title: 'Assignment 4: Final Project', daysOffset: 18, status: 'not-started', grade: null, max: 100 },
+  ]
+  const assignments = assignmentDefs.map((a, i) => {
     const due = new Date(now); due.setDate(now.getDate() + a.daysOffset)
-    const diff = Math.ceil((due - now) / 86400000)
-    return { id:`asgn_${courseId}_${i}`, type:'assignment', title:a.title, dueDate:due.toISOString().slice(0,10), status:(diff<0&&a.status!=='submitted')?'late':a.status, grade:a.grade, max:a.max, courseId }
+    const diffDays = Math.ceil((due - now) / 86400000)
+    const isLate = diffDays < 0 && a.status !== 'submitted'
+    return {
+      id: `asgn_${courseId}_${i}`, title: a.title,
+      dueDate: due.toISOString().slice(0, 10),
+      status: isLate ? 'late' : a.status,
+      grade: a.grade, max: a.max,
+    }
   })
+
   const resources = [
-    { id:`res_${courseId}_0`, type:'resource', subtype:'pdf',   title:'Course Textbook (PDF)',   size:'12.4 MB', uploadDate:'2026-02-01', courseId },
-    { id:`res_${courseId}_1`, type:'resource', subtype:'pdf',   title:'Lab Manual',              size:'3.2 MB',  uploadDate:'2026-02-05', courseId },
-    { id:`res_${courseId}_2`, type:'resource', subtype:'zip',   title:'Lecture Slides Pack',     size:'28.7 MB', uploadDate:'2026-03-10', courseId },
-    { id:`res_${courseId}_3`, type:'resource', subtype:'excel', title:'Grade Sheet Template',    size:'0.4 MB',  uploadDate:'2026-02-08', courseId },
-    { id:`res_${courseId}_4`, type:'resource', subtype:'word',  title:'Project Specification',   size:'1.1 MB',  uploadDate:'2026-04-01', courseId },
-    { id:`res_${courseId}_5`, type:'resource', subtype:'link',  title:'Reference Documentation', url:'https://docs.example.com', uploadDate:'2026-02-15', courseId },
+    { id: `res_${courseId}_0`, title: 'Course Textbook (PDF)', type: 'pdf',     size: '12.4 MB', uploadDate: '2026-02-01' },
+    { id: `res_${courseId}_1`, title: 'Lab Manual',            type: 'pdf',     size: '3.2 MB',  uploadDate: '2026-02-05' },
+    { id: `res_${courseId}_2`, title: 'Lecture Slides Pack',   type: 'zip',     size: '28.7 MB', uploadDate: '2026-03-10' },
+    { id: `res_${courseId}_3`, title: 'Grade Sheet Template',  type: 'excel',   size: '0.4 MB',  uploadDate: '2026-02-08' },
+    { id: `res_${courseId}_4`, title: 'Project Specification', type: 'word',    size: '1.1 MB',  uploadDate: '2026-04-01' },
+    { id: `res_${courseId}_5`, title: 'Reference Documentation', type: 'link',  url: 'https://docs.example.com', uploadDate: '2026-02-15' },
   ]
+
   const recordings = lectures.slice(0, 5).map((l, i) => ({
-    id:`rec_${courseId}_${i}`, type:'recording', title:l.title+' (Recording)',
-    duration:`${40+rng(i+10)}:${String(rng(i+7)+5).padStart(2,'0')}`, uploadDate:l.uploadDate, url:'https://youtu.be/dQw4w9WgXcQ', courseId,
+    id: `rec_${courseId}_${i}`, title: l.title + ' (Recording)',
+    duration: `${40 + rng(i, 10)}:${String(rng(i + 7, 5)).padStart(2,'0')}`,
+    uploadDate: l.uploadDate, url: 'https://youtu.be/dQw4w9WgXcQ',
   }))
+
   const quizGrades = [
-    { id:`q_${courseId}_0`, title:'Quiz 1',      grade:14+(seed%6),  max:20,  date:'2026-03-05' },
-    { id:`q_${courseId}_1`, title:'Quiz 2',      grade:17+(seed%3),  max:20,  date:'2026-04-10' },
-    { id:`q_${courseId}_2`, title:'Midterm Exam',grade:68+(seed%15), max:100, date:'2026-04-20' },
+    { id: `q_${courseId}_0`, title: 'Quiz 1', grade: 14 + (seed % 6), max: 20, date: '2026-03-05' },
+    { id: `q_${courseId}_1`, title: 'Quiz 2', grade: 17 + (seed % 3), max: 20, date: '2026-04-10' },
+    { id: `q_${courseId}_2`, title: 'Midterm Exam', grade: 68 + (seed % 15), max: 100, date: '2026-04-20' },
   ]
-  const projectGrade = { id:`pg_${courseId}_0`, title:'Course Project', grade:82+(seed%10), max:100, date:'2026-05-15' }
+  const projectGrade = { id: `pg_${courseId}_0`, title: 'Course Project', grade: 82 + (seed % 10), max: 100, date: '2026-05-15' }
+
   const announcements = [
-    { id:`ann_${courseId}_0`, title:'Office Hours Updated',  message:'Office hours for this week have been moved to Thursday 3–5 PM.',             date:'2026-05-28', type:'info' },
-    { id:`ann_${courseId}_1`, title:'Assignment 3 Extended', message:'Due to the midterm, Assignment 3 deadline has been extended by 3 days.',     date:'2026-05-25', type:'warning' },
-    { id:`ann_${courseId}_2`, title:'New Tutorial Uploaded', message:'Tutorial 4 covering exam preparation topics is now available.',               date:'2026-05-22', type:'success' },
+    { id: `ann_${courseId}_0`, title: 'Office Hours Updated', message: 'Office hours for this week have been moved to Thursday 3–5 PM.', date: '2026-05-28', type: 'info' },
+    { id: `ann_${courseId}_1`, title: 'Assignment 3 Extended', message: 'Due to the midterm, Assignment 3 deadline has been extended by 3 days.', date: '2026-05-25', type: 'warning' },
+    { id: `ann_${courseId}_2`, title: 'New Tutorial Uploaded', message: 'Tutorial 4 covering exam preparation topics is now available.', date: '2026-05-22', type: 'success' },
   ]
+
   return { lectures, tutorials, assignments, resources, recordings, quizGrades, projectGrade, announcements }
 }
 
-// ── Overview Tab ──────────────────────────────────────────────────────────────
+// ── Learning Hub Main Component ─────────────────────────────────────────────
+
+function LearningHubSection({ profile }) {
+  const [selectedCourseId, setSelectedCourseId] = useState(LH_COURSES[0].id)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [bookmarks, setBookmarks] = useLS('lh_bookmarks_' + profile.email, {})
+  const [submissions, setSubmissions] = useLS('lh_submissions_' + profile.email, {})
+
+  const course = LH_COURSES.find(c => c.id === selectedCourseId) || LH_COURSES[0]
+  const data = buildCourseData(selectedCourseId)
+
+  const toggleBookmark = (itemId) => setBookmarks(prev => ({ ...prev, [itemId]: !prev[itemId] }))
+  const submitAssignment = (aId) => setSubmissions(prev => ({ ...prev, [aId]: 'submitted' }))
+
+  const colorMap = {
+    blue:   { bg: 'bg-blue-50 dark:bg-blue-950/40',   text: 'text-blue-700 dark:text-blue-300',   bar: 'bg-blue-600',     dot: 'bg-blue-500',     border: 'border-blue-200 dark:border-blue-800',   icon: 'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300' },
+    purple: { bg: 'bg-purple-50 dark:bg-purple-950/40',text: 'text-purple-700 dark:text-purple-300',bar: 'bg-purple-600',   dot: 'bg-purple-500',   border: 'border-purple-200 dark:border-purple-800', icon: 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300' },
+    green:  { bg: 'bg-green-50 dark:bg-green-950/40',  text: 'text-green-700 dark:text-green-300',  bar: 'bg-green-600',    dot: 'bg-green-500',    border: 'border-green-200 dark:border-green-800',   icon: 'bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300' },
+    amber:  { bg: 'bg-amber-50 dark:bg-amber-950/40',  text: 'text-amber-700 dark:text-amber-300',  bar: 'bg-amber-500',    dot: 'bg-amber-500',    border: 'border-amber-200 dark:border-amber-800',   icon: 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300' },
+    rose:   { bg: 'bg-rose-50 dark:bg-rose-950/40',    text: 'text-rose-700 dark:text-rose-300',    bar: 'bg-rose-600',     dot: 'bg-rose-500',     border: 'border-rose-200 dark:border-rose-800',     icon: 'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300' },
+  }
+  const cc = colorMap[course.color] || colorMap.blue
+
+  const TABS = [
+    { id: 'overview',     label: 'Overview',     icon: IC.home },
+    { id: 'lectures',     label: 'Lectures',     icon: IC.bookOpen },
+    { id: 'tutorials',    label: 'Tutorials',    icon: IC.book },
+    { id: 'assignments',  label: 'Assignments',  icon: IC.task },
+    { id: 'resources',    label: 'Resources',    icon: IC.paperclip },
+    { id: 'recordings',   label: 'Recordings',   icon: IC.video },
+    { id: 'grades',       label: 'Grades',       icon: IC.trophy },
+  ]
+
+  return (
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+
+      {/* ── Left Panel: Course List ── */}
+      <aside className="w-full lg:w-56 shrink-0">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+          <div className="border-b border-slate-100 dark:border-slate-700 px-4 py-3 bg-slate-50 dark:bg-slate-700/30">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">My Courses</p>
+          </div>
+          <nav className="p-2 space-y-0.5">
+            {LH_COURSES.map(c => {
+              const cm = colorMap[c.color] || colorMap.blue
+              const isActive = c.id === selectedCourseId
+              return (
+                <button key={c.id} onClick={() => { setSelectedCourseId(c.id); setActiveTab('overview') }}
+                  className={`group w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all duration-150 ${isActive ? 'bg-blue-700 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:translate-x-0.5'}`}>
+                  <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${isActive ? 'bg-white' : cm.dot}`} />
+                  <div className="min-w-0">
+                    <p className={`text-xs font-semibold leading-tight ${isActive ? 'text-white' : 'text-slate-800 dark:text-slate-200'}`}>{c.code}</p>
+                    <p className={`text-[11px] leading-snug mt-0.5 truncate ${isActive ? 'text-blue-200' : 'text-slate-400 dark:text-slate-500'}`}>{c.name}</p>
+                    <div className={`mt-1.5 h-1 w-full rounded-full overflow-hidden ${isActive ? 'bg-blue-500' : 'bg-slate-100 dark:bg-slate-600'}`}>
+                      <div className={`h-1 rounded-full transition-all duration-500 ${isActive ? 'bg-white' : cm.bar}`} style={{ width: `${c.progress}%` }} />
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+      </aside>
+
+      {/* ── Right Panel: Course Workspace ── */}
+      <div className="flex-1 min-w-0 space-y-5">
+
+        {/* Course Header */}
+        <div className={`rounded-xl border ${cc.border} ${cc.bg} p-5`}>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${cc.icon}`}>{course.code}</span>
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{course.name}</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{course.instructor}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl">{course.description}</p>
+            </div>
+            <div className="shrink-0 flex flex-col items-end gap-2 min-w-[120px]">
+              <div className="text-right">
+                <p className={`text-3xl font-bold ${cc.text}`}>{course.progress}%</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">complete</p>
+              </div>
+              <div className="w-28 h-2 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
+                <div className={`h-2 rounded-full transition-all duration-700 ${cc.bar}`} style={{ width: `${course.progress}%` }} />
+              </div>
+              <p className="text-xs text-slate-400 dark:text-slate-500">{course.totalMaterials} materials</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Bar */}
+        <div className="flex gap-1 overflow-x-auto rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${activeTab === t.id ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+              <Icon d={t.icon} size={13} />
+              <span className="hidden sm:inline">{t.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && <LHOverviewTab course={course} data={data} cc={cc} />}
+        {activeTab === 'lectures' && <LHMaterialsTab items={data.lectures} kind="Lecture" bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+        {activeTab === 'tutorials' && <LHMaterialsTab items={data.tutorials} kind="Tutorial" bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+        {activeTab === 'assignments' && <LHAssignmentsTab assignments={data.assignments} submissions={submissions} onSubmit={submitAssignment} />}
+        {activeTab === 'resources' && <LHResourcesTab resources={data.resources} bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+        {activeTab === 'recordings' && <LHRecordingsTab recordings={data.recordings} />}
+        {activeTab === 'grades' && <LHGradesTab assignments={data.assignments} quizzes={data.quizGrades} project={data.projectGrade} submissions={submissions} course={course} cc={cc} />}
+      </div>
+    </div>
+  )
+}
+
+// ── Overview Tab ─────────────────────────────────────────────────────────────
 
 function LHOverviewTab({ course, data, cc }) {
   const { announcements, lectures, tutorials, assignments, resources } = data
   const pending = assignments.filter(a => a.status === 'not-started' || a.status === 'in-progress')
   const annTypeStyle = {
-    info:    { bg:'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800',   text:'text-blue-700 dark:text-blue-300',   icon:IC.bell },
-    warning: { bg:'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800',text:'text-amber-700 dark:text-amber-300', icon:IC.alertCircle },
-    success: { bg:'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800',text:'text-green-700 dark:text-green-300', icon:IC.check },
+    info:    { bg: 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800',   text: 'text-blue-700 dark:text-blue-300',   icon: IC.bell },
+    warning: { bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800', text: 'text-amber-700 dark:text-amber-300', icon: IC.alertCircle },
+    success: { bg: 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300', icon: IC.check },
   }
   const statCards = [
-    { label:'Lectures',    value:lectures.length,    icon:IC.bookOpen,  color:'text-blue-700 dark:text-blue-400',   bg:'bg-blue-50 dark:bg-blue-950/40' },
-    { label:'Tutorials',   value:tutorials.length,   icon:IC.book,      color:'text-purple-700 dark:text-purple-400',bg:'bg-purple-50 dark:bg-purple-950/40' },
-    { label:'Assignments', value:assignments.length, icon:IC.task,      color:'text-amber-700 dark:text-amber-400', bg:'bg-amber-50 dark:bg-amber-950/40' },
-    { label:'Resources',   value:resources.length,   icon:IC.paperclip, color:'text-green-700 dark:text-green-400', bg:'bg-green-50 dark:bg-green-950/40' },
+    { label: 'Lectures',    value: lectures.length,   icon: IC.bookOpen,  color: 'text-blue-700 dark:text-blue-400',   bg: 'bg-blue-50 dark:bg-blue-950/40' },
+    { label: 'Tutorials',   value: tutorials.length,  icon: IC.book,      color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/40' },
+    { label: 'Assignments', value: assignments.length,icon: IC.task,      color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40' },
+    { label: 'Resources',   value: resources.length,  icon: IC.paperclip, color: 'text-green-700 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/40' },
   ]
   return (
     <div className="space-y-5">
+      {/* Stat mini cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {statCards.map(s => (
           <div key={s.label} className={`rounded-xl p-4 ${s.bg} transition-all duration-150 hover:-translate-y-0.5 hover:shadow-sm`}>
-            <div className="flex items-center justify-between mb-1"><Icon d={s.icon} size={14}/></div>
+            <div className="flex items-center justify-between mb-1"><Icon d={s.icon} size={14} /></div>
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
+      {/* Announcements */}
       <Card>
         <div className="mb-3 flex items-center gap-2">
-          <Icon d={IC.megaphone} size={15}/>
+          <Icon d={IC.megaphone} size={15} />
           <h3 className="font-semibold text-slate-800 dark:text-slate-200">Recent Announcements</h3>
         </div>
         <div className="space-y-2.5">
@@ -2677,7 +2808,7 @@ function LHOverviewTab({ course, data, cc }) {
               <div key={a.id} className={`rounded-lg border px-4 py-3 ${s.bg}`}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <Icon d={s.icon} size={13}/>
+                    <Icon d={s.icon} size={13} />
                     <p className={`text-sm font-semibold ${s.text}`}>{a.title}</p>
                   </div>
                   <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">{a.date}</span>
@@ -2689,6 +2820,7 @@ function LHOverviewTab({ course, data, cc }) {
         </div>
       </Card>
 
+      {/* Recent uploads + Upcoming deadlines */}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Recent Uploads</h3>
@@ -2696,7 +2828,7 @@ function LHOverviewTab({ course, data, cc }) {
             {[...data.lectures.slice(-2), ...data.tutorials.slice(-1)].map(item => (
               <li key={item.id} className="flex items-center gap-3 group">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                  <Icon d={IC.bookOpen} size={14}/>
+                  <Icon d={IC.bookOpen} size={14} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.title}</p>
@@ -2718,12 +2850,12 @@ function LHOverviewTab({ course, data, cc }) {
                 const urgency = diff < 0 ? 'red' : diff <= 3 ? 'red' : diff <= 7 ? 'yellow' : 'slate'
                 return (
                   <li key={a.id} className="flex items-center gap-3">
-                    <span className={`h-2 w-2 rounded-full shrink-0 ${urgency==='red'?'bg-red-500':urgency==='yellow'?'bg-amber-400':'bg-slate-300 dark:bg-slate-600'}`}/>
+                    <span className={`h-2 w-2 rounded-full shrink-0 ${urgency === 'red' ? 'bg-red-500' : urgency === 'yellow' ? 'bg-amber-400' : 'bg-slate-300 dark:bg-slate-600'}`} />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
                       <p className="text-xs text-slate-400 dark:text-slate-500">Due {a.dueDate}</p>
                     </div>
-                    <Badge color={urgency==='red'?'red':urgency==='yellow'?'yellow':'slate'}>
+                    <Badge color={urgency === 'red' ? 'red' : urgency === 'yellow' ? 'yellow' : 'slate'}>
                       {diff < 0 ? 'Overdue' : `${diff}d left`}
                     </Badge>
                   </li>
@@ -2737,21 +2869,20 @@ function LHOverviewTab({ course, data, cc }) {
   )
 }
 
-// ── Materials Tab (Lectures & Tutorials) ──────────────────────────────────────
+// ── Materials Tab (Lectures & Tutorials) ─────────────────────────────────────
 
-function LHMaterialsTab({ items, kind, bookmarks, onBookmark, onView }) {
+function LHMaterialsTab({ items, kind, bookmarks, onBookmark }) {
   const [search, setSearch] = useState('')
-  const filtered = items.filter(i => i.title.toLowerCase().includes(search.toLowerCase()) || (i.week||'').toLowerCase().includes(search.toLowerCase()))
-  const icon = kind === 'Lecture' ? IC.bookOpen : IC.book
+  const filtered = items.filter(i => i.title.toLowerCase().includes(search.toLowerCase()) || i.week.toLowerCase().includes(search.toLowerCase()))
   return (
     <div className="space-y-4">
-      <SearchBar value={search} onChange={setSearch} placeholder={`Search ${kind.toLowerCase()}s…`}/>
+      <SearchBar value={search} onChange={setSearch} placeholder={`Search ${kind.toLowerCase()}s…`} />
       {filtered.length === 0
         ? (
           <Card>
             <div className="flex flex-col items-center gap-3 py-8">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500">
-                <Icon d={icon} size={24}/>
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+                <Icon d={kind === 'Lecture' ? IC.bookOpen : IC.book} size={24} />
               </div>
               <div className="text-center">
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No {kind.toLowerCase()}s found</p>
@@ -2767,7 +2898,7 @@ function LHMaterialsTab({ items, kind, bookmarks, onBookmark, onView }) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 min-w-0">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                      <Icon d={icon} size={18}/>
+                      <Icon d={kind === 'Lecture' ? IC.bookOpen : IC.book} size={18} />
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{item.title}</p>
@@ -2780,11 +2911,11 @@ function LHMaterialsTab({ items, kind, bookmarks, onBookmark, onView }) {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button onClick={() => onBookmark(item.id)} title={bookmarks[item.id] ? 'Remove bookmark' : 'Bookmark'}
-                      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks[item.id] ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-500' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
-                      <Icon d={bookmarks[item.id] ? IC.bookmarkFilled : IC.bookmark} size={14}/>
+                      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks[item.id] ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-500' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
+                      <Icon d={IC.star} size={14} />
                     </button>
-                    <Btn size="sm" variant="secondary"><Icon d={IC.download} size={13}/>Download</Btn>
-                    <Btn size="sm" onClick={() => onView && onView(item)}><Icon d={IC.eye} size={13}/>View</Btn>
+                    <Btn size="sm" variant="secondary"><Icon d={IC.download} size={13} />Download</Btn>
+                    <Btn size="sm"><Icon d={IC.eye} size={13} />View</Btn>
                   </div>
                 </div>
               </Card>
@@ -2800,10 +2931,10 @@ function LHMaterialsTab({ items, kind, bookmarks, onBookmark, onView }) {
 
 function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
   const statusConfig = {
-    'submitted':   { label:'Submitted',   color:'green', icon:IC.check },
-    'in-progress': { label:'In Progress', color:'blue',  icon:IC.edit },
-    'not-started': { label:'Not Started', color:'slate', icon:IC.clock },
-    'late':        { label:'Late',        color:'red',   icon:IC.alertCircle },
+    'submitted':   { label: 'Submitted',   color: 'green',  icon: IC.check },
+    'in-progress': { label: 'In Progress', color: 'blue',   icon: IC.edit },
+    'not-started': { label: 'Not Started', color: 'slate',  icon: IC.clock },
+    'late':        { label: 'Late',        color: 'red',    icon: IC.alertCircle },
   }
   return (
     <div className="space-y-3">
@@ -2811,8 +2942,8 @@ function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
         ? (
           <Card>
             <div className="flex flex-col items-center gap-3 py-8">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500">
-                <Icon d={IC.task} size={24}/>
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
+                <Icon d={IC.task} size={24} />
               </div>
               <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No assignments yet</p>
             </div>
@@ -2825,11 +2956,11 @@ function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
           const diff = Math.ceil((due - new Date()) / 86400000)
           const isSubmitted = effectiveStatus === 'submitted'
           return (
-            <Card key={a.id} className={`group transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${effectiveStatus==='late'?'border-red-200 dark:border-red-900':''}`}>
+            <Card key={a.id} className={`group transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${effectiveStatus === 'late' ? 'border-red-200 dark:border-red-900' : ''}`}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${isSubmitted?'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400':effectiveStatus==='late'?'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400':'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
-                    <Icon d={sc.icon} size={18}/>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${isSubmitted ? 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' : effectiveStatus === 'late' ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' : 'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                    <Icon d={sc.icon} size={18} />
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-slate-800 dark:text-slate-200">{a.title}</p>
@@ -2837,7 +2968,7 @@ function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
                       <Badge color={sc.color}>{sc.label}</Badge>
                       <span className="text-xs text-slate-400 dark:text-slate-500">Due {a.dueDate}</span>
                       {!isSubmitted && (
-                        <span className={`text-xs font-medium ${diff<0?'text-red-500 dark:text-red-400':diff<=3?'text-amber-600 dark:text-amber-400':'text-slate-400 dark:text-slate-500'}`}>
+                        <span className={`text-xs font-medium ${diff < 0 ? 'text-red-500 dark:text-red-400' : diff <= 3 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
                           {diff < 0 ? `${Math.abs(diff)}d overdue` : `${diff}d remaining`}
                         </span>
                       )}
@@ -2845,13 +2976,13 @@ function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Btn size="sm" variant="secondary"><Icon d={IC.eye} size={13}/>View</Btn>
+                  <Btn size="sm" variant="secondary"><Icon d={IC.eye} size={13} />View</Btn>
                   {!isSubmitted && (
                     <Btn size="sm" variant="success" onClick={() => onSubmit(a.id)}>
-                      <Icon d={IC.upload} size={13}/>Submit
+                      <Icon d={IC.upload} size={13} />Submit
                     </Btn>
                   )}
-                  {isSubmitted && <span className="inline-flex items-center gap-1 rounded-lg bg-green-50 dark:bg-green-950/40 px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300"><Icon d={IC.check} size={11}/>Submitted</span>}
+                  {isSubmitted && <span className="inline-flex items-center gap-1 rounded-lg bg-green-50 dark:bg-green-950/40 px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300"><Icon d={IC.check} size={11} />Submitted</span>}
                 </div>
               </div>
             </Card>
@@ -2864,34 +2995,31 @@ function LHAssignmentsTab({ assignments, submissions, onSubmit }) {
 
 // ── Resources Tab ─────────────────────────────────────────────────────────────
 
-function LHResourcesTab({ resources, bookmarks, onBookmark, onView }) {
-  const typeCfg = {
-    pdf:   { icon:IC.filePdf,         badgeColor:'red',    bg:'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' },
-    word:  { icon:IC.fileText,        badgeColor:'blue',   bg:'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400' },
-    excel: { icon:IC.fileSpreadsheet, badgeColor:'green',  bg:'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' },
-    zip:   { icon:IC.archive,         badgeColor:'yellow', bg:'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' },
-    link:  { icon:IC.externalLink,    badgeColor:'purple', bg:'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400' },
+function LHResourcesTab({ resources, bookmarks, onBookmark }) {
+  const typeConfig = {
+    pdf:   { icon: IC.filePdf,        label: 'PDF',   bg: 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' },
+    word:  { icon: IC.fileText,       label: 'Word',  bg: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400' },
+    excel: { icon: IC.fileSpreadsheet,label: 'Excel', bg: 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400' },
+    zip:   { icon: IC.archive,        label: 'ZIP',   bg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' },
+    link:  { icon: IC.externalLink,   label: 'Link',  bg: 'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400' },
   }
-  // support both `type` (FILE 1) and `subtype` (FILE 2) field names
-  const getType = (r) => r.subtype || r.type || 'link'
   return (
     <div className="space-y-3">
       {resources.length === 0
-        ? <Card><div className="flex flex-col items-center gap-3 py-8"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500"><Icon d={IC.paperclip} size={24}/></div><p className="text-sm font-medium text-slate-600 dark:text-slate-400">No resources uploaded yet</p></div></Card>
+        ? <Card><div className="flex flex-col items-center gap-3 py-8"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700"><Icon d={IC.paperclip} size={24}/></div><p className="text-sm font-medium text-slate-600 dark:text-slate-400">No resources uploaded yet</p></div></Card>
         : resources.map(r => {
-          const t = getType(r)
-          const tc = typeCfg[t] || typeCfg.link
+          const tc = typeConfig[r.type] || typeConfig.link
           return (
             <Card key={r.id} className="group hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tc.bg}`}>
-                    <Icon d={tc.icon} size={18}/>
+                    <Icon d={tc.icon} size={18} />
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{r.title}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <Badge color={tc.badgeColor}>{t.toUpperCase()}</Badge>
+                      <Badge color={r.type === 'pdf' ? 'red' : r.type === 'link' ? 'purple' : r.type === 'zip' ? 'yellow' : r.type === 'excel' ? 'green' : 'blue'}>{tc.label}</Badge>
                       {r.size && <span className="text-xs text-slate-400 dark:text-slate-500">{r.size}</span>}
                       <span className="text-xs text-slate-400 dark:text-slate-500">{r.uploadDate}</span>
                     </div>
@@ -2899,12 +3027,12 @@ function LHResourcesTab({ resources, bookmarks, onBookmark, onView }) {
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button onClick={() => onBookmark(r.id)} title={bookmarks[r.id] ? 'Remove bookmark' : 'Bookmark'}
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks[r.id]?'bg-amber-50 dark:bg-amber-950/40 text-amber-500':'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
-                    <Icon d={bookmarks[r.id] ? IC.bookmarkFilled : IC.bookmark} size={14}/>
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks[r.id] ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-500' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
+                    <Icon d={IC.star} size={14} />
                   </button>
-                  {t === 'link'
-                    ? <a href={r.url || '#'} target="_blank" rel="noreferrer"><Btn size="sm"><Icon d={IC.externalLink} size={13}/>Open</Btn></a>
-                    : <><Btn size="sm" variant="secondary" onClick={() => onView && onView(r)}><Icon d={IC.eye} size={13}/>View</Btn><Btn size="sm"><Icon d={IC.download} size={13}/>Download</Btn></>
+                  {r.type === 'link'
+                    ? <a href={r.url || '#'} target="_blank" rel="noreferrer"><Btn size="sm"><Icon d={IC.externalLink} size={13} />Open</Btn></a>
+                    : <><Btn size="sm" variant="secondary"><Icon d={IC.eye} size={13} />View</Btn><Btn size="sm"><Icon d={IC.download} size={13} />Download</Btn></>
                   }
                 </div>
               </div>
@@ -2918,35 +3046,35 @@ function LHResourcesTab({ resources, bookmarks, onBookmark, onView }) {
 
 // ── Recordings Tab ────────────────────────────────────────────────────────────
 
-function LHRecordingsTab({ recordings, bookmarks, onBookmark, onView }) {
+function LHRecordingsTab({ recordings }) {
   return (
     <div className="space-y-3">
       {recordings.length === 0
-        ? <Card><div className="flex flex-col items-center gap-3 py-8"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500"><Icon d={IC.video} size={24}/></div><p className="text-sm font-medium text-slate-600 dark:text-slate-400">No recordings available yet</p></div></Card>
+        ? <Card><div className="flex flex-col items-center gap-3 py-8"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700"><Icon d={IC.video} size={24}/></div><p className="text-sm font-medium text-slate-600 dark:text-slate-400">No recordings available yet</p></div></Card>
         : recordings.map(r => (
           <Card key={r.id} className="group hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-900 dark:bg-slate-700 text-white">
-                  <Icon d={IC.playCircle} size={22}/>
+                  <Icon d={IC.playCircle} size={22} />
                 </div>
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{r.title}</p>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500"><Icon d={IC.clock} size={11}/>{r.duration}</span>
+                    <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
+                      <Icon d={IC.clock} size={11} />{r.duration}
+                    </span>
                     <span className="text-xs text-slate-400 dark:text-slate-500">{r.uploadDate}</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                {onBookmark && (
-                  <button onClick={() => onBookmark(r.id)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${bookmarks&&bookmarks[r.id]?'bg-amber-50 dark:bg-amber-950/40 text-amber-500':'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-amber-500'}`}>
-                    <Icon d={bookmarks&&bookmarks[r.id]?IC.bookmarkFilled:IC.bookmark} size={14}/>
-                  </button>
-                )}
-                <a href={r.url} target="_blank" rel="noreferrer"><Btn size="sm"><Icon d={IC.playCircle} size={13}/>Watch</Btn></a>
-                <a href={r.url} target="_blank" rel="noreferrer"><Btn size="sm" variant="secondary"><Icon d={IC.externalLink} size={13}/>Open Link</Btn></a>
+                <a href={r.url} target="_blank" rel="noreferrer">
+                  <Btn size="sm"><Icon d={IC.playCircle} size={13} />Watch</Btn>
+                </a>
+                <a href={r.url} target="_blank" rel="noreferrer">
+                  <Btn size="sm" variant="secondary"><Icon d={IC.externalLink} size={13} />Open Link</Btn>
+                </a>
               </div>
             </div>
           </Card>
@@ -2961,18 +3089,20 @@ function LHRecordingsTab({ recordings, bookmarks, onBookmark, onView }) {
 function LHGradesTab({ assignments, quizzes, project, submissions, course, cc }) {
   const submittedAssignments = assignments.filter(a => (submissions[a.id] === 'submitted' || a.status === 'submitted') && a.grade != null)
   const allGradedItems = [
-    ...submittedAssignments.map(a => ({ ...a, category:'assignment', pct:Math.round((a.grade/a.max)*100) })),
-    ...quizzes.map(q => ({ ...q, category:'quiz', pct:Math.round((q.grade/q.max)*100) })),
-    { ...project, category:'project', pct:Math.round((project.grade/project.max)*100) },
+    ...submittedAssignments.map(a => ({ ...a, category: 'assignment', pct: Math.round((a.grade / a.max) * 100) })),
+    ...quizzes.map(q => ({ ...q, category: 'quiz', pct: Math.round((q.grade / q.max) * 100) })),
+    { ...project, category: 'project', pct: Math.round((project.grade / project.max) * 100) },
   ]
-  const courseAvg = allGradedItems.length > 0 ? Math.round(allGradedItems.reduce((s,i) => s+i.pct, 0) / allGradedItems.length) : 0
+  const courseAvg = allGradedItems.length > 0 ? Math.round(allGradedItems.reduce((s, i) => s + i.pct, 0) / allGradedItems.length) : 0
   const studentAvg = courseAvg - 3 + Math.floor(Math.random() * 6)
-  const gradeColor = p => p>=85?'text-green-700 dark:text-green-400':p>=70?'text-blue-700 dark:text-blue-400':p>=50?'text-amber-700 dark:text-amber-400':'text-red-700 dark:text-red-400'
-  const gradeBg    = p => p>=85?'bg-green-50 dark:bg-green-950/40':p>=70?'bg-blue-50 dark:bg-blue-950/40':p>=50?'bg-amber-50 dark:bg-amber-950/40':'bg-red-50 dark:bg-red-950/40'
-  const gradeLetter = p => p>=90?'A+':p>=85?'A':p>=80?'A-':p>=75?'B+':p>=70?'B':p>=65?'B-':p>=60?'C+':p>=55?'C':'F'
-  const barColor   = p => p>=85?'bg-green-500':p>=70?'bg-blue-500':'bg-amber-500'
+
+  const gradeColor = (pct) => pct >= 85 ? 'text-green-700 dark:text-green-400' : pct >= 70 ? 'text-blue-700 dark:text-blue-400' : pct >= 50 ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'
+  const gradeBg    = (pct) => pct >= 85 ? 'bg-green-50 dark:bg-green-950/40' : pct >= 70 ? 'bg-blue-50 dark:bg-blue-950/40' : pct >= 50 ? 'bg-amber-50 dark:bg-amber-950/40' : 'bg-red-50 dark:bg-red-950/40'
+  const gradeLetter = (pct) => pct >= 90 ? 'A+' : pct >= 85 ? 'A' : pct >= 80 ? 'A-' : pct >= 75 ? 'B+' : pct >= 70 ? 'B' : pct >= 65 ? 'B-' : pct >= 60 ? 'C+' : pct >= 55 ? 'C' : 'F'
+
   return (
     <div className="space-y-5">
+      {/* Summary analytics */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className={`rounded-xl p-4 ${gradeBg(courseAvg)} transition-all hover:-translate-y-0.5 hover:shadow-sm`}>
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Course Average</p>
@@ -2991,783 +3121,77 @@ function LHGradesTab({ assignments, quizzes, project, submissions, course, cc })
         </div>
       </div>
 
+      {/* Assignment Grades */}
       {submittedAssignments.length > 0 && (
         <Card>
           <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Assignment Grades</h3>
           <div className="space-y-3">
-            {submittedAssignments.map(a => {
-              const pct = Math.round((a.grade/a.max)*100)
-              return (
-                <div key={a.id} className="flex items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
-                      <div className="flex items-center gap-2 shrink-0 ml-3">
-                        <span className={`text-sm font-bold ${gradeColor(pct)}`}>{a.grade}/{a.max}</span>
-                        <span className={`text-xs font-semibold ${gradeColor(pct)}`}>{pct}%</span>
-                      </div>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                      <div className={`h-1.5 rounded-full transition-all duration-700 ${barColor(pct)}`} style={{width:`${pct}%`}}/>
+            {submittedAssignments.map(a => (
+              <div key={a.id} className="flex items-center gap-3 group">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      <span className={`text-sm font-bold ${gradeColor(Math.round((a.grade / a.max) * 100))}`}>{a.grade}/{a.max}</span>
+                      <span className={`text-xs font-semibold ${gradeColor(Math.round((a.grade / a.max) * 100))}`}>{Math.round((a.grade / a.max) * 100)}%</span>
                     </div>
                   </div>
+                  <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                    <div className={`h-1.5 rounded-full transition-all duration-700 ${Math.round((a.grade / a.max) * 100) >= 85 ? 'bg-green-500' : Math.round((a.grade / a.max) * 100) >= 70 ? 'bg-blue-500' : 'bg-amber-500'}`} style={{ width: `${(a.grade / a.max) * 100}%` }} />
+                  </div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </Card>
       )}
 
+      {/* Quiz / Exam Grades */}
       <Card>
         <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Quiz & Exam Grades</h3>
         <div className="space-y-3">
-          {quizzes.map(q => {
-            const pct = Math.round((q.grade/q.max)*100)
-            return (
-              <div key={q.id} className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{q.title}</p>
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className={`text-sm font-bold ${gradeColor(pct)}`}>{q.grade}/{q.max}</span>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gradeBg(pct)} ${gradeColor(pct)}`}>{gradeLetter(pct)}</span>
-                    </div>
+          {quizzes.map(q => (
+            <div key={q.id} className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{q.title}</p>
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <span className={`text-sm font-bold ${gradeColor(Math.round((q.grade / q.max) * 100))}`}>{q.grade}/{q.max}</span>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${gradeBg(Math.round((q.grade / q.max) * 100))} ${gradeColor(Math.round((q.grade / q.max) * 100))}`}>{gradeLetter(Math.round((q.grade / q.max) * 100))}</span>
                   </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                    <div className={`h-1.5 rounded-full transition-all duration-700 ${barColor(pct)}`} style={{width:`${pct}%`}}/>
-                  </div>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{q.date}</p>
                 </div>
+                <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                  <div className={`h-1.5 rounded-full transition-all duration-700 ${Math.round((q.grade / q.max) * 100) >= 85 ? 'bg-green-500' : Math.round((q.grade / q.max) * 100) >= 70 ? 'bg-blue-500' : 'bg-amber-500'}`} style={{ width: `${(q.grade / q.max) * 100}%` }} />
+                </div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{q.date}</p>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
       </Card>
 
+      {/* Project Grade */}
       <Card>
         <h3 className="mb-3 font-semibold text-slate-800 dark:text-slate-200">Project Grade</h3>
-        <div className={`rounded-xl p-4 ${gradeBg(Math.round((project.grade/project.max)*100))}`}>
+        <div className={`rounded-xl p-4 ${gradeBg(project.pct || Math.round((project.grade / project.max) * 100))}`}>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-slate-800 dark:text-slate-200">{project.title}</p>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{project.date}</p>
             </div>
             <div className="text-right">
-              <p className={`text-3xl font-bold ${gradeColor(Math.round((project.grade/project.max)*100))}`}>{project.grade}/{project.max}</p>
-              <p className={`text-sm font-semibold ${gradeColor(Math.round((project.grade/project.max)*100))}`}>{gradeLetter(Math.round((project.grade/project.max)*100))} · {Math.round((project.grade/project.max)*100)}%</p>
+              <p className={`text-3xl font-bold ${gradeColor(Math.round((project.grade / project.max) * 100))}`}>{project.grade}/{project.max}</p>
+              <p className={`text-sm font-semibold ${gradeColor(Math.round((project.grade / project.max) * 100))}`}>{gradeLetter(Math.round((project.grade / project.max) * 100))} · {Math.round((project.grade / project.max) * 100)}%</p>
             </div>
           </div>
           <div className="mt-3 h-2 w-full rounded-full bg-white/50 dark:bg-slate-600/50 overflow-hidden">
-            <div className={`h-2 rounded-full transition-all duration-700 ${barColor(Math.round((project.grade/project.max)*100))}`} style={{width:`${(project.grade/project.max)*100}%`}}/>
+            <div className={`h-2 rounded-full transition-all duration-700 ${Math.round((project.grade / project.max) * 100) >= 85 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${(project.grade / project.max) * 100}%` }} />
           </div>
         </div>
       </Card>
     </div>
   )
 }
-
-// ── Phase 4: Side Panel Widgets ───────────────────────────────────────────────
-
-function LHRecentMaterials({ recentlyViewed, allCoursesData }) {
-  const typeIcon = { lecture:IC.bookOpen, tutorial:IC.book, resource:IC.paperclip, recording:IC.video, assignment:IC.task }
-  const typeBg   = {
-    lecture:   'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',
-    tutorial:  'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400',
-    resource:  'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400',
-    recording: 'bg-slate-800 dark:bg-slate-700 text-white',
-    assignment:'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400',
-  }
-  const recent = (recentlyViewed || []).slice(0, 6)
-  if (recent.length === 0) return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-sm flex flex-col items-center gap-3">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500"><Icon d={IC.history} size={22}/></div>
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400 text-center">No recently viewed items yet</p>
-      <p className="text-xs text-slate-400 dark:text-slate-500 text-center">View lectures, tutorials, or recordings to see them here</p>
-    </div>
-  )
-  const course = id => LH_COURSES.find(c => c.id === id)
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-200">
-        <Icon d={IC.history} size={15}/><h3 className="font-semibold">Recently Viewed</h3>
-      </div>
-      <ul className="space-y-2.5">
-        {recent.map((entry, i) => {
-          const c = course(entry.courseId)
-          const cm = LH_COLOR_MAP[c?.color || 'blue']
-          return (
-            <li key={entry.id + '_' + i} className="flex items-center gap-3 group">
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${typeBg[entry.type] || typeBg.lecture}`}>
-                <Icon d={typeIcon[entry.type] || IC.bookOpen} size={14}/>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{entry.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  {c && <span className={`text-[10px] font-semibold ${cm.text}`}>{c.code}</span>}
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{entry.viewedAt}</span>
-                </div>
-              </div>
-              <Badge color="slate">{entry.type}</Badge>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-  )
-}
-
-function LHBookmarksPanel({ bookmarks, allCoursesData }) {
-  const allItems = []
-  LH_COURSES.forEach(c => {
-    const d = allCoursesData[c.id]
-    if (!d) return
-    ;[...d.lectures, ...d.tutorials, ...d.resources, ...d.recordings].forEach(item => {
-      if (bookmarks[item.id]) allItems.push({ ...item, courseName:c.name, courseCode:c.code, courseColor:c.color })
-    })
-  })
-  const typeIcon = { lecture:IC.bookOpen, tutorial:IC.book, resource:IC.paperclip, recording:IC.video }
-  const typeBg   = {
-    lecture:   'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',
-    tutorial:  'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400',
-    resource:  'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400',
-    recording: 'bg-slate-800 dark:bg-slate-700 text-white',
-  }
-  if (allItems.length === 0) return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-sm flex flex-col items-center gap-3">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-500"><Icon d={IC.bookmark} size={24}/></div>
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No bookmarks yet</p>
-      <p className="text-xs text-slate-400 dark:text-slate-500 text-center">Bookmark lectures, tutorials, resources and recordings across any course</p>
-    </div>
-  )
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200"><Icon d={IC.bookmark} size={15}/><h3 className="font-semibold">Bookmarks</h3></div>
-        <span className="text-xs text-slate-400 dark:text-slate-500">{allItems.length} saved</span>
-      </div>
-      <div className="space-y-2.5">
-        {allItems.map(item => {
-          const cm = LH_COLOR_MAP[item.courseColor || 'blue']
-          return (
-            <div key={item.id} className="flex items-center gap-3 group">
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${typeBg[item.type] || typeBg.lecture}`}>
-                <Icon d={typeIcon[item.type] || IC.bookOpen} size={14}/>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`text-[10px] font-semibold ${cm.text}`}>{item.courseCode}</span>
-                  <Badge color="slate">{item.type}</Badge>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function LHAllDeadlines({ allCoursesData, submissions }) {
-  const now = new Date()
-  const items = []
-  LH_COURSES.forEach(c => {
-    const d = allCoursesData[c.id]
-    if (!d) return
-    d.assignments.forEach(a => {
-      const eff = submissions[a.id] === 'submitted' ? 'submitted' : a.status
-      if (eff === 'submitted') return
-      const diff = Math.ceil((new Date(a.dueDate) - now) / 86400000)
-      items.push({ ...a, courseCode:c.code, courseName:c.name, courseColor:c.color, diff })
-    })
-  })
-  items.sort((a, b) => a.diff - b.diff)
-  if (items.length === 0) return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-sm flex flex-col items-center gap-3">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-50 dark:bg-green-950/40 text-green-500"><Icon d={IC.check} size={24}/></div>
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">All assignments submitted!</p>
-    </div>
-  )
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-200"><Icon d={IC.alertCircle} size={15}/><h3 className="font-semibold">All Upcoming Deadlines</h3></div>
-      <div className="space-y-2.5">
-        {items.slice(0, 8).map(a => {
-          const cm = LH_COLOR_MAP[a.courseColor || 'blue']
-          const urg = a.diff < 0 ? 'red' : a.diff <= 3 ? 'red' : a.diff <= 7 ? 'yellow' : 'slate'
-          return (
-            <div key={a.id} className={`flex items-center gap-3 rounded-lg px-3 py-2 ${a.diff<=3?'bg-red-50 dark:bg-red-950/30':a.diff<=7?'bg-amber-50 dark:bg-amber-950/30':'bg-slate-50 dark:bg-slate-700/30'}`}>
-              <span className={`h-2 w-2 rounded-full shrink-0 ${urg==='red'?'bg-red-500':urg==='yellow'?'bg-amber-400':'bg-slate-300 dark:bg-slate-600'}`}/>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`text-[10px] font-semibold ${cm.text}`}>{a.courseCode}</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500">Due {a.dueDate}</span>
-                </div>
-              </div>
-              <Badge color={urg==='red'?'red':urg==='yellow'?'yellow':'slate'}>{a.diff<0?'Overdue':`${a.diff}d`}</Badge>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function LHCourseProgress({ allCoursesData }) {
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-200"><Icon d={IC.layers} size={15}/><h3 className="font-semibold">Course Progress</h3></div>
-      <div className="space-y-4">
-        {LH_COURSES.map(c => {
-          const cm = LH_COLOR_MAP[c.color || 'blue']
-          const d = allCoursesData[c.id]
-          const total = d ? (d.lectures.length + d.tutorials.length + d.assignments.length + d.resources.length + d.recordings.length) : c.totalMaterials
-          const done  = Math.round(total * (c.progress / 100))
-          return (
-            <div key={c.id}>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className={`h-2 w-2 rounded-full shrink-0 ${cm.dot}`}/>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{c.code}</span>
-                </div>
-                <div className="flex items-center gap-2 shrink-0 ml-2">
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{done}/{total}</span>
-                  <span className={`text-xs font-bold ${cm.text}`}>{c.progress}%</span>
-                </div>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                <div className={`h-1.5 rounded-full transition-all duration-700 ${cm.bar}`} style={{width:`${c.progress}%`}}/>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-// ── Phase 5: Global Search ────────────────────────────────────────────────────
-
-function LHGlobalSearch({ allCoursesData, onSelectCourse, onSelectTab }) {
-  const [q, setQ] = useState('')
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-
-  useEffect(() => {
-    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const typeIcon = { lecture:IC.bookOpen, tutorial:IC.book, resource:IC.paperclip, recording:IC.video, assignment:IC.task }
-  const typeTab  = { lecture:'lectures', tutorial:'tutorials', resource:'resources', recording:'recordings', assignment:'assignments' }
-
-  const results = q.trim().length < 2 ? [] : (() => {
-    const hits = []
-    LH_COURSES.forEach(c => {
-      const d = allCoursesData[c.id]
-      if (!d) return
-      const search = arr => arr.forEach(item => {
-        if (item.title.toLowerCase().includes(q.toLowerCase()))
-          hits.push({ ...item, courseCode:c.code, courseName:c.name, courseColor:c.color, courseId:c.id })
-      })
-      search(d.lectures); search(d.tutorials); search(d.resources); search(d.recordings); search(d.assignments)
-    })
-    return hits.slice(0, 8)
-  })()
-
-  return (
-    <div ref={ref} className="relative">
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"><Icon d={IC.search} size={14}/></span>
-        <input value={q} onChange={e => { setQ(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)}
-          placeholder="Search across all courses…"
-          className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 py-2.5 pl-9 pr-9 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
-        {q && (
-          <button onClick={() => { setQ(''); setOpen(false) }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
-            <Icon d={IC.x} size={14}/>
-          </button>
-        )}
-      </div>
-      {open && q.trim().length >= 2 && (
-        <div className="absolute top-full mt-2 w-full z-30 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl overflow-hidden">
-          {results.length === 0
-            ? <div className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">No results for "{q}"</div>
-            : <ul>
-              {results.map((item, i) => {
-                const cm = LH_COLOR_MAP[item.courseColor || 'blue']
-                const itemType = item.type || (item.subtype ? 'resource' : 'lecture')
-                return (
-                  <li key={item.id + '_s_' + i}>
-                    <button onClick={() => { onSelectCourse(item.courseId); onSelectTab(typeTab[itemType] || 'lectures'); setOpen(false); setQ('') }}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                        <Icon d={typeIcon[itemType] || IC.bookOpen} size={13}/>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{item.title}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-[10px] font-semibold ${cm.text}`}>{item.courseCode}</span>
-                          <span className="text-xs text-slate-400 dark:text-slate-500 capitalize">{itemType}</span>
-                        </div>
-                      </div>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-          }
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Main Learning Hub ─────────────────────────────────────────────────────────
-
-const LH_COLOR_MAP = {
-  blue:   { bg:'bg-blue-50 dark:bg-blue-950/40',     text:'text-blue-700 dark:text-blue-300',     bar:'bg-blue-600',   dot:'bg-blue-500',   border:'border-blue-200 dark:border-blue-800',     icon:'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300' },
-  purple: { bg:'bg-purple-50 dark:bg-purple-950/40', text:'text-purple-700 dark:text-purple-300', bar:'bg-purple-600', dot:'bg-purple-500', border:'border-purple-200 dark:border-purple-800', icon:'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300' },
-  green:  { bg:'bg-green-50 dark:bg-green-950/40',   text:'text-green-700 dark:text-green-300',   bar:'bg-green-600',  dot:'bg-green-500',  border:'border-green-200 dark:border-green-800',   icon:'bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300' },
-  amber:  { bg:'bg-amber-50 dark:bg-amber-950/40',   text:'text-amber-700 dark:text-amber-300',   bar:'bg-amber-500',  dot:'bg-amber-500',  border:'border-amber-200 dark:border-amber-800',   icon:'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300' },
-  rose:   { bg:'bg-rose-50 dark:bg-rose-950/40',     text:'text-rose-700 dark:text-rose-300',     bar:'bg-rose-600',   dot:'bg-rose-500',   border:'border-rose-200 dark:border-rose-800',     icon:'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300' },
-}
-
-// ── Phase 4: Side Panel Widgets ───────────────────────────────────────────────
-
-function LHRecentMaterials({ recentlyViewed, allCoursesData }) {
-  const typeIcon = { lecture:IC.bookOpen, tutorial:IC.book, resource:IC.paperclip, recording:IC.video, assignment:IC.task }
-  const typeBg   = {
-    lecture:   'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',
-    tutorial:  'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400',
-    resource:  'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400',
-    recording: 'bg-slate-800 dark:bg-slate-700 text-white',
-    assignment:'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400',
-  }
-  const recent = (recentlyViewed || []).slice(0, 6)
-  if (recent.length === 0) return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-sm flex flex-col items-center gap-3">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500"><Icon d={IC.history} size={22}/></div>
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400 text-center">No recently viewed items yet</p>
-      <p className="text-xs text-slate-400 dark:text-slate-500 text-center">View lectures, tutorials, or recordings to see them here</p>
-    </div>
-  )
-  const course = id => LH_COURSES.find(c => c.id === id)
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-200">
-        <Icon d={IC.history} size={15}/><h3 className="font-semibold">Recently Viewed</h3>
-      </div>
-      <ul className="space-y-2.5">
-        {recent.map((entry, i) => {
-          const c = course(entry.courseId)
-          const cm = LH_COLOR_MAP[c?.color || 'blue']
-          return (
-            <li key={entry.id + '_' + i} className="flex items-center gap-3 group">
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${typeBg[entry.type] || typeBg.lecture}`}>
-                <Icon d={typeIcon[entry.type] || IC.bookOpen} size={14}/>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{entry.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  {c && <span className={`text-[10px] font-semibold ${cm.text}`}>{c.code}</span>}
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{entry.viewedAt}</span>
-                </div>
-              </div>
-              <Badge color="slate">{entry.type}</Badge>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-  )
-}
-
-function LHBookmarksPanel({ bookmarks, allCoursesData }) {
-  const allItems = []
-  LH_COURSES.forEach(c => {
-    const d = allCoursesData[c.id]
-    if (!d) return
-    ;[...d.lectures, ...d.tutorials, ...d.resources, ...d.recordings].forEach(item => {
-      if (bookmarks[item.id]) allItems.push({ ...item, courseName:c.name, courseCode:c.code, courseColor:c.color })
-    })
-  })
-  const typeIcon = { lecture:IC.bookOpen, tutorial:IC.book, resource:IC.paperclip, recording:IC.video }
-  const typeBg   = {
-    lecture:   'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',
-    tutorial:  'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400',
-    resource:  'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400',
-    recording: 'bg-slate-800 dark:bg-slate-700 text-white',
-  }
-  if (allItems.length === 0) return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-sm flex flex-col items-center gap-3">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-500"><Icon d={IC.bookmark} size={24}/></div>
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">No bookmarks yet</p>
-      <p className="text-xs text-slate-400 dark:text-slate-500 text-center">Bookmark lectures, tutorials, resources and recordings across any course</p>
-    </div>
-  )
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200"><Icon d={IC.bookmark} size={15}/><h3 className="font-semibold">Bookmarks</h3></div>
-        <span className="text-xs text-slate-400 dark:text-slate-500">{allItems.length} saved</span>
-      </div>
-      <div className="space-y-2.5">
-        {allItems.map(item => {
-          const cm = LH_COLOR_MAP[item.courseColor || 'blue']
-          return (
-            <div key={item.id} className="flex items-center gap-3 group">
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${typeBg[item.type] || typeBg.lecture}`}>
-                <Icon d={typeIcon[item.type] || IC.bookOpen} size={14}/>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{item.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`text-[10px] font-semibold ${cm.text}`}>{item.courseCode}</span>
-                  <Badge color="slate">{item.type}</Badge>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function LHAllDeadlines({ allCoursesData, submissions }) {
-  const now = new Date()
-  const items = []
-  LH_COURSES.forEach(c => {
-    const d = allCoursesData[c.id]
-    if (!d) return
-    d.assignments.forEach(a => {
-      const eff = submissions[a.id] === 'submitted' ? 'submitted' : a.status
-      if (eff === 'submitted') return
-      const diff = Math.ceil((new Date(a.dueDate) - now) / 86400000)
-      items.push({ ...a, courseCode:c.code, courseName:c.name, courseColor:c.color, diff })
-    })
-  })
-  items.sort((a, b) => a.diff - b.diff)
-  if (items.length === 0) return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-sm flex flex-col items-center gap-3">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-50 dark:bg-green-950/40 text-green-500"><Icon d={IC.check} size={24}/></div>
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">All assignments submitted!</p>
-    </div>
-  )
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-200"><Icon d={IC.alertCircle} size={15}/><h3 className="font-semibold">All Upcoming Deadlines</h3></div>
-      <div className="space-y-2.5">
-        {items.slice(0, 8).map(a => {
-          const cm = LH_COLOR_MAP[a.courseColor || 'blue']
-          const urg = a.diff < 0 ? 'red' : a.diff <= 3 ? 'red' : a.diff <= 7 ? 'yellow' : 'slate'
-          return (
-            <div key={a.id} className={`flex items-center gap-3 rounded-lg px-3 py-2 ${a.diff<=3?'bg-red-50 dark:bg-red-950/30':a.diff<=7?'bg-amber-50 dark:bg-amber-950/30':'bg-slate-50 dark:bg-slate-700/30'}`}>
-              <span className={`h-2 w-2 rounded-full shrink-0 ${urg==='red'?'bg-red-500':urg==='yellow'?'bg-amber-400':'bg-slate-300 dark:bg-slate-600'}`}/>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{a.title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`text-[10px] font-semibold ${cm.text}`}>{a.courseCode}</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500">Due {a.dueDate}</span>
-                </div>
-              </div>
-              <Badge color={urg==='red'?'red':urg==='yellow'?'yellow':'slate'}>{a.diff<0?'Overdue':`${a.diff}d`}</Badge>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function LHCourseProgress({ allCoursesData }) {
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-200"><Icon d={IC.layers} size={15}/><h3 className="font-semibold">Course Progress</h3></div>
-      <div className="space-y-4">
-        {LH_COURSES.map(c => {
-          const cm = LH_COLOR_MAP[c.color || 'blue']
-          const d = allCoursesData[c.id]
-          const total = d ? (d.lectures.length + d.tutorials.length + d.assignments.length + d.resources.length + d.recordings.length) : c.totalMaterials
-          const done  = Math.round(total * (c.progress / 100))
-          return (
-            <div key={c.id}>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className={`h-2 w-2 rounded-full shrink-0 ${cm.dot}`}/>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{c.code}</span>
-                </div>
-                <div className="flex items-center gap-2 shrink-0 ml-2">
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{done}/{total}</span>
-                  <span className={`text-xs font-bold ${cm.text}`}>{c.progress}%</span>
-                </div>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                <div className={`h-1.5 rounded-full transition-all duration-700 ${cm.bar}`} style={{width:`${c.progress}%`}}/>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-// ── Phase 5: Global Search ────────────────────────────────────────────────────
-
-function LHGlobalSearch({ allCoursesData, onSelectCourse, onSelectTab }) {
-  const [q, setQ] = useState('')
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-
-  useEffect(() => {
-    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const typeIcon = { lecture:IC.bookOpen, tutorial:IC.book, resource:IC.paperclip, recording:IC.video, assignment:IC.task }
-  const typeTab  = { lecture:'lectures', tutorial:'tutorials', resource:'resources', recording:'recordings', assignment:'assignments' }
-
-  const results = q.trim().length < 2 ? [] : (() => {
-    const hits = []
-    LH_COURSES.forEach(c => {
-      const d = allCoursesData[c.id]
-      if (!d) return
-      const search = arr => arr.forEach(item => {
-        if (item.title.toLowerCase().includes(q.toLowerCase()))
-          hits.push({ ...item, courseCode:c.code, courseName:c.name, courseColor:c.color, courseId:c.id })
-      })
-      search(d.lectures); search(d.tutorials); search(d.resources); search(d.recordings); search(d.assignments)
-    })
-    return hits.slice(0, 8)
-  })()
-
-  return (
-    <div ref={ref} className="relative">
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"><Icon d={IC.search} size={14}/></span>
-        <input value={q} onChange={e => { setQ(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)}
-          placeholder="Search across all courses…"
-          className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 py-2.5 pl-9 pr-9 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
-        {q && (
-          <button onClick={() => { setQ(''); setOpen(false) }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
-            <Icon d={IC.x} size={14}/>
-          </button>
-        )}
-      </div>
-      {open && q.trim().length >= 2 && (
-        <div className="absolute top-full mt-2 w-full z-30 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl overflow-hidden">
-          {results.length === 0
-            ? <div className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">No results for "{q}"</div>
-            : <ul>
-              {results.map((item, i) => {
-                const cm = LH_COLOR_MAP[item.courseColor || 'blue']
-                const itemType = item.type || (item.subtype ? 'resource' : 'lecture')
-                return (
-                  <li key={item.id + '_s_' + i}>
-                    <button onClick={() => { onSelectCourse(item.courseId); onSelectTab(typeTab[itemType] || 'lectures'); setOpen(false); setQ('') }}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                        <Icon d={typeIcon[itemType] || IC.bookOpen} size={13}/>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{item.title}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-[10px] font-semibold ${cm.text}`}>{item.courseCode}</span>
-                          <span className="text-xs text-slate-400 dark:text-slate-500 capitalize">{itemType}</span>
-                        </div>
-                      </div>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-          }
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Main Learning Hub ─────────────────────────────────────────────────────────
-
-
-
-function LearningHubSection({ profile }) {
-  const [selectedCourseId, setSelectedCourseId] = useState(LH_COURSES[0].id)
-  const [activeTab, setActiveTab]  = useState('overview')
-  const [sidePanel, setSidePanel]  = useState('progress') // 'progress'|'bookmarks'|'deadlines'|'recent'
-  const [bookmarks, setBookmarks]  = useLS('lh_bookmarks_'+profile.email, {})
-  const [submissions, setSubmissions] = useLS('lh_submissions_'+profile.email, {})
-  const [recentlyViewed, setRecentlyViewed] = useLS('lh_recent_'+profile.email, [])
-
-  // Pre-build all course data once
-  const allCoursesData = {}
-  LH_COURSES.forEach(c=>{ allCoursesData[c.id]=buildCourseData(c.id) })
-
-  const course = LH_COURSES.find(c=>c.id===selectedCourseId)||LH_COURSES[0]
-  const data   = allCoursesData[selectedCourseId]
-  const cc     = LH_COLOR_MAP[course.color]||LH_COLOR_MAP.blue
-
-  const toggleBookmark = (itemId) => setBookmarks(prev=>({...prev,[itemId]:!prev[itemId]}))
-  const submitAssignment = (aId)  => setSubmissions(prev=>({...prev,[aId]:'submitted'}))
-
-  const trackView = (item) => {
-    const now = new Date()
-    const timeStr = `${now.toLocaleDateString(undefined,{month:'short',day:'numeric'})} ${now.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}`
-    setRecentlyViewed(prev=>{
-      const filtered = (prev||[]).filter(e=>e.id!==item.id)
-      return [{...item,viewedAt:timeStr,courseId:item.courseId||selectedCourseId},...filtered].slice(0,20)
-    })
-  }
-
-  const TABS = [
-    { id:'overview',    label:'Overview',    icon:IC.home },
-    { id:'lectures',    label:'Lectures',    icon:IC.bookOpen },
-    { id:'tutorials',   label:'Tutorials',   icon:IC.book },
-    { id:'assignments', label:'Assignments', icon:IC.task },
-    { id:'resources',   label:'Resources',   icon:IC.paperclip },
-    { id:'recordings',  label:'Recordings',  icon:IC.video },
-    { id:'grades',      label:'Grades',      icon:IC.trophy },
-  ]
-
-  const SIDE_TABS = [
-    { id:'progress',  label:'Progress',   icon:IC.layers },
-    { id:'deadlines', label:'Deadlines',  icon:IC.alertCircle },
-    { id:'bookmarks', label:'Saved',      icon:IC.bookmark },
-    { id:'recent',    label:'Recent',     icon:IC.history },
-  ]
-
-  const bmCount = Object.values(bookmarks).filter(Boolean).length
-  const pendingCount = LH_COURSES.reduce((sum,c)=>{
-    const d = allCoursesData[c.id]
-    if(!d) return sum
-    return sum + d.assignments.filter(a=>{
-      const eff = submissions[a.id]==='submitted'?'submitted':a.status
-      return eff!=='submitted'
-    }).length
-  },0)
-
-  return (
-    <div className="space-y-5">
-      {/* Page header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><Icon d={IC.bookOpen} size={20}/>Learning Hub</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">All your courses, materials, and grades in one place</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {pendingCount>0&&<Badge color="red">{pendingCount} pending</Badge>}
-          {bmCount>0&&<Badge color="yellow">{bmCount} saved</Badge>}
-        </div>
-      </div>
-
-      {/* Global search */}
-      <LHGlobalSearch allCoursesData={allCoursesData} onSelectCourse={setSelectedCourseId} onSelectTab={setActiveTab}/>
-
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-
-        {/* ── Left: Course Selector ── */}
-        <aside className="w-full xl:w-52 shrink-0">
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
-            <div className="border-b border-slate-100 dark:border-slate-700 px-4 py-3 bg-slate-50 dark:bg-slate-700/30">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">My Courses</p>
-            </div>
-            <nav className="p-2 space-y-0.5">
-              {LH_COURSES.map(c=>{
-                const cm = LH_COLOR_MAP[c.color]||LH_COLOR_MAP.blue
-                const isActive = c.id===selectedCourseId
-                return (
-                  <button key={c.id} onClick={()=>{setSelectedCourseId(c.id);setActiveTab('overview')}}
-                    className={`group w-full flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all duration-150 ${isActive?'bg-blue-700 text-white shadow-sm':'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:translate-x-0.5'}`}>
-                    <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${isActive?'bg-white':cm.dot}`}/>
-                    <div className="min-w-0">
-                      <p className={`text-xs font-semibold leading-tight ${isActive?'text-white':'text-slate-800 dark:text-slate-200'}`}>{c.code}</p>
-                      <p className={`text-[11px] leading-snug mt-0.5 truncate ${isActive?'text-blue-200':'text-slate-400 dark:text-slate-500'}`}>{c.name}</p>
-                      <div className={`mt-1.5 h-1 w-full rounded-full overflow-hidden ${isActive?'bg-blue-500':'bg-slate-100 dark:bg-slate-600'}`}>
-                        <div className={`h-1 rounded-full transition-all duration-500 ${isActive?'bg-white':cm.bar}`} style={{width:`${c.progress}%`}}/>
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
-        </aside>
-
-        {/* ── Center: Course Workspace ── */}
-        <div className="flex-1 min-w-0 space-y-4">
-
-          {/* Course header */}
-          <div className={`rounded-xl border ${cc.border} ${cc.bg} p-5`}>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="space-y-1.5 min-w-0">
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${cc.icon}`}>{course.code}</span>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{course.name}</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{course.instructor}</p>
-                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl">{course.description}</p>
-              </div>
-              <div className="shrink-0 flex flex-col items-end gap-2 min-w-[110px]">
-                <p className={`text-3xl font-bold ${cc.text}`}>{course.progress}%</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500">complete</p>
-                <div className="w-24 h-2 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
-                  <div className={`h-2 rounded-full transition-all duration-700 ${cc.bar}`} style={{width:`${course.progress}%`}}/>
-                </div>
-                <p className="text-xs text-slate-400 dark:text-slate-500">{course.totalMaterials} materials</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tab bar */}
-          <div className="flex gap-1 overflow-x-auto rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
-            {TABS.map(t=>(
-              <button key={t.id} onClick={()=>setActiveTab(t.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${activeTab===t.id?'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-400 shadow-sm':'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
-                <Icon d={t.icon} size={13}/><span className="hidden sm:inline">{t.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Tab content */}
-          {activeTab==='overview'    && <LHOverviewTab course={course} data={data} cc={cc} profile={profile} allCoursesData={allCoursesData} onBookmark={toggleBookmark} bookmarks={bookmarks}/>}
-          {activeTab==='lectures'    && <LHMaterialsTab items={data.lectures}  kind="Lecture"  bookmarks={bookmarks} onBookmark={toggleBookmark} onView={trackView}/>}
-          {activeTab==='tutorials'   && <LHMaterialsTab items={data.tutorials} kind="Tutorial" bookmarks={bookmarks} onBookmark={toggleBookmark} onView={trackView}/>}
-          {activeTab==='assignments' && <LHAssignmentsTab assignments={data.assignments} submissions={submissions} onSubmit={submitAssignment}/>}
-          {activeTab==='resources'   && <LHResourcesTab resources={data.resources} bookmarks={bookmarks} onBookmark={toggleBookmark} onView={trackView}/>}
-          {activeTab==='recordings'  && <LHRecordingsTab recordings={data.recordings} bookmarks={bookmarks} onBookmark={toggleBookmark} onView={trackView}/>}
-          {activeTab==='grades'      && <LHGradesTab assignments={data.assignments} quizzes={data.quizGrades} project={data.projectGrade} submissions={submissions}/>}
-        </div>
-
-        {/* ── Right: Side Widgets ── */}
-        <aside className="w-full xl:w-64 shrink-0 space-y-3">
-          {/* Side panel tabs */}
-          <div className="flex gap-1 rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
-            {SIDE_TABS.map(t=>(
-              <button key={t.id} onClick={()=>setSidePanel(t.id)} title={t.label}
-                className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all duration-150 ${sidePanel===t.id?'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-400 shadow-sm':'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}>
-                <Icon d={t.icon} size={12}/><span className="hidden sm:xl:hidden 2xl:inline">{t.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {sidePanel==='progress'  && <LHCourseProgress allCoursesData={allCoursesData}/>}
-          {sidePanel==='deadlines' && <LHAllDeadlines allCoursesData={allCoursesData} submissions={submissions}/>}
-          {sidePanel==='bookmarks' && <LHBookmarksPanel bookmarks={bookmarks} allCoursesData={allCoursesData}/>}
-          {sidePanel==='recent'    && <LHRecentMaterials recentlyViewed={recentlyViewed} allCoursesData={allCoursesData}/>}
-        </aside>
-      </div>
-    </div>
-  )
-}
-
-
-
-
 
 function ScheduleSection({ profile }) {
   const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday']
@@ -3949,7 +3373,7 @@ const navItems=[
     {id:'overview',label:'Overview',icon:IC.home},
     {id:'notifications',label:'Notifications',icon:IC.bell,badge:unread},
     {id:'projects',label:'My Projects',icon:IC.folder},
-    {id:'learning',label:'Learning Hub',icon:IC.bookOpen},
+    {id:'learning',label:'Learning Hub',icon:IC.graduationCap},
     {id:'schedule',label:'Schedule',icon:IC.calendar},
     {id:'invitations',label:'Invitations',icon:IC.users,badge:invites},
     {id:'instructors',label:'Find Instructors',icon:IC.book},
@@ -4377,5 +3801,4 @@ const navItems=[
       </div>
     </div>
   )
-}
 }
